@@ -21,6 +21,8 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "TODocumentPickerViewController.h"
+
 
 @interface TODocumentPickerTableViewController : UITableViewController
 
@@ -28,5 +30,16 @@
 
 @property (nonatomic, copy)   NSString *filePath; /* The file path this view controller corresponds to */
 @property (nonatomic, strong) NSArray  *items;    /* All of the items displayed by this view controller */
+
+@end
+
+@interface TODocumentPickerViewController (TODocumentPickerTableViewController)
+
+/**
+ Manually update a particular view controller with new item data. Data sources can use this to insert asynchronous data.
+ */
+- (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
+
+- (void)pushNewViewControllerForFilePath:(NSString *)filePath animated:(BOOL)animated;
 
 @end

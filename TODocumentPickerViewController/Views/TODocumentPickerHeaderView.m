@@ -26,6 +26,7 @@
 
 @property (nonatomic, strong, readwrite) UISearchBar *searchBar;
 @property (nonatomic, strong, readwrite) TODocumentPickerSegmentedControl *sortControl;
+@property (nonatomic, strong, readwrite) UIView *navigationBarBackground;
 @property (nonatomic, strong, readwrite) UINavigationBar *navigationBar;
 
 - (void)setupViews;
@@ -60,7 +61,14 @@
     
     self.navigationBar = [[UINavigationBar alloc] init];
     self.navigationBar.translatesAutoresizingMaskIntoConstraints = NO;
-    self.navigationBar.hidden = YES;
+    self.navigationBar.backgroundColor = [UIColor clearColor];
+    
+    for (UIView *view in self.navigationBar.subviews) {
+        if ([NSStringFromClass([view class]) rangeOfString:@"BarBackground"].length != 0) {
+            self.navigationBarBackground = view;
+            break;
+        }
+    }
     
     [self addSubview:self.navigationBar];
     [self addSubview:self.sortControl];
@@ -94,22 +102,22 @@
 
 #pragma mark - Navigation Bar Animation -
 - (void)setNavigationBarHidden:(BOOL)hidden animated:(BOOL)animated
-{
-    if (self.navigationBar.hidden == hidden)
+{ 
+    if (self.navigationBarBackground.hidden == hidden)
         return;
     
     if (!animated) {
-        self.navigationBar.hidden = hidden;
+        self.navigationBarBackground.hidden = hidden;
         return;
     }
     
-    self.navigationBar.hidden = NO;
-    self.navigationBar.alpha = hidden ? 1.0f : 0.0f;
+    self.navigationBarBackground.hidden = NO;
+    self.navigationBarBackground.alpha = hidden ? 1.0f : 0.0f;
     
     [UIView animateWithDuration:0.3f animations:^{
-        self.navigationBar.alpha = hidden ? 0.0f : 1.0f;
+        self.navigationBarBackground.alpha = hidden ? 0.0f : 1.0f;
     }completion:^(BOOL complete) {
-        self.navigationBar.hidden = hidden;
+        self.navigationBarBackground.hidden = hidden;
     }];
 }
 

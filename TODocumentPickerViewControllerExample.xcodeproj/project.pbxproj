@@ -21,16 +21,6 @@
 		22A3E1A31A56880C00C4839E /* TODocumentPickerSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1A21A56880C00C4839E /* TODocumentPickerSegmentedControl.m */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		22707A951A53BDDF008E66CC /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 22707A731A53BDDF008E66CC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 22707A7A1A53BDDF008E66CC;
-			remoteInfo = TODocumentPickerViewControllerExample;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
 		22707A7B1A53BDDF008E66CC /* TODocumentPickerViewControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TODocumentPickerViewControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22707A7F1A53BDDF008E66CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -42,7 +32,6 @@
 		22707A891A53BDDF008E66CC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		22707A8B1A53BDDF008E66CC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		22707A8E1A53BDDF008E66CC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		22707A941A53BDDF008E66CC /* TODocumentPickerViewControllerExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TODocumentPickerViewControllerExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22707AAE1A550B65008E66CC /* TODocumentsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentsDataSource.h; sourceTree = "<group>"; };
 		22707AAF1A550B65008E66CC /* TODocumentsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentsDataSource.m; sourceTree = "<group>"; };
 		22A3E1931A56857700C4839E /* TODocumentPickerTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerTableViewController.h; sourceTree = "<group>"; };
@@ -65,13 +54,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22707A911A53BDDF008E66CC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -88,7 +70,6 @@
 			isa = PBXGroup;
 			children = (
 				22707A7B1A53BDDF008E66CC /* TODocumentPickerViewControllerExample.app */,
-				22707A941A53BDDF008E66CC /* TODocumentPickerViewControllerExampleTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -183,24 +164,6 @@
 			productReference = 22707A7B1A53BDDF008E66CC /* TODocumentPickerViewControllerExample.app */;
 			productType = "com.apple.product-type.application";
 		};
-		22707A931A53BDDF008E66CC /* TODocumentPickerViewControllerExampleTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 22707AA11A53BDDF008E66CC /* Build configuration list for PBXNativeTarget "TODocumentPickerViewControllerExampleTests" */;
-			buildPhases = (
-				22707A901A53BDDF008E66CC /* Sources */,
-				22707A911A53BDDF008E66CC /* Frameworks */,
-				22707A921A53BDDF008E66CC /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				22707A961A53BDDF008E66CC /* PBXTargetDependency */,
-			);
-			name = TODocumentPickerViewControllerExampleTests;
-			productName = TODocumentPickerViewControllerExampleTests;
-			productReference = 22707A941A53BDDF008E66CC /* TODocumentPickerViewControllerExampleTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -212,10 +175,6 @@
 				TargetAttributes = {
 					22707A7A1A53BDDF008E66CC = {
 						CreatedOnToolsVersion = 6.1.1;
-					};
-					22707A931A53BDDF008E66CC = {
-						CreatedOnToolsVersion = 6.1.1;
-						TestTargetID = 22707A7A1A53BDDF008E66CC;
 					};
 				};
 			};
@@ -233,7 +192,6 @@
 			projectRoot = "";
 			targets = (
 				22707A7A1A53BDDF008E66CC /* TODocumentPickerViewControllerExample */,
-				22707A931A53BDDF008E66CC /* TODocumentPickerViewControllerExampleTests */,
 			);
 		};
 /* End PBXProject section */
@@ -246,13 +204,6 @@
 				22707A8A1A53BDDF008E66CC /* Main.storyboard in Resources */,
 				22707A8F1A53BDDF008E66CC /* LaunchScreen.xib in Resources */,
 				22707A8C1A53BDDF008E66CC /* Images.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		22707A921A53BDDF008E66CC /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,22 +226,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22707A901A53BDDF008E66CC /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		22707A961A53BDDF008E66CC /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 22707A7A1A53BDDF008E66CC /* TODocumentPickerViewControllerExample */;
-			targetProxy = 22707A951A53BDDF008E66CC /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		22707A881A53BDDF008E66CC /* Main.storyboard */ = {
@@ -412,40 +348,6 @@
 			};
 			name = Release;
 		};
-		22707AA21A53BDDF008E66CC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = TODocumentPickerViewControllerExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TODocumentPickerViewControllerExample.app/TODocumentPickerViewControllerExample";
-			};
-			name = Debug;
-		};
-		22707AA31A53BDDF008E66CC /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = TODocumentPickerViewControllerExampleTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TODocumentPickerViewControllerExample.app/TODocumentPickerViewControllerExample";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -463,15 +365,6 @@
 			buildConfigurations = (
 				22707A9F1A53BDDF008E66CC /* Debug */,
 				22707AA01A53BDDF008E66CC /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		22707AA11A53BDDF008E66CC /* Build configuration list for PBXNativeTarget "TODocumentPickerViewControllerExampleTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				22707AA21A53BDDF008E66CC /* Debug */,
-				22707AA31A53BDDF008E66CC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

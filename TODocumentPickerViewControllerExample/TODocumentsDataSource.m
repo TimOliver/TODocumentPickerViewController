@@ -10,11 +10,39 @@
 
 @interface TODocumentsDataSource ()
 
+- (void)createTestData;
 - (NSString *)documentsPath;
 
 @end
 
 @implementation TODocumentsDataSource
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        [self createTestData];
+    }
+    
+    return self;
+}
+
+- (void)createTestData
+{
+    NSFileManager *defaultManager = [NSFileManager defaultManager];
+    NSString *documentsFilePath = [self documentsPath];
+    
+    NSString *folder1 = [documentsFilePath stringByAppendingPathComponent:@"Folder 1"];
+    [defaultManager createDirectoryAtPath:folder1 withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    NSString *subFolder1 = [folder1 stringByAppendingPathComponent:@"Sub Folder 1"];
+    [defaultManager createDirectoryAtPath:subFolder1 withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    NSString *folder2 = [documentsFilePath stringByAppendingPathComponent:@"Folder 2"];
+    [defaultManager createDirectoryAtPath:folder2 withIntermediateDirectories:YES attributes:nil error:nil];
+    
+    NSString *textFile = [documentsFilePath stringByAppendingPathComponent:@"Hello World.txt"];
+    [@"Hello world!" writeToFile:textFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+}
 
 #pragma mark - Class Override -
 - (void)requestItemsForFilePath:(NSString *)filePath
@@ -40,6 +68,14 @@
 - (void)cancelRequestForFilePath:(NSString *)filePath
 {
     
+}
+
+- (NSString *)titleForFilePath:(NSString *)filePath
+{
+    if ([filePath isEqualToString:@"/"])
+        return @"Documents";
+    
+    return [filePath lastPathComponent];
 }
 
 #pragma mark - Static Data -

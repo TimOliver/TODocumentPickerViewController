@@ -21,13 +21,13 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TODocumentPickerViewController.h"
+#import "TODocumentPickerTableViewController.h"
 
 @interface TODocumentPickerViewController ()
 
 @property (nonatomic, strong) UIBarButtonItem *doneButton;
 
 - (void)setup;
-- (void)pushNewViewControllerForFilePath:(NSString *)filePath animated:(BOOL)animated;
 - (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
 - (TODocumentPickerTableViewController *)tableViewControllerForFilePath:(NSString *)filePath;
 
@@ -85,6 +85,8 @@
 
 - (void)viewDidLoad
 {
+    self.toolbarHidden = NO;
+ 
     //If no view controllers have been added yet, start setting them up now
     if (self.viewControllers.count == 0)
         [self pushNewViewControllerForFilePath:@"/" animated:NO];

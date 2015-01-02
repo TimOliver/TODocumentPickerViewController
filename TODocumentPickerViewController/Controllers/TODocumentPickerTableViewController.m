@@ -28,8 +28,12 @@
 
 @property (nonatomic, strong) TODocumentPickerHeaderView *headerView;
 @property (nonatomic, strong) UISearchBar *searchBar;
+@property (nonatomic, strong) UILabel *toolBarLabel;
 
 - (void)refreshControlTriggered;
+- (void)selectButtonTapped;
+
+- (void)updateFooterLabel;
 
 @end
 
@@ -52,6 +56,16 @@
     self.headerView.frame = tableHeaderView.bounds;
     [tableHeaderView addSubview:self.headerView];
     
+    self.toolBarLabel = [[UILabel alloc] initWithFrame:(CGRect){0,0,215,44}];
+    self.toolBarLabel.font = [UIFont systemFontOfSize:12.0f];
+    self.toolBarLabel.textColor = self.navigationController.navigationBar.titleTextAttributes[NSForegroundColorAttributeName];
+    self.toolBarLabel.textAlignment = NSTextAlignmentCenter;
+    self.toolBarLabel.text = NSLocalizedString(@"No files or folders found", nil);
+    
+    UIBarButtonItem *selectItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Select", nil) style:UIBarButtonItemStylePlain target:self action:@selector(selectButtonTapped)];
+    UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *labelItem = [[UIBarButtonItem alloc] initWithCustomView:self.toolBarLabel];
+    self.toolbarItems = @[selectItem, spaceItem, labelItem, spaceItem];
 }
 
 #pragma mark - Event Handling -
@@ -61,6 +75,11 @@
         self.refreshControlHandler();
     else
         [self.refreshControl endRefreshing];
+}
+
+- (void)selectButtonTapped
+{
+    
 }
 
 #pragma mark - Table View Data Source -
@@ -84,6 +103,7 @@
     TODocumentPickerItem *item = self.items[indexPath.row];
     cell.textLabel.text = item.fileName;
     cell.detailTextLabel.text = [NSString stringWithFormat:@"%ld", (long)item.fileSize];
+    cell.accessoryType = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     
     return cell;
 }
@@ -92,6 +112,13 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    TODocumentPickerItem *item = self.items[indexPath.row];
+    if (item.isFolder) {
+        NSString *newFilePath = [self.filePath stringByAppendingPathComponent:item.fileName];
+        [(TODocumentPickerViewController *)self.navigationController pushNewViewControllerForFilePath:newFilePath animated:YES];
+    }
+
 }
 
 #pragma mark - Accessors -
@@ -102,6 +129,37 @@
     
     _items = items;
     [self.tableView reloadData];
+    
+    [self updateFooterLabel];
+}
+
+#pragma mark - Footer Label -
+- (void)updateFooterLabel
+{
+    NSInteger numberOfFolders = 0, numberOfFiles = 0;
+    
+    for (TODocumentPickerItem *item in self.items) {
+        if (item.isFolder)
+            numberOfFolders++;
+        else
+            numberOfFiles++;
+    }
+    
+    //'folder' or 'folders' depending on number
+    NSString *pluralFolders = (numberOfFolders == 1) ? NSLocalizedString(@"folder", nil) : NSLocalizedString(@"folders", nil);
+    NSString *pluralFiles = (numberOfFiles == 1) ? NSLocalizedString(@"file", nil) : NSLocalizedString(@"files", nil);
+    
+    NSString *labelText = nil;
+    if (numberOfFolders && numberOfFiles)
+        labelText = [NSString stringWithFormat:@"%ld %@, %ld %@", (long)numberOfFolders, pluralFolders, (long)numberOfFiles, pluralFiles];
+    else if (numberOfFolders)
+        labelText = [NSString stringWithFormat:@"%ld %@", (long)numberOfFolders, pluralFolders];
+    else if (numberOfFiles)
+        labelText = [NSString stringWithFormat:@"%ld %@", (long)numberOfFiles, pluralFiles];
+    else
+        labelText = NSLocalizedString(@"No files or folders found", nil);
+    
+    self.toolBarLabel.text = labelText;
 }
 
 #pragma mark - Scroll View Handling - 

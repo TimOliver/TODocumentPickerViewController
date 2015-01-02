@@ -21,8 +21,6 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
-
-#import "TODocumentPickerTableViewController.h"
 #import "TODocumentPickerItem.h"
 
 @class TODocumentPickerViewControllerDataSource;
@@ -33,11 +31,6 @@
 @property (nonatomic, weak)   id<TODocumentPickerViewControllerDelegate> documentPickerDelegate;  /* Sends feedback events to another object */
 @property (nonatomic, strong) TODocumentPickerViewControllerDataSource *dataSource;               /* Readonly access to the data source for additonal changes. */
 @property (nonatomic, strong) NSArray *allowedFileExtensions;                                     /* File extensions that may be chosen */
-
-/**
- Manually update a particular view controller with new item data. Data sources can use this insert asynchronous data.
- */
-- (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
 
 @end
 
