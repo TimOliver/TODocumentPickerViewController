@@ -22,8 +22,69 @@
 
 #import "TODocumentPickerItem.h"
 
+@interface TODocumentPickerItem ()
+
+@property (nonatomic, readonly) NSByteCountFormatter *sharedFileSizeFormatter;
+@property (nonatomic, readonly) NSDateFormatter *sharedDateFormatter;
+@property (nonatomic, copy, readwrite) NSString *localizedMetadata;
+
+/* Rebuild the localized description string */
+- (void)formatMetadata;
+
+@end
+
 @implementation TODocumentPickerItem
 
+#pragma mark Accessors -
+- (NSString *)localizedMetadata
+{
+    if (self.isFolder)
+        return nil;
+    
+    if (_localizedMetadata == nil)
+        [self formatMetadata];
+    
+    return _localizedMetadata;
+}
+
+#pragma mark - Info formatter -
+- (void)formatMetadata
+{
+    NSString *formattedSize = [self.sharedFileSizeFormatter stringFromByteCount:(long long)self.fileSize];
+    NSString *formattedDate = [self.sharedDateFormatter stringFromDate:self.lastModifiedDate];
+    
+    if (self.lastModifiedDate)
+        _localizedMetadata = [NSString stringWithFormat:@"%@ • %@", formattedSize, formattedDate];
+    else
+        _localizedMetadata = formattedSize;
+}
+
+- (NSByteCountFormatter *)sharedFileSizeFormatter
+{
+    static NSByteCountFormatter *_sharedFileSizeFormatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _sharedFileSizeFormatter = [[NSByteCountFormatter alloc] init];
+        _sharedFileSizeFormatter.allowsNonnumericFormatting = NO;
+    });
+
+    return _sharedFileSizeFormatter;
+}
+
+- (NSDateFormatter *)sharedDateFormatter
+{
+    static NSDateFormatter *_sharedDateFormatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _sharedDateFormatter = [[NSDateFormatter alloc] init];
+        _sharedDateFormatter.dateStyle = NSDateFormatterMediumStyle;
+        _sharedDateFormatter.timeStyle = NSDateFormatterShortStyle;
+    });
+    
+    return _sharedDateFormatter;
+}
+
+#pragma mark - System Description -
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"Name: %@ Size: %ld Folder: %d", self.fileName, (long)self.fileSize, self.isFolder];

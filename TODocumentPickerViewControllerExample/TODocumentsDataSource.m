@@ -58,6 +58,7 @@
         TODocumentPickerItem *item = [TODocumentPickerItem new];
         item.fileName = file;
         item.fileSize = attributes.fileSize;
+        item.lastModifiedDate = attributes.fileModificationDate;
         item.isFolder = (attributes.fileType == NSFileTypeDirectory);
         [items addObject:item];
     }

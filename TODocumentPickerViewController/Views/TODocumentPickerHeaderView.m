@@ -82,11 +82,11 @@
                             @"navigationBar":self.navigationBar};
     
     //Search bar constraints
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[searchBar]|" options:0 metrics:nil views:views]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[searchBar]-12-|" options:0 metrics:nil views:views]];
     
     //segmented control
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[searchBar]-7-[sortControl]-8-|" options:0 metrics:nil views:views]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-8-[sortControl]-8-|" options:0 metrics:nil views:views]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-8-[sortControl]-20-|" options:0 metrics:nil views:views]];
     
     //navigation bar
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-44-[navigationBar]|" options:0 metrics:nil views:views]];
@@ -141,6 +141,12 @@
     } completion:nil];
     
     [searchBar setShowsCancelButton:NO animated:YES];
+}
+
+- (void)dismissKeyboard
+{
+    if ([self.searchBar isFirstResponder])
+        [self.searchBar resignFirstResponder];
 }
 
 @end

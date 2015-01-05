@@ -25,8 +25,6 @@
 
 @interface TODocumentPickerViewController ()
 
-@property (nonatomic, strong) UIBarButtonItem *doneButton;
-
 - (void)setup;
 - (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
 - (TODocumentPickerTableViewController *)tableViewControllerForFilePath:(NSString *)filePath;
@@ -80,7 +78,7 @@
 - (void)setup
 {
     self.modalPresentationStyle = UIModalPresentationFormSheet;
-    self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil) style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonTapped:)];
+    
 }
 
 - (void)viewDidLoad
@@ -126,19 +124,6 @@
     }
     
     return nil;
-}
-
-#pragma mark - Navigation Controller Overrides -
-- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
-{
-    viewController.navigationItem.rightBarButtonItem = self.doneButton;
-    [super pushViewController:viewController animated:animated];
-}
-
-#pragma mark - Button Callbacks - 
-- (void)doneButtonTapped:(id)sender
-{
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Accessors -

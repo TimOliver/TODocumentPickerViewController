@@ -29,4 +29,6 @@
 @property (nonatomic, strong) NSDate    *lastModifiedDate;
 @property (nonatomic, assign) BOOL      isFolder;
 
+@property (nonatomic, copy, readonly) NSString *localizedMetadata;
+
 @end

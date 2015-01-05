@@ -28,9 +28,24 @@
 
 @interface TODocumentPickerViewController : UINavigationController
 
-@property (nonatomic, weak)   id<TODocumentPickerViewControllerDelegate> documentPickerDelegate;  /* Sends feedback events to another object */
-@property (nonatomic, strong) TODocumentPickerViewControllerDataSource *dataSource;               /* Readonly access to the data source for additonal changes. */
-@property (nonatomic, strong) NSArray *allowedFileExtensions;                                     /* File extensions that may be chosen */
+/** 
+ Sends delegate callback events to the specified object 
+ */
+@property (nonatomic, weak)   id<TODocumentPickerViewControllerDelegate> documentPickerDelegate;
+
+/**
+ Readonly access to the data source for additonal changes. 
+ */
+@property (nonatomic, strong) TODocumentPickerViewControllerDataSource *dataSource;
+
+/**
+ File extensions that may be selected in the document picker. (If nil, all may be selected)
+ */
+@property (nonatomic, strong) NSArray *allowedFileExtensions;
+
+@property (nonatomic, strong) NSDictionary *fileFormatIcons;
+
+@property (nonatomic, strong) NSDictionary *themeAttributes;
 
 @end
 
@@ -44,7 +59,7 @@
 /* When an asynchronous load is complete, call this block to update the document picker with the new items. */
 @property (nonatomic, copy, readonly) void (^updateItemsForFilePath)(NSArray *items, NSString *filePath);
 
-- (void)requestItemsForFilePath:(NSString *)filePath;  /* (REQUIRED) Begin a potentially asynchronous request for a list of items. */
+- (void)requestItemsForFilePath:(NSString *)filePath;  /* (REQUIRED) Begin a request for a list of items. (May be asynchronous or not) */
 - (void)cancelRequestForFilePath:(NSString *)filePath; /* (REQUIRED) Cancel an asynchronous request in-progress */
 
 - (NSString *)titleForFilePath:(NSString *)filePath;   /* (OPTIONAL) If necessary, provide a custom title for each file path item. */
@@ -62,3 +77,17 @@
 - (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker didSelectItems:(NSArray *)items;
 
 @end
+
+//-------------------------------------------------------------------------
+// Theming Attributes
+
+extern NSString *const TODocumentPickerViewControllerThemeAttributeBackgroundColor;                     /* Background color of the table view */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableSeparatorColor;                 /* Color of the table cell divider lines */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableCellTitleColor;                 /* Color of the title text label in each cell */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor;            /* Color of the subtitle text label in each cell */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor;         /* Color of the arrow accessory icon */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableCellIconTintColor;              /* Tint color of the icons in each cell */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor;   /* Background color of each section header */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor;              /* Color of the text in each section header */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor;              /* Tint color of the scrollable section index column */
+

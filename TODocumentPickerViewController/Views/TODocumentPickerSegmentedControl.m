@@ -21,46 +21,111 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #import "TODocumentPickerSegmentedControl.h"
 
-#define DOWN_ARROW  @"▾"
-#define UP_ARROW    @"▴"
+#define DOWN_ARROW  @"▼"
+#define UP_ARROW    @"▲"
 
 @interface TODocumentPickerSegmentedControl ()
 
-+ (NSArray *)items;
+@property (nonatomic, strong) NSArray *items;
+
 - (void)segmentedControlTapped:(id)sender;
+- (void)updateItemsForCurrentSortType;
 
 @end
 
 @implementation TODocumentPickerSegmentedControl
 
-+ (NSArray *)items
-{
-    return @[NSLocalizedString(@"Name ▾", nil),
-             NSLocalizedString(@"Size", nil),
-             NSLocalizedString(@"Date", nil)];
-}
+#pragma mark - Class Creation -
 
 - (instancetype)init
 {
-    if (self = [super initWithItems:[TODocumentPickerSegmentedControl items]]) {
+    _items = @[NSLocalizedString(@"Name", nil), NSLocalizedString(@"Size", nil), NSLocalizedString(@"Date", nil)];
+    
+    if (self = [super initWithItems:_items]) {
         [self addTarget:self action:@selector(segmentedControlTapped:) forControlEvents:UIControlEventValueChanged];
     }
     
     return self;
 }
 
-#pragma mark - Action Events -
-- (void)segmentedControlTapped:(id)sender
+#pragma mark - Interaction Detection -
+
+//Detects when the same segment is tapped twice
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"Tapped");
+    NSInteger oldValue = self.selectedSegmentIndex;
+    [super touchesEnded:touches withEvent:event];
+    
+    if (oldValue == self.selectedSegmentIndex) {
+        switch (oldValue) {
+            case 0:
+                if (self.sortingType == TODocumentPickerSortTypeNameAscending) {
+                    self.sortingType = TODocumentPickerSortTypeNameDescending;
+                }
+                else {
+                    self.sortingType = TODocumentPickerSortTypeNameAscending;
+                }
+                break;
+            case 1:
+                if (self.sortingType == TODocumentPickerSortTypeSizeAscending) {
+                    self.sortingType = TODocumentPickerSortTypeSizeDescending;
+                }
+                else {
+                    self.sortingType = TODocumentPickerSortTypeSizeAscending;
+                }
+                break;
+            case 2:
+                if (self.sortingType == TODocumentPickerSortTypeDateAscending) {
+                    self.sortingType = TODocumentPickerSortTypeDateDescending;
+                }
+                else {
+                    self.sortingType = TODocumentPickerSortTypeDateAscending;
+                }
+                break;
+        }
+        
+        [self updateItemsForCurrentSortType];
+        
+        if (self.sortTypeChangedHandler)
+            self.sortTypeChangedHandler();
+    }
 }
 
-// Allows the control to detect taps on top of the already-selected segment.
-// Solution by Andy Drizen / Bob de Graf - http://stackoverflow.com/a/21654606/599344
--(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+- (void)segmentedControlTapped:(id)sender
 {
-    [self sendActionsForControlEvents:UIControlEventAllTouchEvents];
-    [super touchesEnded:touches withEvent:event];
+    switch (self.selectedSegmentIndex) {
+        case 0: //Name
+            self.sortingType = TODocumentPickerSortTypeNameAscending;
+            break;
+        case 1: //Size
+            self.sortingType = TODocumentPickerSortTypeSizeAscending;
+            break;
+        case 2: //Date
+            self.sortingType = TODocumentPickerSortTypeDateAscending;
+            break;
+    }
+    
+    [self updateItemsForCurrentSortType];
+    
+    if (self.sortTypeChangedHandler)
+        self.sortTypeChangedHandler();
+}
+
+#pragma mark - Update Items -
+- (void)updateItemsForCurrentSortType
+{
+    //Reset all of the items
+    for (NSInteger i = 0; i < self.items.count; i++)
+        [self setTitle:self.items[i] forSegmentAtIndex:i];
+    
+    switch (self.sortingType) {
+        case TODocumentPickerSortTypeNameAscending:  [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[0], UP_ARROW] forSegmentAtIndex:0]; break;
+        case TODocumentPickerSortTypeNameDescending: [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[0], DOWN_ARROW] forSegmentAtIndex:0]; break;
+        case TODocumentPickerSortTypeSizeAscending:  [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[1], UP_ARROW] forSegmentAtIndex:1]; break;
+        case TODocumentPickerSortTypeSizeDescending: [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[1], DOWN_ARROW] forSegmentAtIndex:1]; break;
+        case TODocumentPickerSortTypeDateAscending:  [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[2], UP_ARROW] forSegmentAtIndex:2]; break;
+        case TODocumentPickerSortTypeDateDescending: [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[2], DOWN_ARROW] forSegmentAtIndex:2]; break;
+    }
 }
 
 @end
