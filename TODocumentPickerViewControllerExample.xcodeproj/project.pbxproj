@@ -22,6 +22,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2211A3CF1A5B80900089106B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
+		2211A3D01A5B80900089106B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		22707A7B1A53BDDF008E66CC /* TODocumentPickerViewControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TODocumentPickerViewControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22707A7F1A53BDDF008E66CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		22707A801A53BDDF008E66CC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -233,6 +235,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				22707A891A53BDDF008E66CC /* Base */,
+				2211A3CF1A5B80900089106B /* ja */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				22707A8E1A53BDDF008E66CC /* Base */,
+				2211A3D01A5B80900089106B /* ja */,
 			);
 			name = LaunchScreen.xib;
 			sourceTree = "<group>";
