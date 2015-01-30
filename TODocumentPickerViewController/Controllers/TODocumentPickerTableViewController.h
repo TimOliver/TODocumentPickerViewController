@@ -27,19 +27,19 @@
 @interface TODocumentPickerTableViewController : UITableViewController
 
 @property (nonatomic, copy)   void (^refreshControlHandler)(void); /* Handler block called whenever the refresh control is triggered. */
-
-@property (nonatomic, copy)   NSString *filePath; /* The file path this view controller corresponds to */
-@property (nonatomic, strong) NSArray  *items;    /* All of the items displayed by this view controller */
+@property (nonatomic, copy)   NSString *filePath; /* The file path that this view controller corresponds to */
+@property (nonatomic, strong) NSArray  *items;    /* All of the items displayed by this view controller. (Setting this will trigger a refresh) */
 
 @end
 
+/* Private method implementations accessible by child table view controllers for their parent document picker controller. */
 @interface TODocumentPickerViewController (TODocumentPickerTableViewController)
 
 /**
- Manually update a particular view controller with new item data. Data sources can use this to insert asynchronous data.
+ Manually update the items in a specific table view controller.
+ 
  */
 - (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
-
 - (void)pushNewViewControllerForFilePath:(NSString *)filePath animated:(BOOL)animated;
 
 @end

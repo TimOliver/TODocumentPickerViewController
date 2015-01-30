@@ -29,8 +29,6 @@
 - (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
 - (TODocumentPickerTableViewController *)tableViewControllerForFilePath:(NSString *)filePath;
 
-- (void)doneButtonTapped:(id)sender;
-
 @end
 
 @implementation TODocumentPickerViewController
@@ -79,6 +77,9 @@
 {
     self.modalPresentationStyle = UIModalPresentationFormSheet;
     
+    //Turn off translucency as the segmented control will be visible through it
+    self.navigationBar.translucent = NO;
+    self.toolbar.translucent = NO;
 }
 
 - (void)viewDidLoad
@@ -110,8 +111,6 @@
     if (controller == nil)
         return;
     
-    [controller.refreshControl endRefreshing];
-    
     controller.items = items;
 }
 
@@ -134,10 +133,11 @@
     
     _dataSource = dataSource;
     
+    /* While the update block is publically readonly, we forcibly assign it to the ivar here. */
     if (_dataSource) {
         __block TODocumentPickerViewController *blockSelf = self;
         id updateBlock = ^(NSArray *items, NSString *filePath) {
-            [blockSelf updateItems:items forFilePath:filePath];
+            dispatch_async(dispatch_get_main_queue(), ^{ [blockSelf updateItems:items forFilePath:filePath]; });
         };
         
         [_dataSource setValue:updateBlock forKey:@"updateItemsForFilePath"];
@@ -153,6 +153,7 @@
 
 @interface TODocumentPickerViewControllerDataSource ()
 
+/* Not completely necessary, but nice to explicitly ensure an ivar for the block is being created. */
 @property (nonatomic, readwrite, copy) void (^updateItemsForFilePath)(NSArray *items, NSString *filePath);
 
 @end
@@ -160,11 +161,7 @@
 @implementation TODocumentPickerViewControllerDataSource
 
 - (void)requestItemsForFilePath:(NSString *)filePath  { [self doesNotRecognizeSelector:_cmd]; }
-- (void)cancelRequestForFilePath:(NSString *)filePath { [self doesNotRecognizeSelector:_cmd]; }
-
-- (NSString *)titleForFilePath:(NSString *)filePath
-{
-    return [filePath lastPathComponent];
-}
+- (void)cancelRequestForFilePath:(NSString *)filePath { /* Empty by default */ }
+- (NSString *)titleForFilePath:(NSString *)filePath { return [filePath lastPathComponent]; }
 
 @end

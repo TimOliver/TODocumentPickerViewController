@@ -19,6 +19,7 @@
 		22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1991A56857700C4839E /* TODocumentPickerItem.m */; };
 		22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E19F1A5685A000C4839E /* TODocumentPickerHeaderView.m */; };
 		22A3E1A31A56880C00C4839E /* TODocumentPickerSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1A21A56880C00C4839E /* TODocumentPickerSegmentedControl.m */; };
+		22A5E42C1A7B17F8000CD302 /* TODocumentPickerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A5E42B1A7B17F8000CD302 /* TODocumentPickerTableView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,8 @@
 		22A3E19F1A5685A000C4839E /* TODocumentPickerHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerHeaderView.m; sourceTree = "<group>"; };
 		22A3E1A11A56880C00C4839E /* TODocumentPickerSegmentedControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerSegmentedControl.h; sourceTree = "<group>"; };
 		22A3E1A21A56880C00C4839E /* TODocumentPickerSegmentedControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerSegmentedControl.m; sourceTree = "<group>"; };
+		22A5E42A1A7B17F8000CD302 /* TODocumentPickerTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerTableView.h; sourceTree = "<group>"; };
+		22A5E42B1A7B17F8000CD302 /* TODocumentPickerTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerTableView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +144,8 @@
 				22A3E19F1A5685A000C4839E /* TODocumentPickerHeaderView.m */,
 				22A3E1A11A56880C00C4839E /* TODocumentPickerSegmentedControl.h */,
 				22A3E1A21A56880C00C4839E /* TODocumentPickerSegmentedControl.m */,
+				22A5E42A1A7B17F8000CD302 /* TODocumentPickerTableView.h */,
+				22A5E42B1A7B17F8000CD302 /* TODocumentPickerTableView.m */,
 			);
 			name = Views;
 			path = TODocumentPickerViewController/Views;
@@ -223,6 +228,7 @@
 				22707AB01A550B65008E66CC /* TODocumentsDataSource.m in Sources */,
 				22A3E19B1A56857700C4839E /* TODocumentPickerTableViewController.m in Sources */,
 				22A3E1A31A56880C00C4839E /* TODocumentPickerSegmentedControl.m in Sources */,
+				22A5E42C1A7B17F8000CD302 /* TODocumentPickerTableView.m in Sources */,
 				22707A841A53BDDF008E66CC /* TOAppDelegate.m in Sources */,
 				22707A811A53BDDF008E66CC /* main.m in Sources */,
 			);

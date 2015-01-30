@@ -28,7 +28,6 @@
 @property (nonatomic, readonly) UISearchBar *searchBar;
 @property (nonatomic, readonly) TODocumentPickerSegmentedControl *sortControl;
 
-- (void)setNavigationBarHidden:(BOOL)hidden animated:(BOOL)animated;
 - (void)dismissKeyboard;
 
 @end

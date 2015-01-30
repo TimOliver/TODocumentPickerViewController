@@ -31,17 +31,43 @@
     NSFileManager *defaultManager = [NSFileManager defaultManager];
     NSString *documentsFilePath = [self documentsPath];
     
-    NSString *folder1 = [documentsFilePath stringByAppendingPathComponent:@"Folder 1"];
-    [defaultManager createDirectoryAtPath:folder1 withIntermediateDirectories:YES attributes:nil error:nil];
+    NSArray *folders = @[@"Degree",
+                         @"Value",
+                         @"Whip",
+                         @"Account",
+                         @"Bead",
+                         @"Horn",
+                         @"Credit",
+                         @"Death",
+                         @"Zoo",
+                         @"Slave",
+                         @"Mask",
+                         @"Library",
+                         @"Front",
+                         @"Tub",
+                         @"Kettle",
+                         @"Club",
+                         @"Cherries",
+                         @"Song",
+                         @"Summer",
+                         @"Rule",
+                         @"Account/A - Subfolder",
+                         @"Account/B - Subfolder",
+                         @"AccountC - Subfolder",
+                         @"AccountD - Subfolder",
+                         @"Account/E - Subfolder",
+                         @"Account/F - Subfolder",];
     
-    NSString *subFolder1 = [folder1 stringByAppendingPathComponent:@"Sub Folder 1"];
-    [defaultManager createDirectoryAtPath:subFolder1 withIntermediateDirectories:YES attributes:nil error:nil];
-    
-    NSString *folder2 = [documentsFilePath stringByAppendingPathComponent:@"Folder 2"];
-    [defaultManager createDirectoryAtPath:folder2 withIntermediateDirectories:YES attributes:nil error:nil];
+    for (NSString *folder in folders) {
+        NSString *filePath = [documentsFilePath stringByAppendingPathComponent:folder];
+        [[NSFileManager defaultManager] createDirectoryAtPath:filePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
     
     NSString *textFile = [documentsFilePath stringByAppendingPathComponent:@"Hello World.txt"];
     [@"Hello world!" writeToFile:textFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    
+    NSString *textFile2 = [documentsFilePath stringByAppendingPathComponent:@"AAA.txt"];
+    [@"XD!" writeToFile:textFile2 atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
 #pragma mark - Class Override -
@@ -57,18 +83,13 @@
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         TODocumentPickerItem *item = [TODocumentPickerItem new];
         item.fileName = file;
-        item.fileSize = attributes.fileSize;
+        item.fileSize = (NSUInteger)attributes.fileSize;
         item.lastModifiedDate = attributes.fileModificationDate;
         item.isFolder = (attributes.fileType == NSFileTypeDirectory);
         [items addObject:item];
     }
     
     self.updateItemsForFilePath(items, filePath);
-}
-
-- (void)cancelRequestForFilePath:(NSString *)filePath
-{
-    
 }
 
 - (NSString *)titleForFilePath:(NSString *)filePath

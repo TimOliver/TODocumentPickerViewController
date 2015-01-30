@@ -28,41 +28,48 @@
 
 @interface TODocumentPickerViewController : UINavigationController
 
-/** 
- Sends delegate callback events to the specified object 
- */
-@property (nonatomic, weak)   id<TODocumentPickerViewControllerDelegate> documentPickerDelegate;
+@property (nonatomic, strong) TODocumentPickerViewControllerDataSource *dataSource;              /* Data source for file info. Retained by the document picker. */
+@property (nonatomic, weak)   id<TODocumentPickerViewControllerDelegate> documentPickerDelegate; /* Sends out delegate events to the assigned object */
 
-/**
- Readonly access to the data source for additonal changes. 
- */
-@property (nonatomic, strong) TODocumentPickerViewControllerDataSource *dataSource;
-
-/**
- File extensions that may be selected in the document picker. (If nil, all may be selected)
- */
-@property (nonatomic, strong) NSArray *allowedFileExtensions;
-
-@property (nonatomic, strong) NSDictionary *fileFormatIcons;
-
-@property (nonatomic, strong) NSDictionary *themeAttributes;
+@property (nonatomic, strong) NSArray *allowedFileExtensions;   /* File formats that may be selected by this controller. (If nil, all files may be selected) */
+@property (nonatomic, assign) BOOL showExcludedFileExtensions;  /* Shows files that weren't on the allowed extensions list, but grayed out (Default is NO) */
+@property (nonatomic, strong) NSDictionary *fileFormatIcons;    /* If dealing with custom formats, this lets you add custom icons for those formats (Images must be 40x40 points) */
+@property (nonatomic, strong) NSDictionary *themeAttributes;    /* Attributes for applying a new colour scheme to this view controller. */
 
 @end
 
 //-------------------------------------------------------------------------
+// An abstract class used to provide the document picker with per-folder file information
 
-/**
- An abstract class that is used to provide the document with the necessary file data
- */
 @interface TODocumentPickerViewControllerDataSource : NSObject
 
-/* When an asynchronous load is complete, call this block to update the document picker with the new items. */
+/**
+ Whether synchronously or asynchronously, when your data source has finished building
+ a list of items, you must call this block to pass those items back up to the view controller.
+ (For UI considerations, this block always executes on the main thread)
+ */
 @property (nonatomic, copy, readonly) void (^updateItemsForFilePath)(NSArray *items, NSString *filePath);
 
-- (void)requestItemsForFilePath:(NSString *)filePath;  /* (REQUIRED) Begin a request for a list of items. (May be asynchronous or not) */
-- (void)cancelRequestForFilePath:(NSString *)filePath; /* (REQUIRED) Cancel an asynchronous request in-progress */
+/**
+ Called by the view controller when it wants to obtain a list of items for the folder at the end of the file path.
+ Whether the data source subsequently hands off this request asynchronously or not, when completed, the data source
+ must call the 'updateItemsForFilePath' block.
+ 
+ @param filePath The file path with which to download file information
+ */
+- (void)requestItemsForFilePath:(NSString *)filePath;
 
-- (NSString *)titleForFilePath:(NSString *)filePath;   /* (OPTIONAL) If necessary, provide a custom title for each file path item. */
+/**
+ If an asynchronous request for files is currently progress and the representing view controller is canceled,
+ (eg, if the user hits 'back' before it completes), this method will be called to give the request a chance to cancel.
+ */
+- (void)cancelRequestForFilePath:(NSString *)filePath;
+
+/**
+ The title that will appear in the navigation bar for the folder at this file path.
+ If not implemented, defautl behaviour is to return simply the folder name from the filePath string
+ */
+- (NSString *)titleForFilePath:(NSString *)filePath;
 
 @end
 

@@ -22,16 +22,41 @@
 
 #import "TODocumentPickerTableViewController.h"
 #import "TODocumentPickerItem.h"
+#import "TODocumentPickerTableView.h"
 #import "TODocumentPickerHeaderView.h"
 
-@interface TODocumentPickerTableViewController () <UISearchBarDelegate>
+/* Sorting categories for file size */
+typedef NS_ENUM(NSInteger, TODocumentPickerSortingSize) {
+    TODocumentPickerSortingSizeUnknown, //File size unknown
+    TODocumentPickerSortingSizeTiny,    //Tiny files 0MB-10MB
+    TODocumentPickerSortingSizeSmall,   //Small files 10MB-50MB
+    TODocumentPickerSortingSizeMedium,  //Medium files 50MB-150MB
+    TODocumentPickerSortingSizeBig,     //Big files 150MB - 1000MB
+    TODocumentPickerSortingSizeHuge,    //Massive files > 1000MB
+    TODocumentPickerSortingSizeFolder,  //Folder
+    TODocumentPickerSortingSizeNumber   //Total for counting
+};
+
+/* Sorting categories for date */
+typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
+    TODocumentPickerSortingDateUnknown,
+    TODocumentPickerSortingDateToday,
+    TODocumentPickerSortingDateYesterday,
+    TODocumentPickerSortingDateThisWeek,
+    TODocumentPickerSortingDateThisMonth,
+    TODocumentPickerSortingDateLastSixMonths,
+    TODocumentPickerSortingDateLastYear,
+    TODocumentPickerSortingDateLastDecade,
+    TODocumentPickerSortingDateNumber   //Total for counting
+};
+
+@interface TODocumentPickerTableViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
 
 /* Localized item collation management */
 @property (nonatomic, strong) UILocalizedIndexedCollation *indexedCollation;
 
 /* View management */
 @property (nonatomic, strong) TODocumentPickerHeaderView *headerView;
-@property (nonatomic, strong) UISearchBar *searchBar;
 @property (nonatomic, strong) UILabel *toolBarLabel;
 @property (nonatomic, strong) UIBarButtonItem *doneButton;
 
@@ -45,6 +70,7 @@
 
 /* Item Management */
 @property (nonatomic, strong) NSArray *sortedItems;     /* Items in a single-section sorted order (ie date/size) */
+@property (nonatomic, strong) NSArray *indexedItems;    /* For alphabetical sorting, an array of item arrays */
 @property (nonatomic, strong) NSArray *filteredItems;   /* Items filtered via search */
 
 /* Visible comics (Will be a subarray for names) */
@@ -52,17 +78,24 @@
 
 @property (nonatomic, assign) TODocumentPickerSortType sortingType;
 
-/* Ensure that the header bar content isn't obscured by the table view section index. */
-- (void)setupHeaderConstraints;
+@property (nonatomic, assign) BOOL headerBarInitiallyHidden;
 
-/* Called when the user swipes down to refresh. */
+/* Setup positions and constraints */
+- (void)resetHeaderConstraints;
+- (void)resetTableViewInitialOffset;
+
+/* User interaction callbacks */
 - (void)refreshControlTriggered;
 - (void)selectButtonTapped;
 - (void)doneButtonTapped:(id)sender;
 
+/* Visual content updates */
+- (void)updateContent;
 - (void)updateFooterLabel;
-
 - (void)updateBarButtonsAnimated:(BOOL)animated;
+
+/* Item management */
+- (void)setupIndexedItems;
 
 @end
 
@@ -81,24 +114,26 @@
     self.cellFileFont   = [UIFont systemFontOfSize:17.0f];
     
     /* Configure table */
+    self.tableView = [[TODocumentPickerTableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
     self.tableView.rowHeight = 54.0f;
     self.tableView.sectionIndexBackgroundColor = self.view.backgroundColor;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
-    
+
     /* Pull-to-refresh control */
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refreshControlTriggered) forControlEvents:UIControlEventValueChanged];
     
     /* Configure header view and components */
-    /* Place the header view in a container view to allow navigation bar pinning */
     self.headerView = [TODocumentPickerHeaderView new];
+    
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:self.headerView.bounds];
     tableHeaderView.backgroundColor = self.view.backgroundColor;
-    tableHeaderView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    self.tableView.tableHeaderView = tableHeaderView;
-    self.headerView.frame = tableHeaderView.bounds;
     [tableHeaderView addSubview:self.headerView];
-    
+    self.tableView.tableHeaderView = tableHeaderView;
+
     /* Handler for changing sort type */
     self.headerView.sortControl.sortTypeChangedHandler = ^{
         blockSelf.sortingType = self.headerView.sortControl.sortingType;
@@ -126,16 +161,24 @@
 {
     [super viewWillAppear:animated];
     
-    //Slightly redundant, but must be called here to ensure the table view has finished setting itself up beforehand
-    [self setupHeaderConstraints];
+    [self updateContent];
+    [self resetHeaderConstraints];
+    
+    if (!self.headerBarInitiallyHidden) {
+        [self resetTableViewInitialOffset];
+        self.headerBarInitiallyHidden = YES;
+    }
 }
 
-- (void)setupHeaderConstraints
+- (void)resetTableViewInitialOffset
 {
-    //Skip if we've already added constraints
-    if (self.headerView.superview.constraints.count > 0)
-        return;
-    
+    CGPoint contentOffset = self.tableView.contentOffset;
+    contentOffset.y = -self.tableView.contentInset.top + CGRectGetHeight(self.headerView.frame);
+    self.tableView.contentOffset = contentOffset;
+}
+
+- (void)resetHeaderConstraints
+{
     //Extract the section index view
     UIView *indexView = nil;
     for (UIView *view in self.tableView.subviews) {
@@ -146,14 +189,16 @@
         break;
     }
     
-    if (indexView == nil)
-        return;
-    
-    UIView *parentView = self.headerView.superview;
     NSInteger width = (NSInteger)CGRectGetWidth(indexView.frame);
     
-    NSString *constraint = [NSString stringWithFormat:@"H:|[headerView]-%ld-|", (long)width];
-    [parentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:constraint options:0 metrics:nil views:@{@"headerView":self.headerView}]];
+    //TODO: Figure out how to do this in autolayout
+    CGFloat newWidth = CGRectGetWidth(self.tableView.bounds) - width;
+    if ((NSInteger)newWidth == (NSInteger)CGRectGetWidth(self.headerView.frame))
+        return;
+    
+    CGRect frame = self.headerView.frame;
+    frame.size.width = newWidth;
+    self.headerView.frame = frame;
 }
 
 #pragma mark - Event Handling -
@@ -187,12 +232,12 @@
 #pragma mark - Table View Data Source -
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    return self.indexedItems.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.items.count;
+    return [self.indexedItems[section] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -204,7 +249,7 @@
         cell.detailTextLabel.textColor = [UIColor colorWithWhite:0.6f alpha:1.0f];
     }
         
-    TODocumentPickerItem *item = self.items[indexPath.row];
+    TODocumentPickerItem *item = self.indexedItems[indexPath.section][indexPath.row];
     cell.textLabel.text         = item.fileName;
     cell.detailTextLabel.text   = item.localizedMetadata;
     cell.accessoryType          = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
@@ -215,10 +260,31 @@
 
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {
+    if (self.sortingType >= TODocumentPickerSortTypeDateAscending)
+        return nil;
+    
     NSArray *localizedSectionTitles = [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
     NSMutableArray *sectionTitles = [@[@"{search}"] mutableCopy];
     [sectionTitles addObjectsFromArray:localizedSectionTitles];
     return sectionTitles;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    if ([self.indexedItems[section] count] > 0)
+        return [[self.indexedCollation sectionTitles] objectAtIndex:section];
+    
+    return nil; //return nil to hide section header views
+}
+
+- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
+{
+    if (index == 0) {
+        [self.tableView setContentOffset:CGPointZero animated:NO];
+        return -1;
+    }
+        
+    return [[UILocalizedIndexedCollation currentCollation] sectionForSectionIndexTitleAtIndex:index-1];
 }
 
 #pragma mark - Table View Delegate -
@@ -244,9 +310,12 @@
         return;
     
     _items = items;
-    [self.tableView reloadData];
     
-    [self updateFooterLabel];
+    [self.refreshControl endRefreshing];
+    
+    [self setupIndexedItems];
+    
+    [self updateContent];
 }
 
 - (void)setSortingType:(TODocumentPickerSortType)sortingType
@@ -255,22 +324,25 @@
         return;
     
     _sortingType = sortingType;
-    
-    // Change the section index color to appear 'disabled'z
-    UIColor *disabledColor = [UIColor colorWithWhite:0.7f alpha:1.0f];
-    self.tableView.sectionIndexColor = (_sortingType > TODocumentPickerSortTypeNameDescending) ? disabledColor : nil;
-        
-    [self.tableView reloadData];
+ 
+    [self updateContent];
 }
 
 - (NSArray *)visibleItems
 {
-    
-    
     return self.sortedItems;
 }
 
-#pragma mark - Footer Label -
+#pragma mark - Update View Content -
+- (void)updateContent
+{
+    [self.tableView reloadData];
+
+    [self resetHeaderConstraints];
+    
+    [self updateFooterLabel];
+}
+
 - (void)updateFooterLabel
 {
     NSInteger numberOfFolders = 0, numberOfFiles = 0;
@@ -297,6 +369,31 @@
         labelText = NSLocalizedString(@"No files or folders found", nil);
     
     self.toolBarLabel.text = labelText;
+}
+
+#pragma mark - Items Setup -
+//Referenced from the ineffible NSHipster: http://nshipster.com/uilocalizedindexedcollation/
+- (void)setupIndexedItems
+{
+    SEL selector = @selector(fileName);
+    NSInteger sectionTitlesCount = [[self.indexedCollation sectionTitles] count];
+    
+    NSMutableArray *mutableSections = [[NSMutableArray alloc] initWithCapacity:sectionTitlesCount];
+    for (NSUInteger idx = 0; idx < sectionTitlesCount; idx++) {
+        [mutableSections addObject:[NSMutableArray array]];
+    }
+    
+    for (id object in self.items) {
+        NSInteger sectionNumber = [[UILocalizedIndexedCollation currentCollation] sectionForObject:object collationStringSelector:selector];
+        [[mutableSections objectAtIndex:sectionNumber] addObject:object];
+    }
+    
+    for (NSUInteger idx = 0; idx < sectionTitlesCount; idx++) {
+        NSArray *objectsForSection = [mutableSections objectAtIndex:idx];
+        [mutableSections replaceObjectAtIndex:idx withObject:[[UILocalizedIndexedCollation currentCollation] sortedArrayFromArray:objectsForSection collationStringSelector:selector]];
+    }
+    
+    self.indexedItems = mutableSections;
 }
 
 @end

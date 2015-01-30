@@ -26,7 +26,6 @@
 
 @property (nonatomic, strong, readwrite) UISearchBar *searchBar;
 @property (nonatomic, strong, readwrite) TODocumentPickerSegmentedControl *sortControl;
-@property (nonatomic, strong, readwrite) UINavigationBar *navigationBar;
 
 - (void)setupViews;
 - (void)setupConstraints;
@@ -37,9 +36,9 @@
 
 - (instancetype)init
 {
-    if (self = [super initWithFrame:(CGRect){0,0,0,88}]) {
-        self.translatesAutoresizingMaskIntoConstraints = NO;
-        self.backgroundColor = [UIColor redColor];
+    if (self = [super initWithFrame:(CGRect){0,0,320,88}]) {
+        self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        self.backgroundColor = [UIColor clearColor];
         
         [self setupViews];
         [self setupConstraints];
@@ -59,12 +58,6 @@
     self.sortControl = [[TODocumentPickerSegmentedControl alloc] init];
     self.sortControl.translatesAutoresizingMaskIntoConstraints = NO;
     
-    self.navigationBar = [[UINavigationBar alloc] init];
-    self.navigationBar.translatesAutoresizingMaskIntoConstraints = NO;
-    self.navigationBar.backgroundColor = [UIColor clearColor];
-    self.navigationBar.hidden = YES;
-    
-    [self addSubview:self.navigationBar];
     [self addSubview:self.sortControl];
     [self addSubview:self.searchBar];
 }
@@ -72,8 +65,7 @@
 - (void)setupConstraints
 {
     NSDictionary *views = @{@"searchBar":self.searchBar,
-                            @"sortControl":self.sortControl,
-                            @"navigationBar":self.navigationBar};
+                            @"sortControl":self.sortControl};
     
     //Search bar constraints
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[searchBar]|" options:0 metrics:nil views:views]];
@@ -81,10 +73,6 @@
     //segmented control
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[searchBar]-7-[sortControl]-8-|" options:0 metrics:nil views:views]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-8-[sortControl]-8-|" options:0 metrics:nil views:views]];
-    
-    //navigation bar
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-44-[navigationBar]|" options:0 metrics:nil views:views]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[navigationBar]|" options:0 metrics:nil views:views]];
 }
 
 - (void)didMoveToSuperview
@@ -92,27 +80,6 @@
     [super didMoveToSuperview];
     self.backgroundColor = self.superview.backgroundColor;
     [self needsUpdateConstraints];
-}
-
-#pragma mark - Navigation Bar Animation -
-- (void)setNavigationBarHidden:(BOOL)hidden animated:(BOOL)animated
-{ 
-    if (self.navigationBar.hidden == hidden)
-        return;
-    
-    if (!animated) {
-        self.navigationBar.hidden = hidden;
-        return;
-    }
-    
-    self.navigationBar.hidden = NO;
-    self.navigationBar.alpha = hidden ? 1.0f : 0.0f;
-    
-    [UIView animateWithDuration:0.3f animations:^{
-        self.navigationBar.alpha = hidden ? 0.0f : 1.0f;
-    }completion:^(BOOL complete) {
-        self.navigationBar.hidden = hidden;
-    }];
 }
 
 #pragma mark - Search Bar Delegate -

@@ -24,10 +24,10 @@
 
 @interface TODocumentPickerItem : NSObject
 
-@property (nonatomic, copy)   NSString  *fileName;
-@property (nonatomic, assign) NSInteger fileSize;
-@property (nonatomic, strong) NSDate    *lastModifiedDate;
-@property (nonatomic, assign) BOOL      isFolder;
+@property (nonatomic, copy)   NSString   *fileName;
+@property (nonatomic, assign) NSUInteger fileSize;
+@property (nonatomic, strong) NSDate     *lastModifiedDate;
+@property (nonatomic, assign) BOOL       isFolder;
 
 @property (nonatomic, copy, readonly) NSString *localizedMetadata;
 

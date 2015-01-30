@@ -19,17 +19,28 @@
 //  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 #import "TODocumentPickerSegmentedControl.h"
 
-#define DOWN_ARROW  @"▼"
-#define UP_ARROW    @"▲"
+#define ARROW_WIDTH 7
+#define ARROW_HEIGHT 4
+
+typedef NS_ENUM(NSInteger, TODocumentPickerSegmentedControlImage) {
+    TODocumentPickerSegmentedControlImageDefault=0,
+    TODocumentPickerSegmentedControlImageDescending=1,
+    TODocumentPickerSegmentedControlImageAscending=2
+};
 
 @interface TODocumentPickerSegmentedControl ()
 
-@property (nonatomic, strong) NSArray *items;
+@property (nonatomic, readonly) NSArray *segmentedControlImages;
 
 - (void)segmentedControlTapped:(id)sender;
 - (void)updateItemsForCurrentSortType;
+
+/* Generates an 'off', 'descending' and 'ascending' images of the supplied text */
++ (NSArray *)TO_documentPickerSegmentedControlItemsForTitle:(NSString *)title;
++ (void)drawArrowAtPoint:(CGPoint)point ascending:(BOOL)ascending;
 
 @end
 
@@ -39,13 +50,21 @@
 
 - (instancetype)init
 {
-    _items = @[NSLocalizedString(@"Name", nil), NSLocalizedString(@"Size", nil), NSLocalizedString(@"Date", nil)];
+    NSArray *items = @[self.segmentedControlImages[0][0], self.segmentedControlImages[1][0], self.segmentedControlImages[2][0]];
     
-    if (self = [super initWithItems:_items]) {
+    if (self = [super initWithItems:items]) {
         [self addTarget:self action:@selector(segmentedControlTapped:) forControlEvents:UIControlEventValueChanged];
     }
     
     return self;
+}
+
+- (void)didMoveToSuperview
+{
+    [super didMoveToSuperview];
+    
+    self.selectedSegmentIndex = 0;
+    [self updateItemsForCurrentSortType];
 }
 
 #pragma mark - Interaction Detection -
@@ -115,17 +134,99 @@
 - (void)updateItemsForCurrentSortType
 {
     //Reset all of the items
-    for (NSInteger i = 0; i < self.items.count; i++)
-        [self setTitle:self.items[i] forSegmentAtIndex:i];
+    for (NSInteger i = 0; i < self.segmentedControlImages.count; i++)
+        [self setImage:[self.segmentedControlImages[i] firstObject] forSegmentAtIndex:i];
     
     switch (self.sortingType) {
-        case TODocumentPickerSortTypeNameAscending:  [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[0], UP_ARROW] forSegmentAtIndex:0]; break;
-        case TODocumentPickerSortTypeNameDescending: [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[0], DOWN_ARROW] forSegmentAtIndex:0]; break;
-        case TODocumentPickerSortTypeSizeAscending:  [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[1], UP_ARROW] forSegmentAtIndex:1]; break;
-        case TODocumentPickerSortTypeSizeDescending: [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[1], DOWN_ARROW] forSegmentAtIndex:1]; break;
-        case TODocumentPickerSortTypeDateAscending:  [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[2], UP_ARROW] forSegmentAtIndex:2]; break;
-        case TODocumentPickerSortTypeDateDescending: [self setTitle:[NSString stringWithFormat:@"%@ %@", self.items[2], DOWN_ARROW] forSegmentAtIndex:2]; break;
+        case TODocumentPickerSortTypeNameAscending:  [self setImage:self.segmentedControlImages[0][TODocumentPickerSegmentedControlImageAscending] forSegmentAtIndex:0]; break;
+        case TODocumentPickerSortTypeNameDescending: [self setImage:self.segmentedControlImages[0][TODocumentPickerSegmentedControlImageDescending] forSegmentAtIndex:0]; break;
+        case TODocumentPickerSortTypeSizeAscending:  [self setImage:self.segmentedControlImages[1][TODocumentPickerSegmentedControlImageAscending] forSegmentAtIndex:1]; break;
+        case TODocumentPickerSortTypeSizeDescending: [self setImage:self.segmentedControlImages[1][TODocumentPickerSegmentedControlImageDescending] forSegmentAtIndex:1]; break;
+        case TODocumentPickerSortTypeDateAscending:  [self setImage:self.segmentedControlImages[2][TODocumentPickerSegmentedControlImageAscending] forSegmentAtIndex:2]; break;
+        case TODocumentPickerSortTypeDateDescending: [self setImage:self.segmentedControlImages[2][TODocumentPickerSegmentedControlImageDescending] forSegmentAtIndex:2]; break;
     }
+}
+
+#pragma mark - Accessors -
+- (NSArray *)segmentedControlImages
+{
+    static NSArray *_segmentedControlImages;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSMutableArray *segmentedControlImages = [NSMutableArray array];
+        [segmentedControlImages addObject:[TODocumentPickerSegmentedControl TO_documentPickerSegmentedControlItemsForTitle:NSLocalizedString(@"Name", @"Segmented Control Name")]];
+        [segmentedControlImages addObject:[TODocumentPickerSegmentedControl TO_documentPickerSegmentedControlItemsForTitle:NSLocalizedString(@"Size", @"Segmented Control Size")]];
+        [segmentedControlImages addObject:[TODocumentPickerSegmentedControl TO_documentPickerSegmentedControlItemsForTitle:NSLocalizedString(@"Date", @"Segmented Control Date")]];
+        _segmentedControlImages = [NSArray arrayWithArray:segmentedControlImages];
+    });
+    
+    return _segmentedControlImages;
+}
+
+#pragma mark - Segmented Control Image generation -
+
+//Annoyingly, [drawInRect:withAttributes] has no easy 'center' option. Sticking to the old way for now
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
++ (NSArray *)TO_documentPickerSegmentedControlItemsForTitle:(NSString *)title
+{
+    UIFont *font = [UIFont systemFontOfSize:14.0f];
+    NSMutableArray *images = [NSMutableArray array];
+    
+    //Work out the size of all of the images
+    CGSize imageSize = [title sizeWithAttributes:@{NSFontAttributeName:font}];
+    imageSize.width += (ARROW_WIDTH + 3) * 2; //Add enough padding on either side so the content is still center
+    
+    CGRect frame = (CGRect){CGPointZero, imageSize};
+    
+    for (NSInteger i = 0; i <= 2; i++) {
+        UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0.0f);
+        {
+            //draw the text
+            [[UIColor blackColor] set];
+            [title drawInRect:frame withFont:font lineBreakMode:NSLineBreakByClipping alignment:NSTextAlignmentCenter];
+            
+            //depending on the iteration, draw the arrow
+            if (i > 0) {
+                CGPoint arrowPoint = CGPointZero;
+                arrowPoint.x = CGRectGetMaxX(frame) - ARROW_WIDTH;
+                arrowPoint.y = ceil((CGRectGetHeight(frame) - ARROW_HEIGHT) * 0.5f);
+                
+                [TODocumentPickerSegmentedControl drawArrowAtPoint:arrowPoint ascending:(i==2)];
+            }
+            
+            [images addObject:UIGraphicsGetImageFromCurrentImageContext()];
+        }
+        UIGraphicsEndImageContext();
+    }
+    
+    return images;
+}
+
+#pragma GCC diagnostic pop
+
++ (void)drawArrowAtPoint:(CGPoint)point ascending:(BOOL)ascending
+{
+    CGRect frame = {(CGPoint)point, {ARROW_WIDTH,ARROW_HEIGHT}};
+    
+    UIBezierPath* arrowPath = UIBezierPath.bezierPath;
+    if (!ascending) {
+        [arrowPath moveToPoint: CGPointMake(CGRectGetMinX(frame), CGRectGetMinY(frame))];
+        [arrowPath addLineToPoint: CGPointMake(CGRectGetMinX(frame) + 7, CGRectGetMinY(frame))];
+        [arrowPath addLineToPoint: CGPointMake(CGRectGetMinX(frame) + 3.5, CGRectGetMinY(frame) + 4)];
+        [arrowPath addLineToPoint: CGPointMake(CGRectGetMinX(frame), CGRectGetMinY(frame))];
+    }
+    else {
+        [arrowPath moveToPoint: CGPointMake(CGRectGetMinX(frame), CGRectGetMaxY(frame))];
+        [arrowPath addLineToPoint: CGPointMake(CGRectGetMinX(frame) + 7, CGRectGetMaxY(frame))];
+        [arrowPath addLineToPoint: CGPointMake(CGRectGetMinX(frame) + 3.5, CGRectGetMinY(frame))];
+        [arrowPath addLineToPoint: CGPointMake(CGRectGetMinX(frame), CGRectGetMaxY(frame))];
+    }
+    
+    [arrowPath closePath];
+    [[UIColor blackColor] setFill];
+    [arrowPath fill];
 }
 
 @end
