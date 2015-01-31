@@ -38,9 +38,6 @@
 #pragma mark Accessors -
 - (NSString *)localizedMetadata
 {
-    if (self.isFolder)
-        return nil;
-    
     if (_localizedMetadata == nil)
         [self formatMetadata];
     
@@ -53,10 +50,15 @@
     NSString *formattedSize = [self.sharedFileSizeFormatter stringFromByteCount:(long long)self.fileSize];
     NSString *formattedDate = [self.sharedDateFormatter stringFromDate:self.lastModifiedDate];
     
-    if (self.lastModifiedDate)
+    if (!self.isFolder && self.lastModifiedDate && self.fileSize) {
         _localizedMetadata = [NSString stringWithFormat:@"%@ • %@", formattedSize, formattedDate];
-    else
+    }
+    else if (self.lastModifiedDate) {
+        _localizedMetadata = formattedDate;
+    }
+    else if (self.fileSize) {
         _localizedMetadata = formattedSize;
+    }
 }
 
 - (NSByteCountFormatter *)sharedFileSizeFormatter
