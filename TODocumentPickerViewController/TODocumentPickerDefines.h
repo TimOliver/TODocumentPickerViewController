@@ -1,5 +1,5 @@
 //
-//  TODocumentPickerSegmentedControl.h
+//  TODocumentPickerDefines.h
 //
 //  Copyright 2015 Timothy Oliver. All rights reserved.
 //
@@ -21,11 +21,15 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
-#import "TODocumentPickerDefines.h"
+#import <Foundation/FOundation.h>
 
-@interface TODocumentPickerSegmentedControl : UISegmentedControl
+/* The various sorting orders in which the picker can display the files. */
+typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
+    TODocumentPickerSortTypeNameAscending,
+    TODocumentPickerSortTypeNameDescending,
+    TODocumentPickerSortTypeDateAscending,
+    TODocumentPickerSortTypeDateDescending,
+    TODocumentPickerSortTypeSizeAscending,
+    TODocumentPickerSortTypeSizeDescending
+};
 
-@property (nonatomic, assign) TODocumentPickerSortType sortingType;
-@property (nonatomic, copy)   void (^sortTypeChangedHandler)(void);
-
-@end

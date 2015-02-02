@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		225C38F61A7DFB90004DA4D9 /* NSDate+Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 225C38F51A7DFB90004DA4D9 /* NSDate+Utilities.m */; };
+		225C38F91A7E37DC004DA4D9 /* TODocumentPickerItemManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */; };
 		22707A811A53BDDF008E66CC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707A801A53BDDF008E66CC /* main.m */; };
 		22707A841A53BDDF008E66CC /* TOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707A831A53BDDF008E66CC /* TOAppDelegate.m */; };
 		22707A871A53BDDF008E66CC /* TOViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707A861A53BDDF008E66CC /* TOViewController.m */; };
@@ -25,6 +27,11 @@
 /* Begin PBXFileReference section */
 		2211A3CF1A5B80900089106B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
 		2211A3D01A5B80900089106B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		225C38F41A7DFB90004DA4D9 /* NSDate+Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDate+Utilities.h"; path = "TODocumentPickerViewController/Categories/NSDate+Utilities.h"; sourceTree = "<group>"; };
+		225C38F51A7DFB90004DA4D9 /* NSDate+Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Utilities.m"; path = "TODocumentPickerViewController/Categories/NSDate+Utilities.m"; sourceTree = "<group>"; };
+		225C38F71A7E37DC004DA4D9 /* TODocumentPickerItemManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerItemManager.h; sourceTree = "<group>"; };
+		225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerItemManager.m; sourceTree = "<group>"; };
+		225C38FA1A7E3AF0004DA4D9 /* TODocumentPickerDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TODocumentPickerDefines.h; path = TODocumentPickerViewController/TODocumentPickerDefines.h; sourceTree = "<group>"; };
 		22707A7B1A53BDDF008E66CC /* TODocumentPickerViewControllerExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TODocumentPickerViewControllerExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		22707A7F1A53BDDF008E66CC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		22707A801A53BDDF008E66CC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -62,6 +69,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		225C38F31A7DFB7A004DA4D9 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				225C38F41A7DFB90004DA4D9 /* NSDate+Utilities.h */,
+				225C38F51A7DFB90004DA4D9 /* NSDate+Utilities.m */,
+			);
+			name = Categories;
+			sourceTree = "<group>";
+		};
 		22707A721A53BDDF008E66CC = {
 			isa = PBXGroup;
 			children = (
@@ -108,6 +124,8 @@
 		22707AA41A53BE85008E66CC /* TODocumentPickerViewController */ = {
 			isa = PBXGroup;
 			children = (
+				225C38FA1A7E3AF0004DA4D9 /* TODocumentPickerDefines.h */,
+				225C38F31A7DFB7A004DA4D9 /* Categories */,
 				22A3E1921A56857700C4839E /* Controllers */,
 				22A3E1971A56857700C4839E /* Models */,
 				22A3E19A1A56857700C4839E /* Views */,
@@ -132,6 +150,8 @@
 			children = (
 				22A3E1981A56857700C4839E /* TODocumentPickerItem.h */,
 				22A3E1991A56857700C4839E /* TODocumentPickerItem.m */,
+				225C38F71A7E37DC004DA4D9 /* TODocumentPickerItemManager.h */,
+				225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */,
 			);
 			name = Models;
 			path = TODocumentPickerViewController/Models;
@@ -225,11 +245,13 @@
 				22707A871A53BDDF008E66CC /* TOViewController.m in Sources */,
 				22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */,
 				22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */,
+				225C38F61A7DFB90004DA4D9 /* NSDate+Utilities.m in Sources */,
 				22707AB01A550B65008E66CC /* TODocumentsDataSource.m in Sources */,
 				22A3E19B1A56857700C4839E /* TODocumentPickerTableViewController.m in Sources */,
 				22A3E1A31A56880C00C4839E /* TODocumentPickerSegmentedControl.m in Sources */,
 				22A5E42C1A7B17F8000CD302 /* TODocumentPickerTableView.m in Sources */,
 				22707A841A53BDDF008E66CC /* TOAppDelegate.m in Sources */,
+				225C38F91A7E37DC004DA4D9 /* TODocumentPickerItemManager.m in Sources */,
 				22707A811A53BDDF008E66CC /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

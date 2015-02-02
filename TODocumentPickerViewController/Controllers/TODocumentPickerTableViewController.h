@@ -23,7 +23,6 @@
 #import <UIKit/UIKit.h>
 #import "TODocumentPickerViewController.h"
 
-
 @interface TODocumentPickerTableViewController : UITableViewController
 
 @property (nonatomic, copy)   void (^refreshControlHandler)(void); /* Handler block called whenever the refresh control is triggered. */

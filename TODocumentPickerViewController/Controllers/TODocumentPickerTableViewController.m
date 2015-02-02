@@ -20,10 +20,16 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#import "TODocumentPickerDefines.h"
+
 #import "TODocumentPickerTableViewController.h"
-#import "TODocumentPickerItem.h"
 #import "TODocumentPickerTableView.h"
 #import "TODocumentPickerHeaderView.h"
+#import "TODocumentPickerItem.h"
+#import "NSDate+Utilities.h"
+
+//Minimum number of items required before drawing an index is required
+#define MIN_INDEX_NUMBER 15
 
 /* Sorting categories for file size */
 typedef NS_ENUM(NSInteger, TODocumentPickerSortingSize) {
@@ -52,11 +58,18 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
     TODocumentPickerSortingDateYesterday,
     TODocumentPickerSortingDateThisWeek,
     TODocumentPickerSortingDateThisMonth,
-    TODocumentPickerSortingDateLastSixMonths,
     TODocumentPickerSortingDateLastYear,
     TODocumentPickerSortingDateLastDecade,
     TODocumentPickerSortingDateNumber   //Total for counting
 };
+
+#define PICKER_VIEW_DATE_SECTION_NAMES  @[NSLocalizedString(@"Unknown Date",@""), \
+                                            NSLocalizedString(@"Today",@""), \
+                                            NSLocalizedString(@"Yesterday",@""), \
+                                            NSLocalizedString(@"This Week",@""), \
+                                            NSLocalizedString(@"This Month",@""), \
+                                            NSLocalizedString(@"Last Year",@""), \
+                                            NSLocalizedString(@"Last Decade",@"")]
 
 @interface TODocumentPickerTableViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
 
@@ -77,13 +90,21 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 @property (nonatomic, strong) UIFont *cellFileFont;
 
 /* Item Management */
-@property (nonatomic, strong) NSArray *indexedItems;    /* Item arrays sorted into sections */
+@property (nonatomic, strong) NSArray *sortedItems;     /* Single list of sorted items */
+@property (nonatomic, strong) NSArray *sectionedItems;  /* Item arrays sorted into sections */
 @property (nonatomic, strong) NSArray *filteredItems;   /* Items filtered via search */
+
+/* Section Management */
+@property (nonatomic, strong) NSArray *sectionTitles;   /* The names of each section in the table */
 
 /* Currently visible sorting mode */
 @property (nonatomic, assign) TODocumentPickerSortType sortingType;
 
+/* Single use flag to align the scroll view to below the header. */
 @property (nonatomic, assign) BOOL headerBarInitiallyHidden;
+
+/* State tracking */
+@property (nonatomic, readonly) BOOL sectionIndexVisible; /* Check to see if we have enough items to warrant an index. */
 
 /* Setup positions and constraints */
 - (void)resetHeaderConstraints;
@@ -100,10 +121,12 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 - (void)updateBarButtonsAnimated:(BOOL)animated;
 
 /* Item management */
-- (void)setupIndexedItems;
-- (void)setupAlphabeticalIndex;
-- (void)setupSizeIndex;
-- (void)setupDateIndex;
+- (void)setupItems;             /* Reset the items lists and re-sorts them. */
+- (void)setupSortedItems;       /* Single list of sorted items. */
+- (void)setupIndexedItems;      /* Multiple sublists of indexed items. */
+- (void)setupAlphabeticalIndex; /* A-Z */
+- (void)setupSizeIndex;         /* File size */
+- (void)setupDateIndex;         /* Time index */
 @end
 
 @implementation TODocumentPickerTableViewController
@@ -186,17 +209,21 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 
 - (void)resetHeaderConstraints
 {
-    //Extract the section index view
-    UIView *indexView = nil;
-    for (UIView *view in self.tableView.subviews) {
-        if ([NSStringFromClass([view class]) rangeOfString:@"ViewIndex"].length == 0)
-            continue;
-        
-        indexView = view;
-        break;
-    }
+    NSInteger width = 0;
     
-    NSInteger width = (NSInteger)CGRectGetWidth(indexView.frame);
+    if (self.sortingType <= TODocumentPickerSortTypeNameDescending) {
+        //Extract the section index view
+        UIView *indexView = nil;
+        for (UIView *view in self.tableView.subviews) {
+            if ([NSStringFromClass([view class]) rangeOfString:@"ViewIndex"].length == 0)
+                continue;
+            
+            indexView = view;
+            break;
+        }
+        
+        width = (NSInteger)CGRectGetWidth(indexView.frame);
+    }
     
     //TODO: Figure out how to do this in autolayout
     CGFloat newWidth = CGRectGetWidth(self.tableView.bounds) - width;
@@ -239,12 +266,12 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 #pragma mark - Table View Data Source -
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return self.indexedItems.count;
+    return self.sectionedItems.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.indexedItems[section] count];
+    return [self.sectionedItems[section] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -256,7 +283,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
         cell.detailTextLabel.textColor = [UIColor colorWithWhite:0.6f alpha:1.0f];
     }
         
-    TODocumentPickerItem *item = self.indexedItems[indexPath.section][indexPath.row];
+    TODocumentPickerItem *item = self.sectionedItems[indexPath.section][indexPath.row];
     cell.textLabel.text         = item.fileName;
     cell.detailTextLabel.text   = item.localizedMetadata;
     cell.accessoryType          = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
@@ -281,7 +308,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if ([self.indexedItems[section] count] == 0)
+    if ([self.sectionedItems[section] count] == 0)
         return nil;
 
     /* Create section titles for each different sort type */
@@ -347,7 +374,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
     
     _sortingType = sortingType;
  
-    [self setupIndexedItems];
+    [self setupItems];
     [self updateContent];
 }
 
@@ -355,9 +382,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 - (void)updateContent
 {
     [self.tableView reloadData];
-
     [self resetHeaderConstraints];
-    
     [self updateFooterLabel];
 }
 
@@ -390,6 +415,41 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 }
 
 #pragma mark - Items Setup -
+- (void)setupItems
+{
+    self.sortedItems = nil;
+    self.sectionedItems = nil;
+    
+    if (self.items.count < MIN_INDEX_NUMBER)
+        [self setupSortedItems];
+    else
+        [self setupIndexedItems];
+}
+
+- (void)setupSortedItems
+{
+    BOOL reverse = NO;
+    NSString *sortKey = nil;
+    
+    //Work out which selector to use as the comparison basis and whether to reverse it
+    switch (self.sortingType) {
+        case TODocumentPickerSortTypeNameDescending: reverse = YES;
+        case TODocumentPickerSortTypeNameAscending:  sortKey = @"fileName";
+            break;
+            
+        case TODocumentPickerSortTypeDateDescending: reverse = YES;
+        case TODocumentPickerSortTypeDateAscending:  sortKey = @"lastModifiedDate";
+            break;
+            
+        case TODocumentPickerSortTypeSizeDescending: reverse = YES;
+        case TODocumentPickerSortTypeSizeAscending:  sortKey = @"fileSize";
+            break;
+    }
+    
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:sortKey ascending:!reverse];
+    self.sortedItems = [self.items sortedArrayUsingDescriptors:@[sortDescriptor]];
+}
+
 //Referenced from the ineffible NSHipster: http://nshipster.com/uilocalizedindexedcollation/
 - (void)setupIndexedItems
 {
@@ -430,9 +490,9 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
     }
     
     if (self.sortingType == TODocumentPickerSortTypeNameAscending)
-        self.indexedItems = mutableSections;
+        self.sectionedItems = mutableSections;
     else
-        self.indexedItems = [[mutableSections reverseObjectEnumerator] allObjects];
+        self.sectionedItems = [[mutableSections reverseObjectEnumerator] allObjects];
 }
 
 - (void)setupSizeIndex
@@ -460,14 +520,37 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
     }
     
     if (self.sortingType == TODocumentPickerSortTypeSizeAscending)
-        self.indexedItems = sections;
+        self.sectionedItems = sections;
     else
-        self.indexedItems = [[sections reverseObjectEnumerator] allObjects];
+        self.sectionedItems = [[sections reverseObjectEnumerator] allObjects];
 }
 
 - (void)setupDateIndex
 {
+    NSMutableArray *sections = [NSMutableArray arrayWithCapacity:TODocumentPickerSortingSizeNumber];
     
+    for (NSInteger i = 0; i < TODocumentPickerSortingDateNumber; i++)
+        [sections addObject:[NSMutableArray array]];
+    
+    for (TODocumentPickerItem *item in self.items) {
+        if (item.fileSize == 0)
+            [sections[TODocumentPickerSortingSizeUnknown] addObject:item];
+        else if (item.fileSize < 10 * 1024)
+            [sections[TODocumentPickerSortingSizeTiny] addObject:item];
+        else if (item.fileSize < 50 * 1024)
+            [sections[TODocumentPickerSortingSizeSmall] addObject:item];
+        else if (item.fileSize < 150 * 1024)
+            [sections[TODocumentPickerSortingSizeMedium] addObject:item];
+        else if (item.fileSize < 1000 * 1024)
+            [sections[TODocumentPickerSortingSizeBig] addObject:item];
+        else
+            [sections[TODocumentPickerSortingSizeHuge] addObject:item];
+    }
+    
+    if (self.sortingType == TODocumentPickerSortTypeSizeAscending)
+        self.sectionedItems = sections;
+    else
+        self.sectionedItems = [[sections reverseObjectEnumerator] allObjects];
 }
 
 @end

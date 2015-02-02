@@ -28,7 +28,6 @@
 
 - (void)createTestData
 {
-    NSFileManager *defaultManager = [NSFileManager defaultManager];
     NSString *documentsFilePath = [self documentsPath];
     
     NSArray *folders = @[@"Degree",
