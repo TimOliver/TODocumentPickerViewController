@@ -21,6 +21,7 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TODocumentPickerItemManager.h"
+#import "TODocumentPickerItem.h"
 
 @interface TODocumentPickerItemManager ()
 
@@ -28,14 +29,16 @@
 @property (nonatomic, strong) NSArray *sectionedItems;  /* A list containing lists of items for each section */
 @property (nonatomic, strong) NSArray *filteredItems;   /* A single list of filtered items */
 
-@property (nonatomic, strong) NSArray *sectionNames;    /* Names of the sections, aligned to sectionedItems property. */
+@property (nonatomic, strong) NSArray *sectionTitles;    /* Names of the sections, aligned to sectionedItems property. */
 
 - (void)rebuildItems; /* Flush out, and rebuild the list of items */
-- (BOOL)shouldUseSections;  /* Calculate if there's enough items to warrant sections */
+- (BOOL)shouldUseSections;  /* Calculate if we should use sections or not */
 
-- (NSArray *)sortedItemsArrayWithArray:(NSArray *)items;
-- (NSArray *)sectionedItemsWithArray:(NSArray *)items;
-- (NSArray *)filteredItemsWithSearchString:(NSString *)searchString;
+- (NSArray *)sortedItemsArrayWithArray:(NSArray *)items; /* Build a sorted list of items. */
+- (NSArray *)sectionedItemsWithArray:(NSArray *)items;   /* Build a sectioned list of sorted lists of items. */
+- (NSArray *)filteredItemsWithItems:(NSArray *)items searchString:(NSString *)searchString; /* Take a list and filter it out */
+
+- (NSArray *)sectionTitlesForItems:(NSArray *)items;
 
 @end
 
@@ -48,23 +51,34 @@
     self.sortedItems    = nil;
     self.sectionedItems = nil;
     self.filteredItems  = nil;
+    self.sectionTitles  = nil;
     
     //A search string overrides all other lists
     if (self.searchString.length > 0) {
-        self.filteredItems = [self filteredItemsWithSearchString:self.searchString];
+        self.filteredItems = [self filteredItemsWithItems:self.items searchString:self.searchString];
         self.filteredItems = [self sortedItemsArrayWithArray:self.filteredItems];
-        return;
+    }
+    //if sections are warranted, sort them out, else do a flat single list
+    else if ([self shouldUseSections]) {
+        self.sectionTitles = [self sectionTitlesForItems:self.items];
+        self.sectionedItems = [self sectionedItemsWithArray:self.items];
+    }
+    else {
+        self.sortedItems = [self sortedItemsArrayWithArray:self.items];
     }
     
-    //if sections are warranted, sort them out, else do a flat single list
-    if ([self shouldUseSections])
-        self.sectionedItems = [self sectionedItemsWithArray:nil];
-    
-    self.sortedItems = [self sortedItemsArrayWithArray:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView reloadData];
+        if (self.contentReloadedHandler)
+            self.contentReloadedHandler();
+    });
 }
 
 - (BOOL)shouldUseSections
 {
+    if (self.tableView == nil || self.sortingType > TODocumentPickerSortTypeNameDescending)
+        return NO;
+    
     CGSize tableSize = self.tableView.bounds.size;
     CGFloat height = MAX(tableSize.width, tableSize.height);
     
@@ -77,17 +91,75 @@
 
 - (NSArray *)sortedItemsArrayWithArray:(NSArray *)items
 {
-    return nil;
+    BOOL reverse = NO;
+    NSString *sortKey = nil;
+    
+    //Work out which selector to use as the comparison basis and whether to reverse it
+    switch (self.sortingType) {
+        case TODocumentPickerSortTypeNameDescending: reverse = YES;
+        case TODocumentPickerSortTypeNameAscending:  sortKey = @"fileName";
+            break;
+            
+        case TODocumentPickerSortTypeDateDescending: reverse = YES;
+        case TODocumentPickerSortTypeDateAscending:  sortKey = @"lastModifiedDate";
+            break;
+            
+        case TODocumentPickerSortTypeSizeDescending: reverse = YES;
+        case TODocumentPickerSortTypeSizeAscending:  sortKey = @"fileSize";
+            break;
+    }
+    
+    //Sort the files
+    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:sortKey ascending:!reverse];
+    items = [items sortedArrayUsingDescriptors:@[sortDescriptor]];
+    return items;
 }
 
 - (NSArray *)sectionedItemsWithArray:(NSArray *)items
 {
-    return nil;
+    SEL selector = @selector(fileName);
+    NSInteger sectionTitlesCount = self.sectionTitles.count;
+    
+    NSMutableArray *mutableSections = [[NSMutableArray alloc] initWithCapacity:sectionTitlesCount];
+    for (NSUInteger idx = 0; idx < sectionTitlesCount; idx++) {
+        [mutableSections addObject:[NSMutableArray array]];
+    }
+    
+    for (id object in items) {
+        NSInteger sectionNumber = [[UILocalizedIndexedCollation currentCollation] sectionForObject:object collationStringSelector:selector];
+        [[mutableSections objectAtIndex:sectionNumber] addObject:object];
+    }
+    
+    for (NSUInteger idx = 0; idx < sectionTitlesCount; idx++) {
+        NSArray *objectsForSection = mutableSections[idx];
+        [mutableSections replaceObjectAtIndex:idx withObject:[[UILocalizedIndexedCollation currentCollation] sortedArrayFromArray:objectsForSection collationStringSelector:selector]];
+    }
+    
+    NSArray *sections = [NSArray arrayWithArray:mutableSections];
+    if (self.sortingType == TODocumentPickerSortTypeNameDescending)
+        sections = [[sections reverseObjectEnumerator] allObjects];
+    
+    return sections;
 }
 
-- (NSArray *)filteredItemsWithSearchString:(NSString *)searchString
+- (NSArray *)sectionTitlesForItems:(NSArray *)items
 {
-    return nil;
+    NSArray *localizedSectionTitles = [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
+    if (self.sortingType == TODocumentPickerSortTypeNameDescending)
+        localizedSectionTitles = [[localizedSectionTitles reverseObjectEnumerator] allObjects];
+    
+    return localizedSectionTitles;
+}
+
+- (NSArray *)filteredItemsWithItems:(NSArray *)items searchString:(NSString *)searchString
+{
+    NSMutableArray *filteredItems = [NSMutableArray array];
+    [items enumerateObjectsWithOptions:0 usingBlock:^(TODocumentPickerItem *item, NSUInteger i, BOOL *stop) {
+        if ([item.fileName rangeOfString:searchString options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch)].location != NSNotFound)
+            [filteredItems addObject:item];
+    }];
+    
+    return [NSArray arrayWithArray:filteredItems];
 }
 
 #pragma mark - Item Serving -
@@ -97,7 +169,7 @@
         return self.filteredItems[indexPath.row];
     
     if (self.sectionedItems)
-        return self.sectionedItems[indexPath.section][indexPath.section];
+        return self.sectionedItems[indexPath.section][indexPath.row];
     
     if (self.sortedItems)
         return self.sortedItems[indexPath.row];
@@ -108,6 +180,9 @@
 #pragma mark - Section Mangement -
 - (NSInteger)numberOfSections
 {
+    if (self.items.count > 0 && self.sortedItems == nil && self.sectionedItems == nil && self.filteredItems == nil)
+        [self rebuildItems];
+    
     if (self.sectionedItems)
         return self.sectionedItems.count;
     
@@ -132,17 +207,27 @@
 #pragma mark - Section Index Mangement -
 - (NSArray *)sectionIndexTitles
 {
-    return nil;
+    if (self.sectionTitles.count == 0)
+        return nil;
+    
+    //Append the search icon at the front
+    return [@[@"{search}"] arrayByAddingObjectsFromArray:self.sectionTitles];
 }
 
 - (NSString *)titleForHeaderInSection:(NSInteger)section
 {
-    return nil;
+    if ([self.sectionedItems[section] count] == 0)
+        return nil;
+    
+    return self.sectionTitles[section];
 }
 
 - (NSInteger)sectionForSectionIndexAtIndex:(NSInteger)index
 {
-    return 0;
+    if (index == 0)
+        return -1;
+        
+    return [[UILocalizedIndexedCollation currentCollation] sectionForSectionIndexTitleAtIndex:index-1];
 }
 
 #pragma mark - Accessors -
@@ -155,10 +240,10 @@
     
     _items = items;
     
+    if (self.tableView == nil)
+        return;
+    
     [self rebuildItems];
-    [self.tableView reloadData];
-    if (self.contentReloadedHandler)
-        self.contentReloadedHandler();
 }
 
 - (void)setSortingType:(TODocumentPickerSortType)sortingType
@@ -168,10 +253,10 @@
     
     _sortingType = sortingType;
     
+    if (self.tableView == nil)
+        return;
+    
     [self rebuildItems];
-    [self.tableView reloadData];
-    if (self.contentReloadedHandler)
-        self.contentReloadedHandler();
 }
 
 - (void)setSearchString:(NSString *)searchString
@@ -181,10 +266,10 @@
     
     _searchString = searchString;
     
+    if (self.tableView == nil)
+        return;
+    
     [self rebuildItems];
-    [self.tableView reloadData];
-    if (self.contentReloadedHandler)
-        self.contentReloadedHandler();
 }
 
 @end

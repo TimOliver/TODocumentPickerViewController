@@ -30,43 +30,44 @@
 {
     NSString *documentsFilePath = [self documentsPath];
     
-    NSArray *folders = @[@"Degree",
-                         @"Value",
-                         @"Whip",
-                         @"Account",
-                         @"Bead",
-                         @"Horn",
-                         @"Credit",
-                         @"Death",
-                         @"Zoo",
-                         @"Slave",
-                         @"Mask",
-                         @"Library",
-                         @"Front",
-                         @"Tub",
-                         @"Kettle",
-                         @"Club",
-                         @"Cherries",
-                         @"Song",
-                         @"Summer",
-                         @"Rule",
-                         @"Account/A - Subfolder",
-                         @"Account/B - Subfolder",
-                         @"AccountC - Subfolder",
-                         @"AccountD - Subfolder",
-                         @"Account/E - Subfolder",
-                         @"Account/F - Subfolder",];
+    NSArray *folders = @[@"Apps",
+                         @"Archive",
+                         @"Books",
+                         @"Comics",
+                         @"Documents",
+                         @"Examples",
+                         @"Music",
+                         @"Photos",
+                         @"Pictures",
+                         @"Programs",
+                         @"Public",
+                         @"Save Files",
+                         @"Shared",
+                         @"Sites",
+                         @"Writing",
+                         @"Apps/iComics",
+                         @"Apps/Dropbox",
+                         @"Archive/Design Docs",
+                         @"Comics/Adventures in Space",
+                         @"Documents/Invoices",
+                         @"Examples/PSDs",];
     
     for (NSString *folder in folders) {
         NSString *filePath = [documentsFilePath stringByAppendingPathComponent:folder];
         [[NSFileManager defaultManager] createDirectoryAtPath:filePath withIntermediateDirectories:YES attributes:nil error:nil];
     }
     
-    NSString *textFile = [documentsFilePath stringByAppendingPathComponent:@"Hello World.txt"];
-    [@"Hello world!" writeToFile:textFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    NSArray *textFiles = @[@"DesignPlan.txt",
+                           @"HelloWorld.txt",
+                           @"Blog Posts.txt",
+                           @"Test Document.txt",
+                           @"Upcoming Projects.txt"
+                           ];
     
-    NSString *textFile2 = [documentsFilePath stringByAppendingPathComponent:@"AAA.txt"];
-    [@"XD!" writeToFile:textFile2 atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    for (NSString *file in textFiles) {
+        NSString *filePath = [documentsFilePath stringByAppendingPathComponent:file];
+        [file writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    }
 }
 
 #pragma mark - Class Override -
@@ -82,9 +83,9 @@
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         TODocumentPickerItem *item = [TODocumentPickerItem new];
         item.fileName = file;
-        item.fileSize = (NSUInteger)attributes.fileSize;
-        item.lastModifiedDate = attributes.fileModificationDate;
         item.isFolder = (attributes.fileType == NSFileTypeDirectory);
+        item.fileSize = item.isFolder ? 0 : (NSUInteger)attributes.fileSize;
+        item.lastModifiedDate = attributes.fileModificationDate;
         [items addObject:item];
     }
     

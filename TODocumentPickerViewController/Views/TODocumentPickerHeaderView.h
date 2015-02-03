@@ -27,6 +27,7 @@
 
 @property (nonatomic, readonly) UISearchBar *searchBar;
 @property (nonatomic, readonly) TODocumentPickerSegmentedControl *sortControl;
+@property (nonatomic, copy) void (^searchTextChangedHandler)(NSString *searchText);
 
 - (void)dismissKeyboard;
 

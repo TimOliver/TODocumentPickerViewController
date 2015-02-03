@@ -25,56 +25,14 @@
 #import "TODocumentPickerTableViewController.h"
 #import "TODocumentPickerTableView.h"
 #import "TODocumentPickerHeaderView.h"
+#import "TODocumentPickerItemManager.h"
 #import "TODocumentPickerItem.h"
 #import "NSDate+Utilities.h"
 
-//Minimum number of items required before drawing an index is required
-#define MIN_INDEX_NUMBER 15
-
-/* Sorting categories for file size */
-typedef NS_ENUM(NSInteger, TODocumentPickerSortingSize) {
-    TODocumentPickerSortingSizeUnknown, //File size unknown
-    TODocumentPickerSortingSizeTiny,    //Tiny files 0MB-10MB
-    TODocumentPickerSortingSizeSmall,   //Small files 10MB-50MB
-    TODocumentPickerSortingSizeMedium,  //Medium files 50MB-150MB
-    TODocumentPickerSortingSizeBig,     //Big files 150MB - 1000MB
-    TODocumentPickerSortingSizeHuge,    //Massive files > 1000MB
-    TODocumentPickerSortingSizeFolder,  //Folder
-    TODocumentPickerSortingSizeNumber   //Total for counting
-};
-
-#define PICKER_VIEW_SIZE_SECTION_NAMES  @[NSLocalizedString(@"Unknown Size",@""), \
-                                            NSLocalizedString(@"Tiny (< 10MB)",@""), \
-                                            NSLocalizedString(@"Small (10MB - 50MB",@""), \
-                                            NSLocalizedString(@"Medium (50MB - 150MB)",@""), \
-                                            NSLocalizedString(@"Big (150MB - 1000MB)",@""), \
-                                            NSLocalizedString(@"Huge (> 1000MB)",@""), \
-                                            NSLocalizedString(@"Folders",@"")]
-
-/* Sorting categories for date */
-typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
-    TODocumentPickerSortingDateUnknown,
-    TODocumentPickerSortingDateToday,
-    TODocumentPickerSortingDateYesterday,
-    TODocumentPickerSortingDateThisWeek,
-    TODocumentPickerSortingDateThisMonth,
-    TODocumentPickerSortingDateLastYear,
-    TODocumentPickerSortingDateLastDecade,
-    TODocumentPickerSortingDateNumber   //Total for counting
-};
-
-#define PICKER_VIEW_DATE_SECTION_NAMES  @[NSLocalizedString(@"Unknown Date",@""), \
-                                            NSLocalizedString(@"Today",@""), \
-                                            NSLocalizedString(@"Yesterday",@""), \
-                                            NSLocalizedString(@"This Week",@""), \
-                                            NSLocalizedString(@"This Month",@""), \
-                                            NSLocalizedString(@"Last Year",@""), \
-                                            NSLocalizedString(@"Last Decade",@"")]
-
 @interface TODocumentPickerTableViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
 
-/* Localized item collation management */
-@property (nonatomic, strong) UILocalizedIndexedCollation *indexedCollation;
+/* Item Manager */
+@property (nonatomic, strong) TODocumentPickerItemManager *itemManager;
 
 /* View management */
 @property (nonatomic, strong) TODocumentPickerHeaderView *headerView;
@@ -106,6 +64,9 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 /* State tracking */
 @property (nonatomic, readonly) BOOL sectionIndexVisible; /* Check to see if we have enough items to warrant an index. */
 
+/* Serial queue for posting updates to the items property asynchronously. */
+@property (nonatomic, strong) dispatch_queue_t serialQueue;
+
 /* Setup positions and constraints */
 - (void)resetHeaderConstraints;
 - (void)resetTableViewInitialOffset;
@@ -120,28 +81,30 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 - (void)updateFooterLabel;
 - (void)updateBarButtonsAnimated:(BOOL)animated;
 
-/* Item management */
-- (void)setupItems;             /* Reset the items lists and re-sorts them. */
-- (void)setupSortedItems;       /* Single list of sorted items. */
-- (void)setupIndexedItems;      /* Multiple sublists of indexed items. */
-- (void)setupAlphabeticalIndex; /* A-Z */
-- (void)setupSizeIndex;         /* File size */
-- (void)setupDateIndex;         /* Time index */
 @end
 
 @implementation TODocumentPickerTableViewController
 
 #pragma mark - View Setup -
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _cellFolderFont = [UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
+        _cellFileFont   = [UIFont systemFontOfSize:17.0f];
+        
+        _itemManager = [[TODocumentPickerItemManager alloc] init];
+        
+        _serialQueue = dispatch_queue_create("TODocumentPickerViewController.itemBuilderQueue", DISPATCH_QUEUE_SERIAL);
+    }
+    
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     __block TODocumentPickerTableViewController *blockSelf = self;
-    
-    self.indexedCollation = [UILocalizedIndexedCollation currentCollation];
-    
-    self.cellFolderFont = [UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
-    self.cellFileFont   = [UIFont systemFontOfSize:17.0f];
     
     /* Configure table */
     self.tableView = [[TODocumentPickerTableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
@@ -152,12 +115,17 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
     self.tableView.sectionIndexBackgroundColor = self.view.backgroundColor;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
 
+    /* Table item manager setup */
+    self.itemManager.tableView = self.tableView;
+    self.itemManager.contentReloadedHandler = ^{ [blockSelf updateContent]; };
+    
     /* Pull-to-refresh control */
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refreshControlTriggered) forControlEvents:UIControlEventValueChanged];
     
     /* Configure header view and components */
     self.headerView = [TODocumentPickerHeaderView new];
+    self.headerView.searchTextChangedHandler = ^(NSString *searchText) { blockSelf.itemManager.searchString = searchText; };
     
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:self.headerView.bounds];
     tableHeaderView.backgroundColor = self.view.backgroundColor;
@@ -266,12 +234,12 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 #pragma mark - Table View Data Source -
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return self.sectionedItems.count;
+    return [self.itemManager numberOfSections];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.sectionedItems[section] count];
+    return [self.itemManager numberOfRowsForSection:section];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -283,7 +251,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
         cell.detailTextLabel.textColor = [UIColor colorWithWhite:0.6f alpha:1.0f];
     }
         
-    TODocumentPickerItem *item = self.sectionedItems[indexPath.section][indexPath.row];
+    TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
     cell.textLabel.text         = item.fileName;
     cell.detailTextLabel.text   = item.localizedMetadata;
     cell.accessoryType          = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
@@ -294,47 +262,22 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 
 - (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
 {
-    if (self.sortingType >= TODocumentPickerSortTypeDateAscending)
-        return nil;
-    
-    NSArray *localizedSectionTitles = [[UILocalizedIndexedCollation currentCollation] sectionIndexTitles];
-    if (self.sortingType == TODocumentPickerSortTypeNameDescending)
-        localizedSectionTitles = [[localizedSectionTitles reverseObjectEnumerator] allObjects];
-    
-    NSMutableArray *sectionTitles = [@[@"{search}"] mutableCopy];
-    [sectionTitles addObjectsFromArray:localizedSectionTitles];
-    return sectionTitles;
+    return [self.itemManager sectionIndexTitles];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    if ([self.sectionedItems[section] count] == 0)
-        return nil;
-
-    /* Create section titles for each different sort type */
-    NSArray *sectionTitles = nil;
-    if (self.sortingType <= TODocumentPickerSortTypeNameDescending) {
-        sectionTitles = [self.indexedCollation sectionTitles];
-        if (self.sortingType == TODocumentPickerSortTypeNameDescending)
-            sectionTitles = [[sectionTitles reverseObjectEnumerator] allObjects];
-    }
-    else if (self.sortingType <= TODocumentPickerSortTypeSizeDescending) {
-        sectionTitles = PICKER_VIEW_SIZE_SECTION_NAMES;
-        if (self.sortingType == TODocumentPickerSortTypeSizeDescending)
-            sectionTitles = [[sectionTitles reverseObjectEnumerator] allObjects];
-    }
-    
-    return sectionTitles[section];
+    return [self.itemManager titleForHeaderInSection:section];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
 {
-    if (index == 0) {
+    if ([title isEqualToString:@"{search}"]) {
         [self.tableView setContentOffset:CGPointZero animated:NO];
         return -1;
     }
         
-    return [[UILocalizedIndexedCollation currentCollation] sectionForSectionIndexTitleAtIndex:index-1];
+    return [self.itemManager sectionForSectionIndexAtIndex:index];
 }
 
 #pragma mark - Table View Delegate -
@@ -345,7 +288,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    TODocumentPickerItem *item = self.items[indexPath.row];
+    TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
     if (item.isFolder) {
         NSString *newFilePath = [self.filePath stringByAppendingPathComponent:item.fileName];
         [(TODocumentPickerViewController *)self.navigationController pushNewViewControllerForFilePath:newFilePath animated:YES];
@@ -353,35 +296,51 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
 
 }
 
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [self.headerView dismissKeyboard];
+}
+
 #pragma mark - Accessors -  
 - (void)setItems:(NSArray *)items
 {
-    if (items == _items)
+    if (items == self.itemManager.items)
         return;
     
-    _items = items;
-    
-    [self.refreshControl endRefreshing];
-    
-    [self setupIndexedItems];
-    [self updateContent];
+    // If the refresh control is visible, perform this
+    // assignment on a separate queue to ensure the animation isn't interupted
+    if (self.refreshControl.refreshing) {
+        dispatch_async(self.serialQueue, ^{
+            self.itemManager.items = items;
+            
+            //Force the end refresh animation to happen on another iteration of the run loop
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self.refreshControl endRefreshing];
+            });
+        });
+    }
+    else
+        self.itemManager.items = items;
+}
+
+- (NSArray *)items
+{
+    return self.itemManager.items;
 }
 
 - (void)setSortingType:(TODocumentPickerSortType)sortingType
 {
-    if (_sortingType == sortingType)
-        return;
-    
-    _sortingType = sortingType;
- 
-    [self setupItems];
-    [self updateContent];
+    self.itemManager.sortingType = sortingType;
+}
+
+- (TODocumentPickerSortType)sortingType
+{
+    return self.itemManager.sortingType;
 }
 
 #pragma mark - Update View Content -
 - (void)updateContent
 {
-    [self.tableView reloadData];
     [self resetHeaderConstraints];
     [self updateFooterLabel];
 }
@@ -412,145 +371,6 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortingDate) {
         labelText = NSLocalizedString(@"No files or folders found", nil);
     
     self.toolBarLabel.text = labelText;
-}
-
-#pragma mark - Items Setup -
-- (void)setupItems
-{
-    self.sortedItems = nil;
-    self.sectionedItems = nil;
-    
-    if (self.items.count < MIN_INDEX_NUMBER)
-        [self setupSortedItems];
-    else
-        [self setupIndexedItems];
-}
-
-- (void)setupSortedItems
-{
-    BOOL reverse = NO;
-    NSString *sortKey = nil;
-    
-    //Work out which selector to use as the comparison basis and whether to reverse it
-    switch (self.sortingType) {
-        case TODocumentPickerSortTypeNameDescending: reverse = YES;
-        case TODocumentPickerSortTypeNameAscending:  sortKey = @"fileName";
-            break;
-            
-        case TODocumentPickerSortTypeDateDescending: reverse = YES;
-        case TODocumentPickerSortTypeDateAscending:  sortKey = @"lastModifiedDate";
-            break;
-            
-        case TODocumentPickerSortTypeSizeDescending: reverse = YES;
-        case TODocumentPickerSortTypeSizeAscending:  sortKey = @"fileSize";
-            break;
-    }
-    
-    NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:sortKey ascending:!reverse];
-    self.sortedItems = [self.items sortedArrayUsingDescriptors:@[sortDescriptor]];
-}
-
-//Referenced from the ineffible NSHipster: http://nshipster.com/uilocalizedindexedcollation/
-- (void)setupIndexedItems
-{
-    switch (self.sortingType) {
-        case TODocumentPickerSortTypeNameAscending:
-        case TODocumentPickerSortTypeNameDescending:
-            [self setupAlphabeticalIndex];
-            break;
-        case TODocumentPickerSortTypeDateAscending:
-        case TODocumentPickerSortTypeDateDescending:
-            [self setupDateIndex];
-        case TODocumentPickerSortTypeSizeAscending:
-        case TODocumentPickerSortTypeSizeDescending:
-            [self setupSizeIndex];
-        default:
-            break;
-    }
-}
-
-- (void)setupAlphabeticalIndex
-{
-    SEL selector = @selector(fileName);
-    NSInteger sectionTitlesCount = [[self.indexedCollation sectionTitles] count];
-    
-    NSMutableArray *mutableSections = [[NSMutableArray alloc] initWithCapacity:sectionTitlesCount];
-    for (NSUInteger idx = 0; idx < sectionTitlesCount; idx++) {
-        [mutableSections addObject:[NSMutableArray array]];
-    }
-    
-    for (id object in self.items) {
-        NSInteger sectionNumber = [[UILocalizedIndexedCollation currentCollation] sectionForObject:object collationStringSelector:selector];
-        [[mutableSections objectAtIndex:sectionNumber] addObject:object];
-    }
-    
-    for (NSUInteger idx = 0; idx < sectionTitlesCount; idx++) {
-        NSArray *objectsForSection = [mutableSections objectAtIndex:idx];
-        [mutableSections replaceObjectAtIndex:idx withObject:[[UILocalizedIndexedCollation currentCollation] sortedArrayFromArray:objectsForSection collationStringSelector:selector]];
-    }
-    
-    if (self.sortingType == TODocumentPickerSortTypeNameAscending)
-        self.sectionedItems = mutableSections;
-    else
-        self.sectionedItems = [[mutableSections reverseObjectEnumerator] allObjects];
-}
-
-- (void)setupSizeIndex
-{
-    NSMutableArray *sections = [NSMutableArray arrayWithCapacity:TODocumentPickerSortingSizeNumber];
-    
-    for (NSInteger i = 0; i < TODocumentPickerSortingSizeNumber; i++)
-        [sections addObject:[NSMutableArray array]];
-    
-    for (TODocumentPickerItem *item in self.items) {
-        if (item.isFolder)
-            [sections[TODocumentPickerSortingSizeFolder] addObject:item];
-        else if (item.fileSize == 0)
-            [sections[TODocumentPickerSortingSizeUnknown] addObject:item];
-        else if (item.fileSize < 10 * 1024)
-            [sections[TODocumentPickerSortingSizeTiny] addObject:item];
-        else if (item.fileSize < 50 * 1024)
-            [sections[TODocumentPickerSortingSizeSmall] addObject:item];
-        else if (item.fileSize < 150 * 1024)
-            [sections[TODocumentPickerSortingSizeMedium] addObject:item];
-        else if (item.fileSize < 1000 * 1024)
-            [sections[TODocumentPickerSortingSizeBig] addObject:item];
-        else
-            [sections[TODocumentPickerSortingSizeHuge] addObject:item];
-    }
-    
-    if (self.sortingType == TODocumentPickerSortTypeSizeAscending)
-        self.sectionedItems = sections;
-    else
-        self.sectionedItems = [[sections reverseObjectEnumerator] allObjects];
-}
-
-- (void)setupDateIndex
-{
-    NSMutableArray *sections = [NSMutableArray arrayWithCapacity:TODocumentPickerSortingSizeNumber];
-    
-    for (NSInteger i = 0; i < TODocumentPickerSortingDateNumber; i++)
-        [sections addObject:[NSMutableArray array]];
-    
-    for (TODocumentPickerItem *item in self.items) {
-        if (item.fileSize == 0)
-            [sections[TODocumentPickerSortingSizeUnknown] addObject:item];
-        else if (item.fileSize < 10 * 1024)
-            [sections[TODocumentPickerSortingSizeTiny] addObject:item];
-        else if (item.fileSize < 50 * 1024)
-            [sections[TODocumentPickerSortingSizeSmall] addObject:item];
-        else if (item.fileSize < 150 * 1024)
-            [sections[TODocumentPickerSortingSizeMedium] addObject:item];
-        else if (item.fileSize < 1000 * 1024)
-            [sections[TODocumentPickerSortingSizeBig] addObject:item];
-        else
-            [sections[TODocumentPickerSortingSizeHuge] addObject:item];
-    }
-    
-    if (self.sortingType == TODocumentPickerSortTypeSizeAscending)
-        self.sectionedItems = sections;
-    else
-        self.sectionedItems = [[sections reverseObjectEnumerator] allObjects];
 }
 
 @end

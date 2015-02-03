@@ -83,27 +83,18 @@
 }
 
 #pragma mark - Search Bar Delegate -
-- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
-    [searchBar setShowsCancelButton:YES animated:YES];
+    if (self.searchTextChangedHandler)
+        self.searchTextChangedHandler(searchText);
 }
 
-- (BOOL)searchBarShouldEndEditing:(UISearchBar *)searchBar
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
-    //Must be done via this method else it breaks the search bar's transition animation
-    [searchBar setShowsCancelButton:NO animated:YES];
-    return YES;
+    [self.searchBar resignFirstResponder];
 }
 
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
-{
-    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:0.7f initialSpringVelocity:0.1f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        [searchBar resignFirstResponder];
-    } completion:nil];
-    
-    [searchBar setShowsCancelButton:NO animated:YES];
-}
-
+#pragma mark - External Interactions -
 - (void)dismissKeyboard
 {
     if ([self.searchBar isFirstResponder])
