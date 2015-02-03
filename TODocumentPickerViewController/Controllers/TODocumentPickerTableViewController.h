@@ -29,6 +29,10 @@
 @property (nonatomic, copy)   NSString *filePath; /* The file path that this view controller corresponds to */
 @property (nonatomic, strong) NSArray  *items;    /* All of the items displayed by this view controller. (Setting this will trigger a refresh) */
 
+@property (nonatomic, strong) UIImage *defaultIcon;
+@property (nonatomic, strong) UIImage *folderIcon;
+@property (nonatomic, strong) NSDictionary *fileIcons;
+
 @end
 
 /* Private method implementations accessible by child table view controllers for their parent document picker controller. */

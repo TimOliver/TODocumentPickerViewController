@@ -58,8 +58,8 @@
 /* Currently visible sorting mode */
 @property (nonatomic, assign) TODocumentPickerSortType sortingType;
 
-/* Single use flag to align the scroll view to below the header. */
-@property (nonatomic, assign) BOOL headerBarInitiallyHidden;
+/* Single use flag to check for the first time we appear onscreen */
+@property (nonatomic, assign) BOOL viewInitiallyAppeared;
 
 /* State tracking */
 @property (nonatomic, readonly) BOOL sectionIndexVisible; /* Check to see if we have enough items to warrant an index. */
@@ -111,7 +111,7 @@
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    self.tableView.rowHeight = 54.0f;
+    self.tableView.rowHeight = 52.0f;
     self.tableView.sectionIndexBackgroundColor = self.view.backgroundColor;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
 
@@ -159,12 +159,10 @@
 {
     [super viewWillAppear:animated];
     
-    [self updateContent];
-    [self resetHeaderConstraints];
-    
-    if (!self.headerBarInitiallyHidden) {
+    if (!self.viewInitiallyAppeared) {
+        [self.itemManager reloadItems];
         [self resetTableViewInitialOffset];
-        self.headerBarInitiallyHidden = YES;
+        self.viewInitiallyAppeared = YES;
     }
 }
 
@@ -256,6 +254,7 @@
     cell.detailTextLabel.text   = item.localizedMetadata;
     cell.accessoryType          = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     cell.textLabel.font         = item.isFolder ? self.cellFolderFont : self.cellFileFont;
+    cell.imageView.image        = item.isFolder ? self.folderIcon : self.defaultIcon;
     
     return cell;
 }

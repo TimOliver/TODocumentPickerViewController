@@ -38,6 +38,9 @@
 @property (nonatomic, weak) UITableView *tableView;                 /* A weak reference to the relating table view. */
 @property (nonatomic, copy) void (^contentReloadedHandler)(void);   /* A handler called each time the manager decides to reload the table view. */
 
+/* Start sorting items, if not already done so. */
+- (void)reloadItems;
+
 - (NSInteger)numberOfSections;
 - (NSInteger)numberOfRowsForSection:(NSInteger)section;
 - (TODocumentPickerItem *)itemForIndexPath:(NSIndexPath *)indexPath;

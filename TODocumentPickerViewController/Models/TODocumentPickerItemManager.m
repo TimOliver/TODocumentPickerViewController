@@ -45,6 +45,11 @@
 @implementation TODocumentPickerItemManager
 
 #pragma mark - Item Sorting -
+- (void)reloadItems
+{
+    [self rebuildItems];
+}
+
 - (void)rebuildItems
 {
     /* Clear out all of the lists */
@@ -83,7 +88,7 @@
     CGFloat height = MAX(tableSize.width, tableSize.height);
     
     //We should use sections if the height of all rows is > 150% the height of the table
-    if (self.items.count * self.tableView.rowHeight > height * 1.5f)
+    if (floor(self.items.count * self.tableView.rowHeight) >= floor(height * 1.5f))
         return YES;
     
     return NO;
@@ -180,9 +185,6 @@
 #pragma mark - Section Mangement -
 - (NSInteger)numberOfSections
 {
-    if (self.items.count > 0 && self.sortedItems == nil && self.sectionedItems == nil && self.filteredItems == nil)
-        [self rebuildItems];
-    
     if (self.sectionedItems)
         return self.sectionedItems.count;
     

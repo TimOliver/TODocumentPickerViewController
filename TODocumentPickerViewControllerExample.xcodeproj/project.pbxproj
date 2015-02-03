@@ -22,6 +22,7 @@
 		22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E19F1A5685A000C4839E /* TODocumentPickerHeaderView.m */; };
 		22A3E1A31A56880C00C4839E /* TODocumentPickerSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1A21A56880C00C4839E /* TODocumentPickerSegmentedControl.m */; };
 		22A5E42C1A7B17F8000CD302 /* TODocumentPickerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A5E42B1A7B17F8000CD302 /* TODocumentPickerTableView.m */; };
+		22DF14A61A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DF14A51A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,8 @@
 		22A3E1A21A56880C00C4839E /* TODocumentPickerSegmentedControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerSegmentedControl.m; sourceTree = "<group>"; };
 		22A5E42A1A7B17F8000CD302 /* TODocumentPickerTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerTableView.h; sourceTree = "<group>"; };
 		22A5E42B1A7B17F8000CD302 /* TODocumentPickerTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerTableView.m; sourceTree = "<group>"; };
+		22DF14A41A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+TODocumentPickerIcons.h"; path = "TODocumentPickerViewController/Categories/UIImage+TODocumentPickerIcons.h"; sourceTree = "<group>"; };
+		22DF14A51A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+TODocumentPickerIcons.m"; path = "TODocumentPickerViewController/Categories/UIImage+TODocumentPickerIcons.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +77,8 @@
 			children = (
 				225C38F41A7DFB90004DA4D9 /* NSDate+Utilities.h */,
 				225C38F51A7DFB90004DA4D9 /* NSDate+Utilities.m */,
+				22DF14A41A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.h */,
+				22DF14A51A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -241,6 +246,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22DF14A61A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m in Sources */,
 				22A3E19C1A56857700C4839E /* TODocumentPickerViewController.m in Sources */,
 				22707A871A53BDDF008E66CC /* TOViewController.m in Sources */,
 				22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */,

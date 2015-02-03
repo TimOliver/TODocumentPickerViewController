@@ -22,10 +22,16 @@
 
 #import "TODocumentPickerViewController.h"
 #import "TODocumentPickerTableViewController.h"
+#import "UIImage+TODocumentPickerIcons.h"
 
 @interface TODocumentPickerViewController ()
 
+@property (nonatomic, strong) UIImage *defaultIcon;
+@property (nonatomic, strong) UIImage *folderIcon;
+@property (nonatomic, strong) NSDictionary *fileIcons;
+
 - (void)setup;
+- (void)setupIcons;
 - (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
 - (TODocumentPickerTableViewController *)tableViewControllerForFilePath:(NSString *)filePath;
 
@@ -80,6 +86,8 @@
     //Turn off translucency as the segmented control will be visible through it
     self.navigationBar.translucent = NO;
     self.toolbar.translucent = NO;
+    
+    [self setupIcons];
 }
 
 - (void)viewDidLoad
@@ -98,6 +106,9 @@
     TODocumentPickerTableViewController *tableController = [TODocumentPickerTableViewController new];
     tableController.filePath = filePath;
     tableController.title = [self.dataSource titleForFilePath:filePath];
+    tableController.folderIcon = self.folderIcon;
+    tableController.fileIcons = self.fileIcons;
+    tableController.defaultIcon = self.defaultIcon;
     tableController.refreshControlHandler = ^{ [blockSelf.dataSource requestItemsForFilePath:filePath]; };
     [self pushViewController:tableController animated:animated];
     
@@ -142,6 +153,13 @@
         
         [_dataSource setValue:updateBlock forKey:@"updateItemsForFilePath"];
     }
+}
+
+#pragma mark - Media Generation -
+- (void)setupIcons
+{
+    self.folderIcon = [[UIImage TO_documentPickerFolderIcon] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    self.defaultIcon = [[UIImage TO_documentPickerDefaultIcon] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 }
 
 @end
