@@ -392,6 +392,8 @@
 {
     [self resetHeaderConstraints];
     [self updateFooterLabel];
+    
+    self.navigationItem.rightBarButtonItem.enabled = (self.items.count > 0);
 }
 
 - (void)showFeedbackLabelIfNeeded
