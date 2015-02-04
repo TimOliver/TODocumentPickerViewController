@@ -33,6 +33,7 @@
 
 - (void)rebuildItems; /* Flush out, and rebuild the list of items */
 - (BOOL)shouldUseSections;  /* Calculate if we should use sections or not */
+- (void)updateTableView;
 
 - (NSArray *)sortedItemsArrayWithArray:(NSArray *)items; /* Build a sorted list of items. */
 - (NSArray *)sectionedItemsWithArray:(NSArray *)items;   /* Build a sectioned list of sorted lists of items. */
@@ -48,6 +49,7 @@
 - (void)reloadItems
 {
     [self rebuildItems];
+    
 }
 
 - (void)rebuildItems
@@ -72,11 +74,7 @@
         self.sortedItems = [self sortedItemsArrayWithArray:self.items];
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.tableView reloadData];
-        if (self.contentReloadedHandler)
-            self.contentReloadedHandler();
-    });
+    [self updateTableView];
 }
 
 - (BOOL)shouldUseSections
@@ -92,6 +90,15 @@
         return YES;
     
     return NO;
+}
+
+- (void)updateTableView
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView reloadData];
+        if (self.contentReloadedHandler)
+            self.contentReloadedHandler();
+    });
 }
 
 - (NSArray *)sortedItemsArrayWithArray:(NSArray *)items

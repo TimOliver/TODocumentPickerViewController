@@ -30,8 +30,11 @@
 @property (nonatomic, strong) UIImage *folderIcon;
 @property (nonatomic, strong) NSDictionary *fileIcons;
 
+/* General Setup Operations */
 - (void)setup;
 - (void)setupIcons;
+- (void)setupNewTableViewController:(TODocumentPickerTableViewController *)tableViewController;
+
 - (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
 - (TODocumentPickerTableViewController *)tableViewControllerForFilePath:(NSString *)filePath;
 
@@ -90,6 +93,19 @@
     [self setupIcons];
 }
 
+- (void)setupIcons
+{
+    self.folderIcon = [[UIImage TO_documentPickerFolderIcon] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    self.defaultIcon = [[UIImage TO_documentPickerDefaultIcon] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+}
+
+- (void)setupNewTableViewController:(TODocumentPickerTableViewController *)tableViewController
+{
+    tableViewController.folderIcon = self.folderIcon;
+    tableViewController.fileIcons = self.fileIcons;
+    tableViewController.defaultIcon = self.defaultIcon;
+}
+
 - (void)viewDidLoad
 {
     self.toolbarHidden = NO;
@@ -103,15 +119,15 @@
 {
     __block TODocumentPickerViewController *blockSelf = self;
     
+    /* Create a new instance of the documents table view controller and push it */
     TODocumentPickerTableViewController *tableController = [TODocumentPickerTableViewController new];
+    [self setupNewTableViewController:tableController];
     tableController.filePath = filePath;
     tableController.title = [self.dataSource titleForFilePath:filePath];
-    tableController.folderIcon = self.folderIcon;
-    tableController.fileIcons = self.fileIcons;
-    tableController.defaultIcon = self.defaultIcon;
-    tableController.refreshControlHandler = ^{ [blockSelf.dataSource requestItemsForFilePath:filePath]; };
+    tableController.refreshControlTriggeredHandler = ^{ [blockSelf.dataSource requestItemsForFilePath:filePath]; };
     [self pushViewController:tableController animated:animated];
     
+    /* Request the data source to start loading the file contents for this controller. */
     [self.dataSource requestItemsForFilePath:filePath];
 }
 
@@ -153,13 +169,6 @@
         
         [_dataSource setValue:updateBlock forKey:@"updateItemsForFilePath"];
     }
-}
-
-#pragma mark - Media Generation -
-- (void)setupIcons
-{
-    self.folderIcon = [[UIImage TO_documentPickerFolderIcon] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.defaultIcon = [[UIImage TO_documentPickerDefaultIcon] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 }
 
 @end

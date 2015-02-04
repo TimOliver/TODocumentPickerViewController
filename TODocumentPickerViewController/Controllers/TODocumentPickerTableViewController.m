@@ -36,6 +36,8 @@
 
 /* View management */
 @property (nonatomic, strong) TODocumentPickerHeaderView *headerView;
+@property (nonatomic, strong) UIActivityIndicatorView *loadingView;
+@property (nonatomic, strong) UILabel *feedbackLabel;
 @property (nonatomic, strong) UILabel *toolBarLabel;
 @property (nonatomic, strong) UIBarButtonItem *doneButton;
 
@@ -67,9 +69,13 @@
 /* Serial queue for posting updates to the items property asynchronously. */
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 
+/* Show dummy content labels */
+- (void)showFeedbackLabelIfNeeded;
+
 /* Setup positions and constraints */
 - (void)resetHeaderConstraints;
 - (void)resetTableViewInitialOffset;
+- (void)resetAfterInitialItemLoad;
 
 /* User interaction callbacks */
 - (void)refreshControlTriggered;
@@ -104,6 +110,7 @@
 {
     [super viewDidLoad];
     
+    CGRect frame = CGRectZero;
     __block TODocumentPickerTableViewController *blockSelf = self;
     
     /* Configure table */
@@ -119,13 +126,12 @@
     self.itemManager.tableView = self.tableView;
     self.itemManager.contentReloadedHandler = ^{ [blockSelf updateContent]; };
     
-    /* Pull-to-refresh control */
-    self.refreshControl = [[UIRefreshControl alloc] init];
-    [self.refreshControl addTarget:self action:@selector(refreshControlTriggered) forControlEvents:UIControlEventValueChanged];
-    
     /* Configure header view and components */
     self.headerView = [TODocumentPickerHeaderView new];
-    self.headerView.searchTextChangedHandler = ^(NSString *searchText) { blockSelf.itemManager.searchString = searchText; };
+    self.headerView.searchTextChangedHandler = ^(NSString *searchText) {
+        blockSelf.itemManager.searchString = searchText;
+        [blockSelf showFeedbackLabelIfNeeded];
+    };
     
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:self.headerView.bounds];
     tableHeaderView.backgroundColor = self.view.backgroundColor;
@@ -137,12 +143,22 @@
         blockSelf.sortingType = self.headerView.sortControl.sortingType;
     };
     
+    /* Create the incidental loading indicator. */
+    self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.loadingView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+    frame = self.loadingView.frame;
+    frame.origin.x = (CGRectGetWidth(self.tableView.bounds) - CGRectGetWidth(frame)) * 0.5f;
+    frame.origin.y = CGRectGetHeight(self.headerView.frame) + ((self.tableView.rowHeight - CGRectGetHeight(frame)) * 0.5f) + self.tableView.rowHeight;
+    self.loadingView.frame = frame;
+    [self.tableView addSubview:self.loadingView];
+    [self.loadingView startAnimating];
+    
     /* Toolbar files/folders count label */
     self.toolBarLabel = [[UILabel alloc] initWithFrame:(CGRect){0,0,215,44}];
     self.toolBarLabel.font = [UIFont systemFontOfSize:12.0f];
     self.toolBarLabel.textColor = self.navigationController.navigationBar.titleTextAttributes[NSForegroundColorAttributeName];
     self.toolBarLabel.textAlignment = NSTextAlignmentCenter;
-    self.toolBarLabel.text = NSLocalizedString(@"No files or folders found", nil);
+    self.toolBarLabel.text = NSLocalizedString(@"Loading...", nil);
     
     /* Toolbar button elements */
     self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil) style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonTapped:)];
@@ -160,9 +176,29 @@
     [super viewWillAppear:animated];
     
     if (!self.viewInitiallyAppeared) {
+        /* On iPad, the frame of the table view isn't finalised until we hit this call. */
+        /* So rebuild the items once here to ensure they're laid out correctly. */
         [self.itemManager reloadItems];
+        
+        /* Scroll the table downwards so the header view is initially hidden. */
         [self resetTableViewInitialOffset];
+        
         self.viewInitiallyAppeared = YES;
+    }
+}
+
+- (void)resetAfterInitialItemLoad
+{
+    if (self.refreshControl == nil) {
+        self.refreshControl = [[UIRefreshControl alloc] init];
+        [self.refreshControl addTarget:self action:@selector(refreshControlTriggered) forControlEvents:UIControlEventValueChanged];
+    }
+
+    [self.refreshControl endRefreshing];
+    
+    if (self.loadingView) {
+        [self.loadingView removeFromSuperview];
+        self.loadingView = nil;
     }
 }
 
@@ -201,11 +237,23 @@
     self.headerView.frame = frame;
 }
 
+- (void)setupFeedbackLabel
+{
+    if (self.feedbackLabel != nil)
+        return;
+    
+    self.feedbackLabel = [[UILabel alloc] initWithFrame:(CGRect){0,0,20,44}];
+    self.feedbackLabel.font = [UIFont systemFontOfSize:14.0f];
+    self.feedbackLabel.textAlignment = NSTextAlignmentCenter;
+    self.feedbackLabel.textColor = [UIColor colorWithWhite:0.7f alpha:1.0f];
+    
+}
+
 #pragma mark - Event Handling -
 - (void)refreshControlTriggered
 {
-    if (self.refreshControlHandler)
-        self.refreshControlHandler();
+    if (self.refreshControlTriggeredHandler)
+        self.refreshControlTriggeredHandler();
     else
         [self.refreshControl endRefreshing];
 }
@@ -306,20 +354,22 @@
     if (items == self.itemManager.items)
         return;
     
-    // If the refresh control is visible, perform this
-    // assignment on a separate queue to ensure the animation isn't interupted
-    if (self.refreshControl.refreshing) {
-        dispatch_async(self.serialQueue, ^{
-            self.itemManager.items = items;
-            
-            //Force the end refresh animation to happen on another iteration of the run loop
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self.refreshControl endRefreshing];
-            });
-        });
+    //if the items are actually 0, reset the views now,
+    //but still set the value via the serial queue to ensure no collisions
+    if (items.count == 0) {
+        [self resetAfterInitialItemLoad];
+        [self showFeedbackLabelIfNeeded];
     }
-    else
+    
+    // perform sorting on a separate queue to ensure no hiccups in the refresh UI
+    dispatch_async(self.serialQueue, ^{
         self.itemManager.items = items;
+        
+        //Force the end refresh animation to happen on another iteration of the run loop
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self resetAfterInitialItemLoad];
+        });
+    });
 }
 
 - (NSArray *)items
@@ -344,6 +394,46 @@
     [self updateFooterLabel];
 }
 
+- (void)showFeedbackLabelIfNeeded
+{
+    self.feedbackLabel.hidden = YES;
+    
+    //Cancel if searching AND resulting rows is greater than one
+    if (self.itemManager.searchString.length > 0 && [self.itemManager numberOfRowsForSection:0] > 0)
+        return;
+    
+    //Cnacel if not searching and items are present
+    if (self.itemManager.searchString.length == 0 && self.items.count > 0)
+        return;
+    
+    if (self.feedbackLabel == nil) {
+        self.feedbackLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.feedbackLabel.font = [UIFont systemFontOfSize:16.0f];
+        self.feedbackLabel.textColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
+        self.feedbackLabel.textAlignment = NSTextAlignmentCenter;
+        [self.tableView addSubview:self.feedbackLabel];
+    }
+    
+    self.feedbackLabel.hidden = NO;
+    
+    if (self.headerView.searchBar.text.length > 0)
+        self.feedbackLabel.text = NSLocalizedString(@"No Results Found", @"");
+    else
+        self.feedbackLabel.text = NSLocalizedString(@"Folder is Empty", @"");
+    
+    [self.feedbackLabel sizeToFit];
+    
+    CGRect frame = self.feedbackLabel.frame;
+    frame.origin.x = (CGRectGetWidth(self.tableView.bounds) - CGRectGetWidth(frame)) * 0.5f;
+    frame.origin.y = CGRectGetHeight(self.headerView.frame) + ((self.tableView.rowHeight - CGRectGetHeight(frame)) * 0.5f) + self.tableView.rowHeight;
+    self.feedbackLabel.frame = frame;
+}
+
+- (void)showReminderLabelIfNeeded
+{
+    
+}
+
 - (void)updateFooterLabel
 {
     NSInteger numberOfFolders = 0, numberOfFiles = 0;
@@ -366,9 +456,13 @@
         labelText = [NSString stringWithFormat:@"%ld %@", (long)numberOfFolders, pluralFolders];
     else if (numberOfFiles)
         labelText = [NSString stringWithFormat:@"%ld %@", (long)numberOfFiles, pluralFiles];
-    else
-        labelText = NSLocalizedString(@"No files or folders found", nil);
-    
+    else {
+        if (self.loadingView && self.loadingView.hidden == NO)
+            labelText = NSLocalizedString(@"Loading...", nil);
+        else
+            labelText = NSLocalizedString(@"No files or folders found", nil);
+    }
+        
     self.toolBarLabel.text = labelText;
 }
 

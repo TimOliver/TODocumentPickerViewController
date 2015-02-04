@@ -23,7 +23,17 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/FOundation.h>
 
-/* The various sorting orders in which the picker can display the files. */
+/*
+ The default content styles that the controller implements.
+ */
+typedef NS_ENUM(NSInteger, TODocumentPickerViewControllerStyle) {
+    TODocumentPickerViewControllerStyleLightContent,
+    TODocumentPickerViewControllerStyleDarkContent
+};
+
+/* 
+ The various sorting orders in which the picker can display the files. 
+*/
 typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
     TODocumentPickerSortTypeNameAscending,
     TODocumentPickerSortTypeNameDescending,

@@ -25,7 +25,7 @@
 
 @interface TODocumentPickerTableViewController : UITableViewController
 
-@property (nonatomic, copy)   void (^refreshControlHandler)(void); /* Handler block called whenever the refresh control is triggered. */
+@property (nonatomic, copy)   void (^refreshControlTriggeredHandler)(void); /* Handler block called whenever the refresh control is triggered. */
 @property (nonatomic, copy)   NSString *filePath; /* The file path that this view controller corresponds to */
 @property (nonatomic, strong) NSArray  *items;    /* All of the items displayed by this view controller. (Setting this will trigger a refresh) */
 
