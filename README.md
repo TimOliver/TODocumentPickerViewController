@@ -1,6 +1,6 @@
 # TODocumentPickerViewController
 
-TODocumentPickerViewController is an open source 'document picker' implementation, similar to the one provided in iOS 8's iCloud Drive functionality.
+TODocumentPickerViewController is an open source 'document picker' implementation, similar to the one provided in iCloud Drive that was introduced in iOS 8.
 <p align="center">
 <img src="https://raw.githubusercontent.com/TimOliver/TODocumentPickerViewController/master/screenshot.jpg" width="500" style="margin:0 auto" />
 </p>
