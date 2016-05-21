@@ -1,5 +1,9 @@
 # TODocumentPickerViewController
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/TimOliver/TODocumentPickerViewController/master/screenshot.jpg" width="400" style="margin:0 auto" />
+</p>
+
 TODocumentPickerViewController is an open source 'document picker' implementation, similar to the one provided in iOS 8's iCloud Drive functionality.
 The goal of this project is to have a visual interface for drilling down folders, with the ability to select any files/folders at will for import. At the same time, the data source backed has been designed
 to be as absolutely modular as possible, allowing the file structure info to come from any source/API (ie Dropbox, Google Drive, SMB etc)
