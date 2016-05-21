@@ -101,9 +101,13 @@
 
 - (void)setupNewTableViewController:(TODocumentPickerTableViewController *)tableViewController
 {
+    /* Shared Icon Assets */
     tableViewController.folderIcon = self.folderIcon;
     tableViewController.fileIcons = self.fileIcons;
     tableViewController.defaultIcon = self.defaultIcon;
+    
+    /* Data Source Controlled Table View Cell Class */
+    tableViewController.tableViewCellClass = self.dataSource.tableViewCellClass;
 }
 
 - (void)viewDidLoad

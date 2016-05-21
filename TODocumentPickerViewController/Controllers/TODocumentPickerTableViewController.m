@@ -27,12 +27,8 @@
 #import "TODocumentPickerHeaderView.h"
 #import "TODocumentPickerItemManager.h"
 #import "TODocumentPickerItem.h"
-#import "NSDate+Utilities.h"
 
 @interface TODocumentPickerTableViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
-
-/* Item Manager */
-@property (nonatomic, strong) TODocumentPickerItemManager *itemManager;
 
 /* View management */
 @property (nonatomic, strong) TODocumentPickerHeaderView *headerView;
@@ -40,22 +36,23 @@
 @property (nonatomic, strong) UILabel *feedbackLabel;
 @property (nonatomic, strong) UILabel *toolBarLabel;
 @property (nonatomic, strong) UIBarButtonItem *doneButton;
+@property (nonatomic, strong) UIBarButtonItem *selectAllButton;
+@property (nonatomic, strong) UIBarButtonItem *chooseButton;
 
 /* Edit mode toggle */
 @property (nonatomic, strong) UIBarButtonItem *selectButton;
 @property (nonatomic, strong) UIBarButtonItem *cancelButton;
 
+/* Edit mode toolbar items */
+@property (nonatomic, strong) NSArray *nonEditingToolbarItems;
+@property (nonatomic, strong) NSArray *editingToolbarItems;
+
 /* Cell label fonts */
 @property (nonatomic, strong) UIFont *cellFolderFont;
 @property (nonatomic, strong) UIFont *cellFileFont;
 
-/* Item Management */
-@property (nonatomic, strong) NSArray *sortedItems;     /* Single list of sorted items */
-@property (nonatomic, strong) NSArray *sectionedItems;  /* Item arrays sorted into sections */
-@property (nonatomic, strong) NSArray *filteredItems;   /* Items filtered via search */
-
-/* Section Management */
-@property (nonatomic, strong) NSArray *sectionTitles;   /* The names of each section in the table */
+/* Item Manager */
+@property (nonatomic, strong) TODocumentPickerItemManager *itemManager;
 
 /* Currently visible sorting mode */
 @property (nonatomic, assign) TODocumentPickerSortType sortingType;
@@ -65,6 +62,7 @@
 
 /* State tracking */
 @property (nonatomic, readonly) BOOL sectionIndexVisible; /* Check to see if we have enough items to warrant an index. */
+@property (nonatomic, readonly) BOOL allCellsSelected;
 
 /* Serial queue for posting updates to the items property asynchronously. */
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
@@ -80,11 +78,14 @@
 /* User interaction callbacks */
 - (void)refreshControlTriggered;
 - (void)selectButtonTapped;
-- (void)doneButtonTapped:(id)sender;
+- (void)doneButtonTapped;
+- (void)selectAllButtonTapped;
+- (void)chooseButtonTapped;
 
 /* Visual content updates */
 - (void)updateContent;
 - (void)updateFooterLabel;
+- (void)updateToolbarItems;
 - (void)updateBarButtonsAnimated:(BOOL)animated;
 
 @end
@@ -95,7 +96,7 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        _cellFolderFont = [UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
+        _cellFolderFont = [UIFont boldSystemFontOfSize:17.0f];//[UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
         _cellFileFont   = [UIFont systemFontOfSize:17.0f];
         
         _itemManager = [[TODocumentPickerItemManager alloc] init];
@@ -161,10 +162,16 @@
     self.toolBarLabel.text = NSLocalizedString(@"Loading...", nil);
     
     /* Toolbar button elements */
-    self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil) style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonTapped:)];
+    self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil) style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonTapped)];
     UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem *labelItem = [[UIBarButtonItem alloc] initWithCustomView:self.toolBarLabel];
-    self.toolbarItems = @[self.doneButton, spaceItem, labelItem, spaceItem];
+    self.nonEditingToolbarItems = @[self.doneButton, spaceItem, labelItem, spaceItem, spaceItem];
+    
+    self.selectAllButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Select All", @"") style:UIBarButtonItemStylePlain target:self action:@selector(selectAllButtonTapped)];
+    UIBarButtonItem *actionItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:nil action:nil];
+    self.chooseButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Choose", @"") style:UIBarButtonItemStyleDone target:self action:@selector(chooseButtonTapped)];
+    self.editingToolbarItems = @[self.selectAllButton, spaceItem, actionItem, spaceItem, self.chooseButton];
+    actionItem.enabled = NO;
     
     self.selectButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Select", nil) style:UIBarButtonItemStylePlain target:self action:@selector(selectButtonTapped)];
     self.cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStyleDone target:self action:@selector(selectButtonTapped)];
@@ -272,9 +279,35 @@
         [self.navigationItem setHidesBackButton:self.editing animated:animated];
 }
 
-- (void)doneButtonTapped:(id)sender
+- (void)selectAllButtonTapped
+{
+    if (self.editing == NO)
+        return;
+    
+    BOOL selected = (self.allCellsSelected == NO);
+    
+    for (NSInteger i = 0; i < [self.tableView numberOfSections]; i++) {
+        for (NSInteger j = 0; j < [self.tableView numberOfRowsInSection:i]; j++) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:j inSection:i];
+            
+            if (selected)
+                [self.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+            else
+                [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
+        }
+    }
+    
+    [self updateToolbarItems];
+}
+
+- (void)doneButtonTapped
 {
     [self.navigationController.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)chooseButtonTapped
+{
+    
 }
 
 #pragma mark - Table View Data Source -
@@ -293,7 +326,11 @@
     static NSString *identifier = @"TableCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
+        Class tableViewCellClass = self.tableViewCellClass;
+        if (tableViewCellClass == nil)
+            tableViewCellClass = [UITableViewCell class];
+        
+        cell = [[tableViewCellClass alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
         cell.detailTextLabel.textColor = [UIColor colorWithWhite:0.6f alpha:1.0f];
     }
         
@@ -330,8 +367,10 @@
 #pragma mark - Table View Delegate -
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.editing)
+    if (self.editing) {
+        [self updateToolbarItems];
         return;
+    }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
@@ -340,7 +379,12 @@
         NSString *newFilePath = [self.filePath stringByAppendingPathComponent:item.fileName];
         [(TODocumentPickerViewController *)self.navigationController pushNewViewControllerForFilePath:newFilePath animated:YES];
     }
+}
 
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (self.editing)
+        [self updateToolbarItems];
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -387,11 +431,27 @@
     return self.itemManager.sortingType;
 }
 
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated
+{
+    [super setEditing:editing animated:animated];
+    [self updateContent];
+}
+
+- (BOOL)allCellsSelected
+{
+    //If we're mid search, compare the count to the item manager
+    if (self.itemManager.searchString.length > 0)
+        return [self.tableView indexPathsForSelectedRows].count == [self.itemManager numberOfRowsForSection:0];
+    
+    return [self.tableView indexPathsForSelectedRows].count == self.items.count;
+}
+
 #pragma mark - Update View Content -
 - (void)updateContent
 {
     [self resetHeaderConstraints];
     [self updateFooterLabel];
+    [self updateToolbarItems];
     
     self.navigationItem.rightBarButtonItem.enabled = (self.items.count > 0);
 }
@@ -431,11 +491,6 @@
     self.feedbackLabel.frame = frame;
 }
 
-- (void)showReminderLabelIfNeeded
-{
-    
-}
-
 - (void)updateFooterLabel
 {
     NSInteger numberOfFolders = 0, numberOfFiles = 0;
@@ -466,6 +521,20 @@
     }
         
     self.toolBarLabel.text = labelText;
+}
+
+- (void)updateToolbarItems
+{
+    if (self.editing == NO && self.toolbarItems != self.nonEditingToolbarItems)
+        [self setToolbarItems:self.nonEditingToolbarItems animated:YES];
+    else if (self.editing && self.toolbarItems != self.editingToolbarItems)
+        [self setToolbarItems:self.editingToolbarItems animated:YES];
+    
+    if (self.editing == NO)
+        return;
+    
+    self.chooseButton.enabled = ([self.tableView indexPathsForSelectedRows].count > 0);
+    self.selectAllButton.title = self.allCellsSelected ? NSLocalizedString(@"Select None", @"") : NSLocalizedString(@"Select All", @"");
 }
 
 @end

@@ -32,6 +32,7 @@
 @property (nonatomic, strong) UIImage *defaultIcon;
 @property (nonatomic, strong) UIImage *folderIcon;
 @property (nonatomic, strong) NSDictionary *fileIcons;
+@property (nonatomic, assign) Class tableViewCellClass;
 
 @end
 
@@ -40,7 +41,6 @@
 
 /**
  Manually update the items in a specific table view controller.
- 
  */
 - (void)updateItems:(NSArray *)items forFilePath:(NSString *)filePath;
 - (void)pushNewViewControllerForFilePath:(NSString *)filePath animated:(BOOL)animated;

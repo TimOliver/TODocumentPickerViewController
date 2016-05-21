@@ -106,11 +106,18 @@
     BOOL reverse = NO;
     NSString *sortKey = nil;
     
-    //Work out which selector to use as the comparison basis and whether to reverse it
     switch (self.sortingType) {
+        //File name needs to be explicitly sorted, so additional flags like
+        //case-insensitive and numeric handling are properly set
         case TODocumentPickerSortTypeNameDescending: reverse = YES;
-        case TODocumentPickerSortTypeNameAscending:  sortKey = @"fileName";
-            break;
+        case TODocumentPickerSortTypeNameAscending: 
+            items = [items sortedArrayUsingComparator:^NSComparisonResult(TODocumentPickerItem *first, TODocumentPickerItem *second) {
+                return [first.fileName compare:second.fileName options:NSCaseInsensitiveSearch|NSNumericSearch|NSDiacriticInsensitiveSearch];
+            }];
+            if (reverse)
+                items = [[items reverseObjectEnumerator] allObjects];
+            
+            return items;
             
         case TODocumentPickerSortTypeDateDescending: reverse = YES;
         case TODocumentPickerSortTypeDateAscending:  sortKey = @"lastModifiedDate";

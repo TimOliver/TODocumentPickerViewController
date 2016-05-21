@@ -44,6 +44,13 @@
 @interface TODocumentPickerViewControllerDataSource : NSObject
 
 /**
+ The class for which table view cells in the document picker will be instantiated off.
+ This can be used to insert new table view cell classes with additional configurable views.
+ If this property is not set, the default value of [UITableViewCell Class] is used instead
+ */
+@property (nonatomic, assign) Class tableViewCellClass;
+
+/**
  Whether synchronously or asynchronously, when your data source has finished building
  a list of items, you must call this block to pass those items back up to the view controller.
  (For UI considerations, this block always executes on the main thread)
@@ -62,6 +69,8 @@
 /**
  If an asynchronous request for files is currently progress and the representing view controller is canceled,
  (eg, if the user hits 'back' before it completes), this method will be called to give the request a chance to cancel.
+ 
+ @param filePath The file path with which to cancel loading
  */
 - (void)cancelRequestForFilePath:(NSString *)filePath;
 
