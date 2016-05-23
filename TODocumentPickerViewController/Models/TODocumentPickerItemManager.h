@@ -22,7 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "TODocumentPickerDefines.h"
+#import "TODocumentPickerConstants.h"
 
 @class TODocumentPickerItem;
 

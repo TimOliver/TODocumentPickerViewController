@@ -1,5 +1,5 @@
 //
-//  TODocumentPickerDefines.h
+//  TODocumentPickerViewController.h
 //
 //  Copyright 2015 Timothy Oliver. All rights reserved.
 //
@@ -21,25 +21,17 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
-#import <Foundation/FOundation.h>
+#import "TODocumentPickerItem.h"
 
-/*
- The default content styles that the controller implements.
- */
-typedef NS_ENUM(NSInteger, TODocumentPickerViewControllerStyle) {
-    TODocumentPickerViewControllerStyleLightContent,
-    TODocumentPickerViewControllerStyleDarkContent
-};
+@class TODocumentPickerViewControllerDataSource;
+@protocol TODocumentPickerViewControllerDelegate;
 
-/* 
- The various sorting orders in which the picker can display the files. 
-*/
-typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
-    TODocumentPickerSortTypeNameAscending,
-    TODocumentPickerSortTypeNameDescending,
-    TODocumentPickerSortTypeDateAscending,
-    TODocumentPickerSortTypeDateDescending,
-    TODocumentPickerSortTypeSizeAscending,
-    TODocumentPickerSortTypeSizeDescending
-};
+@interface TODocumentPickerViewController : UINavigationController
+
+
+
+@end
+
+
+
 
