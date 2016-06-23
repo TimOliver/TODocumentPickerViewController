@@ -26,7 +26,7 @@
 
 @interface TODocumentPickerViewController : UITableViewController
 
-@property (nonatomic, strong) TODocumentPickerViewControllerDataSource *dataSource;              /* Data source for file info. Retained by the document picker. */
+@property (nonatomic, strong) TODocumentPickerViewControllerDataSource *dataSource;              /* Data source for file info. Retained by the document picker and shared among all children. */
 @property (nonatomic, weak)   id<TODocumentPickerViewControllerDelegate> documentPickerDelegate; /* Sends out delegate events to the assigned object */
 
 @property (nonatomic, strong) NSArray *allowedFileExtensions;   /* File formats that may be selected by this controller. (If nil, all files may be selected) */
@@ -35,20 +35,15 @@
 @property (nonatomic, strong) NSDictionary *themeAttributes;    /* Attributes for applying a new colour scheme to this view controller. */
 
 @property (nonatomic, copy)   void (^refreshControlTriggeredHandler)(void); /* Handler block called whenever the refresh control is triggered. */
-@property (nonatomic, copy)   NSString *filePath; /* The file path that this view controller corresponds to */
-@property (nonatomic, strong) NSArray  *items;    /* All of the items displayed by this view controller. (Setting this will trigger a refresh) */
+@property (nonatomic, copy)   NSString *filePath;               /* The file path that this view controller corresponds to */
+@property (nonatomic, strong) NSArray  *items;                  /* All of the items displayed by this view controller. (Setting this will trigger a refresh) */
 
-@property (nonatomic, strong) UIImage *defaultIcon;
-@property (nonatomic, strong) UIImage *folderIcon;
-@property (nonatomic, strong) NSDictionary *fileIcons;
-@property (nonatomic, assign) Class tableViewCellClass;
+@property (nonatomic, strong) UIImage *defaultIcon;             /* The default icon if the file format isn't recognized, or other icons aren't available. */
+@property (nonatomic, strong) UIImage *folderIcon;              /* The icon used for folder entries. */
+@property (nonatomic, strong) NSDictionary *fileIcons;          /* A dictionary of file extension strings to images to use as icons for each file format. */
+@property (nonatomic, assign) Class tableViewCellClass;         /* If desired, a custom table view cell class that can contain additional controls or formatting. */
 
 @property (nonatomic, copy, readonly) void (^updateItemsForFilePath)(NSArray *items, NSString *filePath);
-
-@end
-
-/* Private method implementations accessible by child table view controllers for their parent document picker controller. */
-@interface TODocumentPickerViewController (TODocumentPickerTableViewController)
 
 /**
  Manually update the items in a specific table view controller.

@@ -15,7 +15,7 @@
 		22707A8C1A53BDDF008E66CC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22707A8B1A53BDDF008E66CC /* Images.xcassets */; };
 		22707A8F1A53BDDF008E66CC /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22707A8D1A53BDDF008E66CC /* LaunchScreen.xib */; };
 		22707AB01A550B65008E66CC /* TODocumentsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707AAF1A550B65008E66CC /* TODocumentsDataSource.m */; };
-		22A3E19B1A56857700C4839E /* TODocumentPickerTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1941A56857700C4839E /* TODocumentPickerTableViewController.m */; };
+		22A3E19B1A56857700C4839E /* TODocumentPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1941A56857700C4839E /* TODocumentPickerViewController.m */; };
 		22A3E19C1A56857700C4839E /* TODocumentPickerViewControllerOld.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1961A56857700C4839E /* TODocumentPickerViewControllerOld.m */; };
 		22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1991A56857700C4839E /* TODocumentPickerItem.m */; };
 		22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E19F1A5685A000C4839E /* TODocumentPickerHeaderView.m */; };
@@ -42,8 +42,8 @@
 		22707A8E1A53BDDF008E66CC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		22707AAE1A550B65008E66CC /* TODocumentsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentsDataSource.h; sourceTree = "<group>"; };
 		22707AAF1A550B65008E66CC /* TODocumentsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentsDataSource.m; sourceTree = "<group>"; };
-		22A3E1931A56857700C4839E /* TODocumentPickerTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerTableViewController.h; sourceTree = "<group>"; };
-		22A3E1941A56857700C4839E /* TODocumentPickerTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerTableViewController.m; sourceTree = "<group>"; };
+		22A3E1931A56857700C4839E /* TODocumentPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerViewController.h; sourceTree = "<group>"; };
+		22A3E1941A56857700C4839E /* TODocumentPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerViewController.m; sourceTree = "<group>"; };
 		22A3E1951A56857700C4839E /* TODocumentPickerViewControllerOld.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerViewControllerOld.h; sourceTree = "<group>"; };
 		22A3E1961A56857700C4839E /* TODocumentPickerViewControllerOld.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerViewControllerOld.m; sourceTree = "<group>"; };
 		22A3E1981A56857700C4839E /* TODocumentPickerItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerItem.h; sourceTree = "<group>"; };
@@ -138,8 +138,8 @@
 			children = (
 				22A3E1951A56857700C4839E /* TODocumentPickerViewControllerOld.h */,
 				22A3E1961A56857700C4839E /* TODocumentPickerViewControllerOld.m */,
-				22A3E1931A56857700C4839E /* TODocumentPickerTableViewController.h */,
-				22A3E1941A56857700C4839E /* TODocumentPickerTableViewController.m */,
+				22A3E1931A56857700C4839E /* TODocumentPickerViewController.h */,
+				22A3E1941A56857700C4839E /* TODocumentPickerViewController.m */,
 			);
 			name = Controllers;
 			path = TODocumentPickerViewController/Controllers;
@@ -247,7 +247,7 @@
 				22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */,
 				22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */,
 				22707AB01A550B65008E66CC /* TODocumentsDataSource.m in Sources */,
-				22A3E19B1A56857700C4839E /* TODocumentPickerTableViewController.m in Sources */,
+				22A3E19B1A56857700C4839E /* TODocumentPickerViewController.m in Sources */,
 				22A3E1A31A56880C00C4839E /* TODocumentPickerSegmentedControl.m in Sources */,
 				22A5E42C1A7B17F8000CD302 /* TODocumentPickerTableView.m in Sources */,
 				22707A841A53BDDF008E66CC /* TOAppDelegate.m in Sources */,
