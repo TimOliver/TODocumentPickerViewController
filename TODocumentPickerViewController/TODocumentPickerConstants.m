@@ -1,5 +1,5 @@
 //
-//  TODocumentPickerSegmentedControl.h
+//  TODocumentPickerDefines.h
 //
 //  Copyright 2015 Timothy Oliver. All rights reserved.
 //
@@ -20,12 +20,14 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
 #import "TODocumentPickerConstants.h"
 
-@interface TODocumentPickerSegmentedControl : UISegmentedControl
-
-@property (nonatomic, assign) TODocumentPickerSortType sortingType;
-@property (nonatomic, copy)   void (^sortTypeChangedHandler)(void);
-
-@end
+NSString * const TODocumentPickerViewControllerThemeAttributeBackgroundColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableSeparatorColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableCellTitleColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableCellIconTintColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor = @"";

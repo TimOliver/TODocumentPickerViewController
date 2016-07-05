@@ -51,23 +51,11 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
 @protocol TODocumentPickerViewControllerDataSource <NSObject>
 
 /**
- The first instance of the document view controller that this data source object was assigned.
- */
-@property (nonatomic, readonly) TODocumentPickerViewController *rootDocumentPickerViewController;
-
-/**
  The class for which table view cells in the document picker will be instantiated off.
  This can be used to insert new table view cell classes with additional configurable views.
  If this property is not set, the default value of [UITableViewCell Class] is used instead
  */
 - (Class)tableCellViewClassForDocumentPickerViewController:(TODocumentPickerViewController *)documentPicker;
-
-/**
- Whether synchronously or asynchronously, when your data source has finished building
- a list of items, you must call this block to pass those items back up to the view controller.
- (For UI considerations, this block always executes on the main thread)
- */
-//@property (nonatomic, copy, readonly) void (^updateItemsForFilePath)(NSArray *items, NSString *filePath);
 
 /**
  Called by the view controller when it wants to obtain a list of items for the folder at the end of the file path.
@@ -104,4 +92,18 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
 /* User selected a set of items and tapped */
 - (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker didSelectItems:(NSArray *)items;
 
+@end
+
 //-------------------------------------------------------------------------
+
+// Theming Attributes
+
+extern NSString *const TODocumentPickerViewControllerThemeAttributeBackgroundColor;                     /* Background color of the table view */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableSeparatorColor;                 /* Color of the table cell divider lines */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableCellTitleColor;                 /* Color of the title text label in each cell */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor;            /* Color of the subtitle text label in each cell */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor;         /* Color of the arrow accessory icon */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableCellIconTintColor;              /* Tint color of the icons in each cell */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor;   /* Background color of each section header */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor;              /* Color of the text in each section header */
+extern NSString *const TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor;              /* Tint color of the scrollable section index column */

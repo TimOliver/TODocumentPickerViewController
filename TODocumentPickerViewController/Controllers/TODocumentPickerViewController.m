@@ -20,15 +20,13 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import "TODocumentPickerDefines.h"
-
-#import "TODocumentPickerTableViewController.h"
+#import "TODocumentPickerViewController.h"
 #import "TODocumentPickerTableView.h"
 #import "TODocumentPickerHeaderView.h"
 #import "TODocumentPickerItemManager.h"
 #import "TODocumentPickerItem.h"
 
-@interface TODocumentPickerTableViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface TODocumentPickerViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
 
 /* View management */
 @property (nonatomic, strong) TODocumentPickerHeaderView *headerView;
@@ -88,9 +86,12 @@
 - (void)updateToolbarItems;
 - (void)updateBarButtonsAnimated:(BOOL)animated;
 
+/* Pushing a new controller */
+- (void)pushNewViewControllerForFilePath:(NSString *)filePath animated:(BOOL)animated;
+
 @end
 
-@implementation TODocumentPickerTableViewController
+@implementation TODocumentPickerViewController
 
 #pragma mark - View Setup -
 - (instancetype)init
@@ -98,9 +99,7 @@
     if (self = [super init]) {
         _cellFolderFont = [UIFont boldSystemFontOfSize:17.0f];//[UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
         _cellFileFont   = [UIFont systemFontOfSize:17.0f];
-        
         _itemManager = [[TODocumentPickerItemManager alloc] init];
-        
         _serialQueue = dispatch_queue_create("TODocumentPickerViewController.itemBuilderQueue", DISPATCH_QUEUE_SERIAL);
     }
     
@@ -112,7 +111,7 @@
     [super viewDidLoad];
     
     CGRect frame = CGRectZero;
-    __block TODocumentPickerTableViewController *blockSelf = self;
+    __weak typeof(self)weakSelf = self;
     
     /* Configure table */
     self.tableView = [[TODocumentPickerTableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
@@ -125,13 +124,13 @@
 
     /* Table item manager setup */
     self.itemManager.tableView = self.tableView;
-    self.itemManager.contentReloadedHandler = ^{ [blockSelf updateContent]; };
+    self.itemManager.contentReloadedHandler = ^{ [weakSelf updateContent]; };
     
     /* Configure header view and components */
     self.headerView = [TODocumentPickerHeaderView new];
     self.headerView.searchTextChangedHandler = ^(NSString *searchText) {
-        blockSelf.itemManager.searchString = searchText;
-        [blockSelf showFeedbackLabelIfNeeded];
+        weakSelf.itemManager.searchString = searchText;
+        [weakSelf showFeedbackLabelIfNeeded];
     };
     
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:self.headerView.bounds];
@@ -141,7 +140,7 @@
 
     /* Handler for changing sort type */
     self.headerView.sortControl.sortTypeChangedHandler = ^{
-        blockSelf.sortingType = self.headerView.sortControl.sortingType;
+        weakSelf.sortingType = self.headerView.sortControl.sortingType;
     };
     
     /* Create the incidental loading indicator. */
@@ -259,10 +258,8 @@
 #pragma mark - Event Handling -
 - (void)refreshControlTriggered
 {
-    if (self.refreshControlTriggeredHandler)
-        self.refreshControlTriggeredHandler();
-    else
-        [self.refreshControl endRefreshing];
+    //TODO: trigger refresh here
+    [self.refreshControl endRefreshing];
 }
 
 - (void)selectButtonTapped

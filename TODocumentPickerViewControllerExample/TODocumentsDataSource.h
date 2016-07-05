@@ -6,9 +6,7 @@
 //  Copyright (c) 2015 Tim Oliver. All rights reserved.
 //
 
-#import "TODocumentPickerViewController.h"
+#import <Foundation/Foundation.h>
 
-
-@interface TODocumentsDataSource : TODocumentPickerViewControllerDataSource
-
+@interface TODocumentsDataSource : NSObject
 @end

@@ -7,8 +7,9 @@
 //
 
 #import "TODocumentsDataSource.h"
+#import "TODocumentPickerConstants.h"
 
-@interface TODocumentsDataSource ()
+@interface TODocumentsDataSource () <TODocumentPickerViewControllerDataSource>
 
 - (void)createTestData;
 - (NSString *)documentsPath;
