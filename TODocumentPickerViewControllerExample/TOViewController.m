@@ -18,9 +18,11 @@
 
 - (IBAction)buttonTapped:(id)sender
 {
-    TODocumentPickerViewController *documentPicker = [TODocumentPickerViewController new];
-    documentPicker.dataSource = [TODocumentsDataSource new];
-    [self presentViewController:documentPicker animated:YES completion:nil];
+    TODocumentPickerViewController *documentPicker = [[TODocumentPickerViewController alloc] initWithFilePath:nil];
+    documentPicker.dataSource = [[TODocumentsDataSource alloc] init];
+    UINavigationController *controller = [[UINavigationController alloc] initWithRootViewController:documentPicker];
+    controller.modalPresentationStyle = UIModalPresentationFormSheet;
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 @end

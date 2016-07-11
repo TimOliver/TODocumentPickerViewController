@@ -1,7 +1,7 @@
 //
 //  TODocumentPickerTableViewController.m
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -27,6 +27,9 @@
 #import "TODocumentPickerItem.h"
 
 @interface TODocumentPickerViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
+
+/* Root Controller Management */
+@property (nonatomic, strong, readwrite) TODocumentPickerViewController *rootViewController;
 
 /* View management */
 @property (nonatomic, strong) TODocumentPickerHeaderView *headerView;
@@ -65,6 +68,10 @@
 /* Serial queue for posting updates to the items property asynchronously. */
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 
+/* Intial setup */
+- (void)commonInit;
+- (void)configureToolbar;
+
 /* Show dummy content labels */
 - (void)showFeedbackLabelIfNeeded;
 
@@ -86,24 +93,41 @@
 - (void)updateToolbarItems;
 - (void)updateBarButtonsAnimated:(BOOL)animated;
 
-/* Pushing a new controller */
-- (void)pushNewViewControllerForFilePath:(NSString *)filePath animated:(BOOL)animated;
+/* Internal controller creation */
+- (instancetype)initWithRootViewController:(TODocumentPickerViewController *)rootController atFilePath:(NSString *)filePath;
 
 @end
 
 @implementation TODocumentPickerViewController
 
 #pragma mark - View Setup -
-- (instancetype)init
+- (instancetype)initWithFilePath:(NSString *)filePath
 {
     if (self = [super init]) {
-        _cellFolderFont = [UIFont boldSystemFontOfSize:17.0f];//[UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
-        _cellFileFont   = [UIFont systemFontOfSize:17.0f];
-        _itemManager = [[TODocumentPickerItemManager alloc] init];
-        _serialQueue = dispatch_queue_create("TODocumentPickerViewController.itemBuilderQueue", DISPATCH_QUEUE_SERIAL);
+        [self commonInit];
+        _rootViewContorller = self;
     }
-    
+
     return self;
+}
+
+- (instancetype)initWithRootViewController:(TODocumentPickerViewController *)rootController atFilePath:(NSString *)filePath
+{
+    if (self = [super init]) {
+        [self commonInit];
+        _rootViewContorller = rootController;
+    }
+
+    return self;
+}
+
+- (void)commonInit
+{
+    _cellFolderFont = [UIFont boldSystemFontOfSize:17.0f];
+    _cellFileFont   = [UIFont systemFontOfSize:17.0f];
+    _itemManager = [[TODocumentPickerItemManager alloc] init];
+    _serialQueue = dispatch_queue_create("TODocumentPickerViewController.itemBuilderQueue", DISPATCH_QUEUE_SERIAL);
+    _showToolbar = YES;
 }
 
 - (void)viewDidLoad
@@ -152,29 +176,73 @@
     self.loadingView.frame = frame;
     [self.tableView addSubview:self.loadingView];
     [self.loadingView startAnimating];
-    
-    /* Toolbar files/folders count label */
-    self.toolBarLabel = [[UILabel alloc] initWithFrame:(CGRect){0,0,215,44}];
-    self.toolBarLabel.font = [UIFont systemFontOfSize:12.0f];
-    self.toolBarLabel.textColor = self.navigationController.navigationBar.titleTextAttributes[NSForegroundColorAttributeName];
-    self.toolBarLabel.textAlignment = NSTextAlignmentCenter;
-    self.toolBarLabel.text = NSLocalizedString(@"Loading...", nil);
-    
-    /* Toolbar button elements */
-    self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil) style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonTapped)];
-    UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIBarButtonItem *labelItem = [[UIBarButtonItem alloc] initWithCustomView:self.toolBarLabel];
-    self.nonEditingToolbarItems = @[self.doneButton, spaceItem, labelItem, spaceItem, spaceItem];
-    
-    self.selectAllButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Select All", @"") style:UIBarButtonItemStylePlain target:self action:@selector(selectAllButtonTapped)];
-    UIBarButtonItem *actionItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:nil action:nil];
-    self.chooseButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Choose", @"") style:UIBarButtonItemStyleDone target:self action:@selector(chooseButtonTapped)];
-    self.editingToolbarItems = @[self.selectAllButton, spaceItem, actionItem, spaceItem, self.chooseButton];
-    actionItem.enabled = NO;
-    
+
+    /* Set-up the Edit/Cancel buttons */
     self.selectButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Select", nil) style:UIBarButtonItemStylePlain target:self action:@selector(selectButtonTapped)];
     self.cancelButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Cancel", nil) style:UIBarButtonItemStyleDone target:self action:@selector(selectButtonTapped)];
     self.navigationItem.rightBarButtonItem = self.selectButton;
+
+    /* Set-up Select All button */
+    self.selectAllButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Select All", @"") style:UIBarButtonItemStylePlain target:self action:@selector(selectAllButtonTapped)];
+
+    /* Set-up the toolbar */
+    [self configureToolbar];
+}
+
+- (void)configureToolbar
+{
+    // If another controller is controlling the toolbar, defer to them
+    if (self.showToolbar == NO) {
+        self.toolBarLabel = nil;
+        self.doneButton = nil;
+        self.chooseButton = nil;
+
+        return;
+    }
+
+    if (self.navigationController.toolbarHidden) {
+        self.navigationController.toolbarHidden = NO;
+    }
+
+    /* Toolbar files/folders count label */
+    if (self.toolBarLabel == nil) {
+        self.toolBarLabel = [[UILabel alloc] initWithFrame:(CGRect){0,0,215,44}];
+        self.toolBarLabel.font = [UIFont systemFontOfSize:12.0f];
+        self.toolBarLabel.textColor = self.navigationController.navigationBar.titleTextAttributes[NSForegroundColorAttributeName];
+        self.toolBarLabel.textAlignment = NSTextAlignmentCenter;
+        self.toolBarLabel.text = NSLocalizedString(@"Loading...", nil);
+    }
+
+    UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+
+    /* Toolbar button elements */
+    if (self.nonEditingToolbarItems == nil) {
+        if (self.doneButton == nil) {
+            self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil)
+                                                               style:UIBarButtonItemStyleDone
+                                                              target:self
+                                                              action:@selector(doneButtonTapped)];
+        }
+
+        UIBarButtonItem *labelItem = [[UIBarButtonItem alloc] initWithCustomView:self.toolBarLabel];
+        self.nonEditingToolbarItems = @[self.doneButton, spaceItem, labelItem, spaceItem, spaceItem];
+    }
+
+    /* Set up editing buttons */
+
+    if (self.editingToolbarItems == nil) {
+        if (self.chooseButton == nil) {
+            self.chooseButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Choose", @"")
+                                                                 style:UIBarButtonItemStyleDone
+                                                                target:self
+                                                                action:@selector(chooseButtonTapped)];
+        }
+
+        UIBarButtonItem *actionItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:nil action:nil];
+        actionItem.enabled = NO;
+
+        self.editingToolbarItems = @[actionItem, spaceItem, self.chooseButton];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -270,19 +338,27 @@
 
 - (void)updateBarButtonsAnimated:(BOOL)animated
 {
+    //Swap the 'Select/Cancel' buttons
     [self.navigationItem setRightBarButtonItem:(self.editing ? self.cancelButton : self.selectButton) animated:animated];
-    
-    if (self.navigationController.viewControllers.count > 1)
+
+    //Hide 'back' if it was visible
+    if (self.navigationController.viewControllers.count > 1) {
         [self.navigationItem setHidesBackButton:self.editing animated:animated];
+    }
+
+    //Add the 'Select All' button in place of the 'Back' button
+    [self.navigationItem setLeftBarButtonItems:self.editing ? @[self.selectAllButton] : nil animated:animated];
 }
 
 - (void)selectAllButtonTapped
 {
     if (self.editing == NO)
         return;
-    
+
+    // Work out if we're selecting, or deselecting all items
     BOOL selected = (self.allCellsSelected == NO);
-    
+
+    // Go through and apply the selection to every item
     for (NSInteger i = 0; i < [self.tableView numberOfSections]; i++) {
         for (NSInteger j = 0; j < [self.tableView numberOfRowsInSection:i]; j++) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:j inSection:i];
@@ -293,7 +369,11 @@
                 [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
         }
     }
-    
+
+    // Update the Select button text
+    self.selectAllButton.title = self.allCellsSelected ? NSLocalizedString(@"Select None", @"") : NSLocalizedString(@"Select All", @"");
+
+    // Update the toolbar state
     [self updateToolbarItems];
 }
 
@@ -374,7 +454,7 @@
     TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
     if (item.isFolder) {
         NSString *newFilePath = [self.filePath stringByAppendingPathComponent:item.fileName];
-        [(TODocumentPickerViewController *)self.navigationController pushNewViewControllerForFilePath:newFilePath animated:YES];
+        //[(TODocumentPickerViewController *)self.navigationController pushNewViewControllerForFilePath:newFilePath animated:YES];
     }
 }
 
@@ -386,10 +466,108 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    //Dismiss the keyboard if it's visible
     [self.headerView dismissKeyboard];
+
+    //Update the header clipping, so it's not visible under translucent bars
+    self.headerView.clippingHeight = scrollView.contentInset.top + scrollView.contentOffset.y;
 }
 
-#pragma mark - Accessors -  
+#pragma mark - Update View Content -
+- (void)updateContent
+{
+    [self resetHeaderConstraints];
+    [self updateFooterLabel];
+    [self updateToolbarItems];
+
+    self.navigationItem.rightBarButtonItem.enabled = (self.items.count > 0);
+}
+
+- (void)showFeedbackLabelIfNeeded
+{
+    self.feedbackLabel.hidden = YES;
+
+    //Cancel if searching AND resulting rows is greater than one
+    if (self.itemManager.searchString.length > 0 && [self.itemManager numberOfRowsForSection:0] > 0)
+        return;
+
+    //Cnacel if not searching and items are present
+    if (self.itemManager.searchString.length == 0 && self.items.count > 0)
+        return;
+
+    if (self.feedbackLabel == nil) {
+        self.feedbackLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.feedbackLabel.font = [UIFont systemFontOfSize:16.0f];
+        self.feedbackLabel.textColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
+        self.feedbackLabel.textAlignment = NSTextAlignmentCenter;
+        [self.tableView addSubview:self.feedbackLabel];
+    }
+
+    self.feedbackLabel.hidden = NO;
+
+    if (self.headerView.searchBar.text.length > 0)
+        self.feedbackLabel.text = NSLocalizedString(@"No Results Found", @"");
+    else
+        self.feedbackLabel.text = NSLocalizedString(@"Folder is Empty", @"");
+
+    [self.feedbackLabel sizeToFit];
+
+    CGRect frame = self.feedbackLabel.frame;
+    frame.origin.x = (CGRectGetWidth(self.tableView.bounds) - CGRectGetWidth(frame)) * 0.5f;
+    frame.origin.y = CGRectGetHeight(self.headerView.frame) + ((self.tableView.rowHeight - CGRectGetHeight(frame)) * 0.5f) + self.tableView.rowHeight;
+    self.feedbackLabel.frame = frame;
+}
+
+- (void)updateFooterLabel
+{
+    NSInteger numberOfFolders = 0, numberOfFiles = 0;
+
+    for (TODocumentPickerItem *item in self.items) {
+        if (item.isFolder)
+            numberOfFolders++;
+        else
+            numberOfFiles++;
+    }
+
+    //'folder' or 'folders' depending on number
+    NSString *pluralFolders = (numberOfFolders == 1) ? NSLocalizedString(@"folder", nil) : NSLocalizedString(@"folders", nil);
+    NSString *pluralFiles = (numberOfFiles == 1) ? NSLocalizedString(@"file", nil) : NSLocalizedString(@"files", nil);
+
+    NSString *labelText = nil;
+    if (numberOfFolders && numberOfFiles)
+        labelText = [NSString stringWithFormat:@"%ld %@, %ld %@", (long)numberOfFolders, pluralFolders, (long)numberOfFiles, pluralFiles];
+    else if (numberOfFolders)
+        labelText = [NSString stringWithFormat:@"%ld %@", (long)numberOfFolders, pluralFolders];
+    else if (numberOfFiles)
+        labelText = [NSString stringWithFormat:@"%ld %@", (long)numberOfFiles, pluralFiles];
+    else {
+        if (self.loadingView && self.loadingView.hidden == NO)
+            labelText = NSLocalizedString(@"Loading...", nil);
+        else
+            labelText = NSLocalizedString(@"No files or folders found", nil);
+    }
+
+    self.toolBarLabel.text = labelText;
+}
+
+- (void)updateToolbarItems
+{
+    if (self.showToolbar == NO) {
+        return;
+    }
+
+    if (self.editing == NO && self.toolbarItems != self.nonEditingToolbarItems)
+        [self setToolbarItems:self.nonEditingToolbarItems animated:YES];
+    else if (self.editing && self.toolbarItems != self.editingToolbarItems)
+        [self setToolbarItems:self.editingToolbarItems animated:YES];
+
+    if (self.editing == NO)
+        return;
+
+    self.chooseButton.enabled = ([self.tableView indexPathsForSelectedRows].count > 0);
+}
+
+#pragma mark - Accessors -
 - (void)setItems:(NSArray *)items
 {
     if (items == self.itemManager.items)
@@ -443,95 +621,14 @@
     return [self.tableView indexPathsForSelectedRows].count == self.items.count;
 }
 
-#pragma mark - Update View Content -
-- (void)updateContent
+- (void)setShowToolbar:(BOOL)showToolbar
 {
-    [self resetHeaderConstraints];
-    [self updateFooterLabel];
-    [self updateToolbarItems];
-    
-    self.navigationItem.rightBarButtonItem.enabled = (self.items.count > 0);
-}
-
-- (void)showFeedbackLabelIfNeeded
-{
-    self.feedbackLabel.hidden = YES;
-    
-    //Cancel if searching AND resulting rows is greater than one
-    if (self.itemManager.searchString.length > 0 && [self.itemManager numberOfRowsForSection:0] > 0)
+    if (_showToolbar == showToolbar) {
         return;
-    
-    //Cnacel if not searching and items are present
-    if (self.itemManager.searchString.length == 0 && self.items.count > 0)
-        return;
-    
-    if (self.feedbackLabel == nil) {
-        self.feedbackLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        self.feedbackLabel.font = [UIFont systemFontOfSize:16.0f];
-        self.feedbackLabel.textColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
-        self.feedbackLabel.textAlignment = NSTextAlignmentCenter;
-        [self.tableView addSubview:self.feedbackLabel];
     }
-    
-    self.feedbackLabel.hidden = NO;
-    
-    if (self.headerView.searchBar.text.length > 0)
-        self.feedbackLabel.text = NSLocalizedString(@"No Results Found", @"");
-    else
-        self.feedbackLabel.text = NSLocalizedString(@"Folder is Empty", @"");
-    
-    [self.feedbackLabel sizeToFit];
-    
-    CGRect frame = self.feedbackLabel.frame;
-    frame.origin.x = (CGRectGetWidth(self.tableView.bounds) - CGRectGetWidth(frame)) * 0.5f;
-    frame.origin.y = CGRectGetHeight(self.headerView.frame) + ((self.tableView.rowHeight - CGRectGetHeight(frame)) * 0.5f) + self.tableView.rowHeight;
-    self.feedbackLabel.frame = frame;
-}
 
-- (void)updateFooterLabel
-{
-    NSInteger numberOfFolders = 0, numberOfFiles = 0;
-    
-    for (TODocumentPickerItem *item in self.items) {
-        if (item.isFolder)
-            numberOfFolders++;
-        else
-            numberOfFiles++;
-    }
-    
-    //'folder' or 'folders' depending on number
-    NSString *pluralFolders = (numberOfFolders == 1) ? NSLocalizedString(@"folder", nil) : NSLocalizedString(@"folders", nil);
-    NSString *pluralFiles = (numberOfFiles == 1) ? NSLocalizedString(@"file", nil) : NSLocalizedString(@"files", nil);
-    
-    NSString *labelText = nil;
-    if (numberOfFolders && numberOfFiles)
-        labelText = [NSString stringWithFormat:@"%ld %@, %ld %@", (long)numberOfFolders, pluralFolders, (long)numberOfFiles, pluralFiles];
-    else if (numberOfFolders)
-        labelText = [NSString stringWithFormat:@"%ld %@", (long)numberOfFolders, pluralFolders];
-    else if (numberOfFiles)
-        labelText = [NSString stringWithFormat:@"%ld %@", (long)numberOfFiles, pluralFiles];
-    else {
-        if (self.loadingView && self.loadingView.hidden == NO)
-            labelText = NSLocalizedString(@"Loading...", nil);
-        else
-            labelText = NSLocalizedString(@"No files or folders found", nil);
-    }
-        
-    self.toolBarLabel.text = labelText;
-}
-
-- (void)updateToolbarItems
-{
-    if (self.editing == NO && self.toolbarItems != self.nonEditingToolbarItems)
-        [self setToolbarItems:self.nonEditingToolbarItems animated:YES];
-    else if (self.editing && self.toolbarItems != self.editingToolbarItems)
-        [self setToolbarItems:self.editingToolbarItems animated:YES];
-    
-    if (self.editing == NO)
-        return;
-    
-    self.chooseButton.enabled = ([self.tableView indexPathsForSelectedRows].count > 0);
-    self.selectAllButton.title = self.allCellsSelected ? NSLocalizedString(@"Select None", @"") : NSLocalizedString(@"Select All", @"");
+    _showToolbar = showToolbar;
+    [self configureToolbar];
 }
 
 @end

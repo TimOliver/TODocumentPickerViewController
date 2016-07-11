@@ -1,7 +1,7 @@
 //
 //  TODocumentPickerHeaderView.m
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -24,6 +24,8 @@
 
 @interface TODocumentPickerHeaderView () <UISearchBarDelegate>
 
+@property (nonatomic, strong, readwrite) UIView *clippingView;
+@property (nonatomic, strong, readwrite) UIView *containerView;
 @property (nonatomic, strong, readwrite) UISearchBar *searchBar;
 @property (nonatomic, strong, readwrite) TODocumentPickerSegmentedControl *sortControl;
 
@@ -48,24 +50,31 @@
 }
 
 - (void)setupViews
-{    
+{
+    self.clippingView = [[UIView alloc] initWithFrame:self.bounds];
+    self.clippingView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.clippingView.clipsToBounds = YES;
+    [self addSubview:self.clippingView];
+
+    self.containerView = [[UIView alloc] initWithFrame:self.bounds];
+    self.containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self.clippingView addSubview:self.containerView];
+
     self.searchBar = [[UISearchBar alloc] initWithFrame:(CGRect){0,0,320,44}];
     self.searchBar.translatesAutoresizingMaskIntoConstraints = NO;
     self.searchBar.delegate = self;
     self.searchBar.placeholder = @"Search";
     self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
-    
+    [self.containerView addSubview:self.searchBar];
+
     self.sortControl = [[TODocumentPickerSegmentedControl alloc] init];
     self.sortControl.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [self addSubview:self.sortControl];
-    [self addSubview:self.searchBar];
+    [self.containerView addSubview:self.sortControl];
 }
 
 - (void)setupConstraints
 {
-    NSDictionary *views = @{@"searchBar":self.searchBar,
-                            @"sortControl":self.sortControl};
+    NSDictionary *views = @{@"searchBar":self.searchBar, @"sortControl":self.sortControl};
     
     //Search bar constraints
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[searchBar]|" options:0 metrics:nil views:views]];
@@ -80,6 +89,31 @@
     [super didMoveToSuperview];
     self.backgroundColor = self.superview.backgroundColor;
     [self needsUpdateConstraints];
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+
+    CGFloat originalHeight = self.bounds.size.height;
+    CGFloat newHeight = originalHeight - self.clippingHeight;
+    CGFloat clampedHeight = MAX(self.clippingHeight, 0);
+
+    //clamp the height
+    newHeight = MAX(0, newHeight);
+    newHeight = MIN(originalHeight, newHeight);
+
+    //Set the clipping view to lower
+    CGRect frame = self.bounds;
+    frame.size.height = newHeight;
+    frame.origin.y = clampedHeight;
+    self.clippingView.frame = frame;
+
+    //At the same time, raise the container view to create the illusion
+    //that the content isn't being lowered
+    frame = self.bounds;
+    frame.origin.y = -clampedHeight;
+    self.containerView.frame = frame;
 }
 
 #pragma mark - Search Bar Delegate -
@@ -99,6 +133,25 @@
 {
     if ([self.searchBar isFirstResponder])
         [self.searchBar resignFirstResponder];
+}
+
+- (void)setClippingHeight:(CGFloat)clippingHeight
+{
+    //Don't bother doing any layout if the we're beyond the clipping threshold
+    clippingHeight = MAX(0, clippingHeight);
+    if (_clippingHeight == clippingHeight) {
+        return;
+    }
+
+    _clippingHeight = clippingHeight;
+
+    if (clippingHeight > self.frame.size.height) {
+        self.hidden = YES;
+        return;
+    }
+
+    self.hidden = NO;
+    [self setNeedsLayout];
 }
 
 @end

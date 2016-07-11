@@ -1,7 +1,7 @@
 //
 //  TODocumentPickerHeaderView.h
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -25,10 +25,17 @@
 
 @interface TODocumentPickerHeaderView : UIView
 
+/* Views */
 @property (nonatomic, readonly) UISearchBar *searchBar;
 @property (nonatomic, readonly) TODocumentPickerSegmentedControl *sortControl;
+
+/* The height from the top of the view that is clipped */
+@property (nonatomic, assign) CGFloat clippingHeight;
+
+/* Responding to text inserted into the search bar */
 @property (nonatomic, copy) void (^searchTextChangedHandler)(NSString *searchText);
 
+/* Cancelling the search bar (i.e the user scrolls the table view) */
 - (void)dismissKeyboard;
 
 @end

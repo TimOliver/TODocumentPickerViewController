@@ -8,6 +8,7 @@
 
 #import "TODocumentsDataSource.h"
 #import "TODocumentPickerConstants.h"
+#import "TODocumentPickerItem.h"
 
 @interface TODocumentsDataSource () <TODocumentPickerViewControllerDataSource>
 
@@ -72,7 +73,7 @@
 }
 
 #pragma mark - Class Override -
-- (void)requestItemsForFilePath:(NSString *)filePath
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker requestItemsForFilePath:(NSString *)filePath completionHandler:(void (^)(NSArray<TODocumentPickerItem *> * _Nullable))completionHandler
 {
     NSString *fullFilePath = [self.documentsPath stringByAppendingPathComponent:filePath];
     NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullFilePath error:nil];
@@ -92,7 +93,7 @@
     
     //Perform after a 1 second delay to simulate a web request
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.updateItemsForFilePath(items, filePath);
+        completionHandler(items);
     });
 }
 

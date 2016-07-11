@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TODocumentPickerViewController.h"
 
-@interface TODocumentsDataSource : NSObject
+@interface TODocumentsDataSource : NSObject <TODocumentPickerViewControllerDataSource>
 @end
