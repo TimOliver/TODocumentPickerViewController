@@ -24,33 +24,26 @@
 #import "TODocumentPickerConstants.h"
 
 @class TODocumentPickerItem;
+@class TODocumentPickerConfiguration;
 
 @interface TODocumentPickerViewController : UITableViewController
+
+@property (nonatomic, readonly, nonnull)  TODocumentPickerConfiguration *configuration; /* An object that holds the configuration for all controllers */
 
 @property (nonatomic, strong, nullable)   id<TODocumentPickerViewControllerDataSource> dataSource;             /* Data source for file info. Retained by the document picker and shared among all children. */
 @property (nonatomic, weak, nullable)     id<TODocumentPickerViewControllerDelegate>   documentPickerDelegate; /* Sends out delegate events to the assigned object */
 
-@property (nonatomic, assign)             BOOL showToolbar;                 /* Whether this controller shows and manages the navigation controller toolbar (Default is YES) */
+@property (nonatomic, readonly, nullable) NSString *filePath; /* The file path that this view controller corresponds to */
+@property (nonatomic, strong, nullable)   NSArray  *items;    /* All of the items displayed by this view controller. (Setting this will trigger a UI refresh) */
 
-@property (nonatomic, readonly, nullable) NSString *filePath;               /* The file path that this view controller corresponds to */
-@property (nonatomic, strong, nullable)   NSArray  *items;                  /* All of the items displayed by this view controller. (Setting this will trigger a UI refresh) */
-
-@property (nonatomic, strong, nullable)   NSArray *allowedFileExtensions;   /* File formats that may be selected by this controller. (If nil, all files may be selected) */
-@property (nonatomic, assign)             BOOL showExcludedFileExtensions;  /* Shows files that weren't on the allowed extensions list, but grayed out (Default is NO) */
-
-@property (nonatomic, strong, nullable)   NSDictionary *fileFormatIcons;    /* If dealing with custom formats, this lets you add custom icons for those formats (Images must be 40x40 points) */
-@property (nonatomic, strong, nullable)   UIImage *defaultIcon;             /* The default icon if the file format isn't recognized, or other icons aren't available. */
-@property (nonatomic, strong, nullable)   UIImage *folderIcon;              /* The icon used for folder entries. */
-@property (nonatomic, strong, nullable)   NSDictionary *fileIcons;          /* A dictionary of file extension strings to images to use as icons for each file format. */
-
-@property (nonatomic, readonly, nonnull)  TODocumentPickerViewController *rootViewContorller; /* In a navigation chain of picker controllers, the root controller at the front.  */
+@property (nonatomic, readonly, nonnull)  TODocumentPickerViewController *rootViewController; /* In a navigation chain of picker controllers, the root controller at the front.  */
 @property (nonatomic, readonly, nonnull)  NSArray *viewControllers;         /* The chain of document picker view controllers in the navigation stack */
 
-@property (nonatomic, assign, nullable)   Class tableViewCellClass;         /* If desired, a custom table view cell class that can contain additional controls or formatting. */
-@property (nonatomic, strong, nullable)   NSDictionary *themeAttributes;    /* Attributes for applying a new colour scheme to this view controller. */
-
-/* Create the base view controller with the initial starting file path */
+/* Create the base view controller with the initial starting file path, with a default configuration */
 - (nullable instancetype)initWithFilePath:(nullable NSString *)filePath;
+
+/* Create an instance with a custom created configuration object */
+- (nullable instancetype)initWithConfiguration:(nullable TODocumentPickerConfiguration *)configuration filePath:(nullable NSString *)filePath;
 
 /* Sets the items for the view controller in this chain, controlling that file path */
 - (void)setItems:(nullable NSArray<TODocumentPickerItem *> *)items forFilePath:(nullable NSString *)filePath;

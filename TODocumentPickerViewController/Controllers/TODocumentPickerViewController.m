@@ -25,11 +25,18 @@
 #import "TODocumentPickerHeaderView.h"
 #import "TODocumentPickerItemManager.h"
 #import "TODocumentPickerItem.h"
+#import "TODocumentPickerConfiguration.h"
 
 @interface TODocumentPickerViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
 
 /* Root Controller Management */
 @property (nonatomic, strong, readwrite) TODocumentPickerViewController *rootViewController;
+
+/* The file path that this controller represents */
+@property (nonatomic, readwrite, copy, nullable) NSString *filePath;
+
+/* The configuration object holding all common properties */
+@property (nonatomic, readwrite, strong, nonnull)  TODocumentPickerConfiguration *configuration;
 
 /* View management */
 @property (nonatomic, strong) TODocumentPickerHeaderView *headerView;
@@ -61,6 +68,9 @@
 /* Single use flag to check for the first time we appear onscreen */
 @property (nonatomic, assign) BOOL viewInitiallyAppeared;
 
+/* Single flag to determine that we've started laying out views */
+@property (nonatomic, assign) BOOL viewInitiallyLaidOut;
+
 /* State tracking */
 @property (nonatomic, readonly) BOOL sectionIndexVisible; /* Check to see if we have enough items to warrant an index. */
 @property (nonatomic, readonly) BOOL allCellsSelected;
@@ -87,14 +97,17 @@
 - (void)selectAllButtonTapped;
 - (void)chooseButtonTapped;
 
+/* Fetch items */
+- (void)reloadItemsFromDataSource;
+
 /* Visual content updates */
-- (void)updateContent;
+- (void)updateViewContent;
 - (void)updateFooterLabel;
 - (void)updateToolbarItems;
 - (void)updateBarButtonsAnimated:(BOOL)animated;
 
 /* Internal controller creation */
-- (instancetype)initWithRootViewController:(TODocumentPickerViewController *)rootController atFilePath:(NSString *)filePath;
+- (instancetype)initWithRootViewController:(TODocumentPickerViewController *)rootController filePath:(NSString *)filePath;
 
 @end
 
@@ -103,19 +116,28 @@
 #pragma mark - View Setup -
 - (instancetype)initWithFilePath:(NSString *)filePath
 {
+    return [self initWithConfiguration:[[TODocumentPickerConfiguration alloc] init] filePath:filePath];
+}
+
+- (instancetype)initWithConfiguration:(TODocumentPickerConfiguration *)configuration filePath:(NSString *)filePath
+{
     if (self = [super init]) {
         [self commonInit];
-        _rootViewContorller = self;
+        _configuration = configuration;
+        _filePath = filePath;
+        _rootViewController = self;
     }
 
     return self;
 }
 
-- (instancetype)initWithRootViewController:(TODocumentPickerViewController *)rootController atFilePath:(NSString *)filePath
+- (instancetype)initWithRootViewController:(TODocumentPickerViewController *)rootController filePath:(NSString *)filePath
 {
     if (self = [super init]) {
         [self commonInit];
-        _rootViewContorller = rootController;
+        _configuration = rootController.configuration;
+        _filePath = filePath;
+        _rootViewController = rootController;
     }
 
     return self;
@@ -127,7 +149,14 @@
     _cellFileFont   = [UIFont systemFontOfSize:17.0f];
     _itemManager = [[TODocumentPickerItemManager alloc] init];
     _serialQueue = dispatch_queue_create("TODocumentPickerViewController.itemBuilderQueue", DISPATCH_QUEUE_SERIAL);
-    _showToolbar = YES;
+}
+
+- (void)dealloc
+{
+    /* Cancel any in-progress requests */
+    if ([self.dataSource respondsToSelector:@selector(documentPickerViewController:cancelRequestForFilePath:)]) {
+        [self.dataSource documentPickerViewController:self cancelRequestForFilePath:self.filePath];
+    }
 }
 
 - (void)viewDidLoad
@@ -148,7 +177,7 @@
 
     /* Table item manager setup */
     self.itemManager.tableView = self.tableView;
-    self.itemManager.contentReloadedHandler = ^{ [weakSelf updateContent]; };
+    self.itemManager.contentReloadedHandler = ^{ [weakSelf updateViewContent]; };
     
     /* Configure header view and components */
     self.headerView = [TODocumentPickerHeaderView new];
@@ -192,7 +221,7 @@
 - (void)configureToolbar
 {
     // If another controller is controlling the toolbar, defer to them
-    if (self.showToolbar == NO) {
+    if (self.configuration.showToolbar == NO) {
         self.toolBarLabel = nil;
         self.doneButton = nil;
         self.chooseButton = nil;
@@ -200,6 +229,7 @@
         return;
     }
 
+    // Unhide the navigation controller's toolbar
     if (self.navigationController.toolbarHidden) {
         self.navigationController.toolbarHidden = NO;
     }
@@ -229,7 +259,6 @@
     }
 
     /* Set up editing buttons */
-
     if (self.editingToolbarItems == nil) {
         if (self.chooseButton == nil) {
             self.chooseButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Choose", @"")
@@ -243,26 +272,45 @@
 
         self.editingToolbarItems = @[actionItem, spaceItem, self.chooseButton];
     }
+
+    [self updateToolbarItems];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+
+    /* Fire this off only on the initial appearence of the controller */
     if (!self.viewInitiallyAppeared) {
-        /* On iPad, the frame of the table view isn't finalised until we hit this call. */
-        /* So rebuild the items once here to ensure they're laid out correctly. */
-        [self.itemManager reloadItems];
-        
-        /* Scroll the table downwards so the header view is initially hidden. */
-        [self resetTableViewInitialOffset];
-        
+        /* So start querying for items at this point, and not sooner */
+        [self reloadItemsFromDataSource];
+
+        /* Set the title when applicable */
+        if ([self.dataSource respondsToSelector:@selector(documentPickerViewController:titleForFilePath:)]) {
+            self.title = [self.dataSource documentPickerViewController:self titleForFilePath:self.filePath];
+        }
+        else {
+            self.title = (self.filePath.length > 0 ? self.filePath.lastPathComponent : @"/");
+        }
+
         self.viewInitiallyAppeared = YES;
+    }
+}
+
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+
+    /* Scroll the table downwards so the header view is initially hidden. */
+    if (self.viewInitiallyLaidOut == NO) {
+        [self resetTableViewInitialOffset];
+        self.viewInitiallyLaidOut = YES;
     }
 }
 
 - (void)resetAfterInitialItemLoad
 {
+    /* After the initial content has loaded, add the pull-to-refresh controler */
     if (self.refreshControl == nil) {
         self.refreshControl = [[UIRefreshControl alloc] init];
         [self.refreshControl addTarget:self action:@selector(refreshControlTriggered) forControlEvents:UIControlEventValueChanged];
@@ -300,8 +348,7 @@
         
         width = (NSInteger)CGRectGetWidth(indexView.frame);
     }
-    
-    //TODO: Figure out how to do this in autolayout
+
     CGFloat newWidth = CGRectGetWidth(self.tableView.bounds) - width;
     if ((NSInteger)newWidth == (NSInteger)CGRectGetWidth(self.headerView.frame))
         return;
@@ -320,7 +367,21 @@
     self.feedbackLabel.font = [UIFont systemFontOfSize:14.0f];
     self.feedbackLabel.textAlignment = NSTextAlignmentCenter;
     self.feedbackLabel.textColor = [UIColor colorWithWhite:0.7f alpha:1.0f];
-    
+}
+
+#pragma mark - Content Request Handling -
+- (void)reloadItemsFromDataSource
+{
+    if (self.rootViewController.dataSource == nil) {
+        return;
+    }
+
+    __weak typeof(self) weakSelf = self;
+    id completionHandler = ^(NSArray<TODocumentPickerItem *> *items) {
+        [weakSelf setItems:items];
+    };
+
+    [self.rootViewController.dataSource documentPickerViewController:self requestItemsForFilePath:self.filePath completionHandler:completionHandler];
 }
 
 #pragma mark - Event Handling -
@@ -403,7 +464,7 @@
     static NSString *identifier = @"TableCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil) {
-        Class tableViewCellClass = self.tableViewCellClass;
+        Class tableViewCellClass = self.configuration.tableViewCellClass;
         if (tableViewCellClass == nil)
             tableViewCellClass = [UITableViewCell class];
         
@@ -416,7 +477,7 @@
     cell.detailTextLabel.text   = item.localizedMetadata;
     cell.accessoryType          = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     cell.textLabel.font         = item.isFolder ? self.cellFolderFont : self.cellFileFont;
-    cell.imageView.image        = item.isFolder ? self.folderIcon : self.defaultIcon;
+    cell.imageView.image        = item.isFolder ? self.configuration.folderIcon : self.configuration.defaultIcon;
     
     return cell;
 }
@@ -434,7 +495,7 @@
 - (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
 {
     if ([title isEqualToString:@"{search}"]) {
-        [self.tableView setContentOffset:CGPointZero animated:NO];
+        [self.tableView setContentOffset:(CGPoint){0, -tableView.contentInset.top} animated:NO];
         return -1;
     }
         
@@ -452,10 +513,17 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
-    if (item.isFolder) {
-        NSString *newFilePath = [self.filePath stringByAppendingPathComponent:item.fileName];
-        //[(TODocumentPickerViewController *)self.navigationController pushNewViewControllerForFilePath:newFilePath animated:YES];
+    if (!item.isFolder) {
+        return;
     }
+
+    NSString *newFilePath = [self.filePath stringByAppendingPathComponent:item.fileName];
+    if (newFilePath == nil) {
+        newFilePath = [@"/" stringByAppendingPathComponent:item.fileName];
+    }
+
+    TODocumentPickerViewController *newController = [[TODocumentPickerViewController alloc] initWithRootViewController:self.rootViewController filePath:newFilePath];
+    [self.navigationController pushViewController:newController animated:YES];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -474,13 +542,13 @@
 }
 
 #pragma mark - Update View Content -
-- (void)updateContent
+- (void)updateViewContent
 {
     [self resetHeaderConstraints];
     [self updateFooterLabel];
     [self updateToolbarItems];
 
-    self.navigationItem.rightBarButtonItem.enabled = (self.items.count > 0);
+    self.selectButton.enabled = (self.items.count > 0);
 }
 
 - (void)showFeedbackLabelIfNeeded
@@ -552,7 +620,7 @@
 
 - (void)updateToolbarItems
 {
-    if (self.showToolbar == NO) {
+    if (self.configuration.showToolbar == NO) {
         return;
     }
 
@@ -609,7 +677,7 @@
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated
 {
     [super setEditing:editing animated:animated];
-    [self updateContent];
+    [self updateViewContent];
 }
 
 - (BOOL)allCellsSelected
@@ -621,14 +689,22 @@
     return [self.tableView indexPathsForSelectedRows].count == self.items.count;
 }
 
-- (void)setShowToolbar:(BOOL)showToolbar
+- (id<TODocumentPickerViewControllerDataSource>)dataSource
 {
-    if (_showToolbar == showToolbar) {
-        return;
+    if (_dataSource == nil) {
+        return self.rootViewController.dataSource;
     }
 
-    _showToolbar = showToolbar;
-    [self configureToolbar];
+    return _dataSource;
+}
+
+- (id<TODocumentPickerViewControllerDelegate>)documentPickerDelegate
+{
+    if (_documentPickerDelegate == nil) {
+        return self.rootViewController.documentPickerDelegate;
+    }
+
+    return _documentPickerDelegate;
 }
 
 @end

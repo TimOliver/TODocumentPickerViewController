@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		220D33011D33F0440004E4BE /* TODocumentPickerConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */; };
 		225C38F91A7E37DC004DA4D9 /* TODocumentPickerItemManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */; };
 		22707A811A53BDDF008E66CC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707A801A53BDDF008E66CC /* main.m */; };
 		22707A841A53BDDF008E66CC /* TOAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707A831A53BDDF008E66CC /* TOAppDelegate.m */; };
@@ -25,6 +26,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		220D32FF1D33F0440004E4BE /* TODocumentPickerConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerConfiguration.h; sourceTree = "<group>"; };
+		220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerConfiguration.m; sourceTree = "<group>"; };
 		2211A3CF1A5B80900089106B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
 		2211A3D01A5B80900089106B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		225C38F71A7E37DC004DA4D9 /* TODocumentPickerItemManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerItemManager.h; sourceTree = "<group>"; };
@@ -150,6 +153,8 @@
 				22A3E1991A56857700C4839E /* TODocumentPickerItem.m */,
 				225C38F71A7E37DC004DA4D9 /* TODocumentPickerItemManager.h */,
 				225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */,
+				220D32FF1D33F0440004E4BE /* TODocumentPickerConfiguration.h */,
+				220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */,
 			);
 			name = Models;
 			path = TODocumentPickerViewController/Models;
@@ -240,6 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22DF14A61A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m in Sources */,
+				220D33011D33F0440004E4BE /* TODocumentPickerConfiguration.m in Sources */,
 				22707A871A53BDDF008E66CC /* TOViewController.m in Sources */,
 				22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */,
 				22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */,

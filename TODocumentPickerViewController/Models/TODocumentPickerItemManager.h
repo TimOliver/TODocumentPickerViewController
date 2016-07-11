@@ -28,7 +28,7 @@
 
 @interface TODocumentPickerItemManager : NSObject
 
-/* Main configuration properties (Changing any of these will cause a reload) */
+/* Main configuration properties (Changing any of these properties will cause a reload) */
 @property (nonatomic, strong) NSArray *items;                       /* Items are passed to the manager by setting this property. */
 @property (nonatomic, assign) TODocumentPickerSortType sortingType; /* The order in which items are displayed. */
 @property (nonatomic, copy)   NSString *searchString;               /* Filter the items with this string */

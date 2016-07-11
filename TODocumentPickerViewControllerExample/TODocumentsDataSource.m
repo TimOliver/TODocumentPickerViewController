@@ -97,9 +97,9 @@
     });
 }
 
-- (NSString *)titleForFilePath:(NSString *)filePath
+- (NSString *)documentPickerViewController:(TODocumentPickerViewController *)documentPicker titleForFilePath:(NSString *)filePath
 {
-    if ([filePath isEqualToString:@"/"])
+    if (filePath.length == 0|| [filePath isEqualToString:@"/"])
         return @"Documents";
     
     return [filePath lastPathComponent];

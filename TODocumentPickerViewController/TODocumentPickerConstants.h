@@ -51,7 +51,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
 
 @protocol TODocumentPickerViewControllerDataSource <NSObject>
 
-@optional
+@required
 
 /**
  Called by the view controller when it wants to obtain a list of items for the folder at the end of the file path.
@@ -62,7 +62,9 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
  */
 - (void)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker
              requestItemsForFilePath:(nonnull NSString *)filePath
-                   completionHandler:(nullable void (^)(NSArray<TODocumentPickerItem *> * _Nullable items))completionHandler;
+                   completionHandler:(nonnull void (^)(NSArray<TODocumentPickerItem *> * _Nullable items))completionHandler;
+
+@optional
 
 /**
  If an asynchronous request for files is currently in progress and the representing view controller is canceled,

@@ -49,7 +49,6 @@
 - (void)reloadItems
 {
     [self rebuildItems];
-    
 }
 
 - (void)rebuildItems
