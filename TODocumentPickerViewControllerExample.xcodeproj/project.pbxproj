@@ -149,12 +149,12 @@
 		22A3E1971A56857700C4839E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				22A3E1981A56857700C4839E /* TODocumentPickerItem.h */,
-				22A3E1991A56857700C4839E /* TODocumentPickerItem.m */,
-				225C38F71A7E37DC004DA4D9 /* TODocumentPickerItemManager.h */,
-				225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */,
 				220D32FF1D33F0440004E4BE /* TODocumentPickerConfiguration.h */,
 				220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */,
+				225C38F71A7E37DC004DA4D9 /* TODocumentPickerItemManager.h */,
+				225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */,
+				22A3E1981A56857700C4839E /* TODocumentPickerItem.h */,
+				22A3E1991A56857700C4839E /* TODocumentPickerItem.m */,
 			);
 			name = Models;
 			path = TODocumentPickerViewController/Models;

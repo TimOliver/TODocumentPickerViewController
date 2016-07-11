@@ -280,6 +280,11 @@
 {
     [super viewWillAppear:animated];
 
+    /* Absolutely make sure this view controller is being presented via navigation controller */
+    if (self.navigationController == nil) {
+        [NSException raise:NSInternalInconsistencyException format:@"TODocumentPickerViewController MUST be presented under a UINavigationController"];
+    }
+
     /* Fire this off only on the initial appearence of the controller */
     if (!self.viewInitiallyAppeared) {
         /* So start querying for items at this point, and not sooner */
@@ -316,8 +321,10 @@
         [self.refreshControl addTarget:self action:@selector(refreshControlTriggered) forControlEvents:UIControlEventValueChanged];
     }
 
+    /* Stop the refresh control */
     [self.refreshControl endRefreshing];
-    
+
+    /* Delete the activity indicator since we won't need it again */
     if (self.loadingView) {
         [self.loadingView removeFromSuperview];
         self.loadingView = nil;
@@ -334,7 +341,8 @@
 - (void)resetHeaderConstraints
 {
     NSInteger width = 0;
-    
+
+    /* Work out the width of the section index view */
     if (self.sortingType <= TODocumentPickerSortTypeNameDescending) {
         //Extract the section index view
         UIView *indexView = nil;
@@ -382,6 +390,39 @@
     };
 
     [self.rootViewController.dataSource documentPickerViewController:self requestItemsForFilePath:self.filePath completionHandler:completionHandler];
+}
+
+- (void)setItems:(NSArray<TODocumentPickerItem *> *)items forFilePath:(NSString *)filePath
+{
+    NSArray *controllers = self.navigationController.viewControllers;
+    NSInteger index = [controllers indexOfObject:self.rootViewController];
+    if (index == NSNotFound) {
+        return;
+    }
+
+    // If file path is nil, assume the root controller
+    if (filePath.length == 0) {
+        self.rootViewController.items = items;
+        return;
+    }
+
+    //Starting from the root controller, loop through each controller up the chain to find the one we need to update
+    while (index < controllers.count) {
+        id controller = controllers[index++];
+        if ([controller isKindOfClass:[TODocumentPickerViewController class]] == NO) {
+            continue;
+        }
+
+        TODocumentPickerViewController *documentPickerController = (TODocumentPickerViewController *)controller;
+        if (documentPickerController.filePath.length == 0) {
+            continue; // The root controller has already been done at this point
+        }
+
+        if ([documentPickerController.filePath caseInsensitiveCompare:filePath] == NSOrderedSame) {
+            documentPickerController.items = items;
+            return;
+        }
+    }
 }
 
 #pragma mark - Event Handling -
