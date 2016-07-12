@@ -28,52 +28,19 @@
     return self;
 }
 
-- (void)createTestData
+#pragma mark - Data Source Methods -
+- (NSString *)documentPickerViewController:(TODocumentPickerViewController *)documentPicker titleForFilePath:(NSString *)filePath
 {
-    NSString *documentsFilePath = [self documentsPath];
-    
-    NSArray *folders = @[@"Apps",
-                         @"Archive",
-                         @"Books",
-                         @"Comics",
-                         @"Documents",
-                         @"Examples",
-                         @"Music",
-                         @"Photos",
-                         @"Pictures",
-                         @"Programs",
-                         @"Public",
-                         @"Save Files",
-                         @"Shared",
-                         @"Sites",
-                         @"Writing",
-                         @"Apps/iComics",
-                         @"Apps/Dropbox",
-                         @"Archive/Design Docs",
-                         @"Comics/Adventures in Space",
-                         @"Documents/Invoices",
-                         @"Examples/PSDs",];
-    
-    for (NSString *folder in folders) {
-        NSString *filePath = [documentsFilePath stringByAppendingPathComponent:folder];
-        [[NSFileManager defaultManager] createDirectoryAtPath:filePath withIntermediateDirectories:YES attributes:nil error:nil];
+    if (filePath.length == 0|| [filePath isEqualToString:@"/"]) {
+        return @"Documents";
     }
-    
-    NSArray *textFiles = @[@"DesignPlan.txt",
-                           @"HelloWorld.txt",
-                           @"Blog Posts.txt",
-                           @"Test Document.txt",
-                           @"Upcoming Projects.txt"
-                           ];
-    
-    for (NSString *file in textFiles) {
-        NSString *filePath = [documentsFilePath stringByAppendingPathComponent:file];
-        [file writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-    }
+
+    return filePath.lastPathComponent;
 }
 
-#pragma mark - Class Override -
-- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker requestItemsForFilePath:(NSString *)filePath completionHandler:(void (^)(NSArray<TODocumentPickerItem *> * _Nullable))completionHandler
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker
+             requestItemsForFilePath:(NSString *)filePath
+                   completionHandler:(void (^)(NSArray<TODocumentPickerItem *> * _Nullable))completionHandler
 {
     NSString *fullFilePath = [self.documentsPath stringByAppendingPathComponent:filePath];
     NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullFilePath error:nil];
@@ -97,16 +64,59 @@
     });
 }
 
-- (NSString *)documentPickerViewController:(TODocumentPickerViewController *)documentPicker titleForFilePath:(NSString *)filePath
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker configureCell:(UITableViewCell *)cell withItem:(TODocumentPickerItem *)item
 {
-    if (filePath.length == 0|| [filePath isEqualToString:@"/"]) {
-        return @"Documents";
+    // Apply the system tint color to these icons
+    if (cell.imageView.image.renderingMode != UIImageRenderingModeAlwaysTemplate) {
+        cell.imageView.image = [cell.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     }
-    
-    return filePath.lastPathComponent;
 }
 
-#pragma mark - Static Data -
+#pragma mark - Class Setup / Management -
+- (void)createTestData
+{
+    NSString *documentsFilePath = [self documentsPath];
+
+    NSArray *folders = @[@"Apps",
+                         @"Archive",
+                         @"Books",
+                         @"Comics",
+                         @"Documents",
+                         @"Examples",
+                         @"Music",
+                         @"Photos",
+                         @"Pictures",
+                         @"Programs",
+                         @"Public",
+                         @"Save Files",
+                         @"Shared",
+                         @"Sites",
+                         @"Writing",
+                         @"Apps/iComics",
+                         @"Apps/Dropbox",
+                         @"Archive/Design Docs",
+                         @"Comics/Adventures in Space",
+                         @"Documents/Invoices",
+                         @"Examples/PSDs",];
+
+    for (NSString *folder in folders) {
+        NSString *filePath = [documentsFilePath stringByAppendingPathComponent:folder];
+        [[NSFileManager defaultManager] createDirectoryAtPath:filePath withIntermediateDirectories:YES attributes:nil error:nil];
+    }
+
+    NSArray *textFiles = @[@"DesignPlan.txt",
+                           @"HelloWorld.txt",
+                           @"Blog Posts.txt",
+                           @"Test Document.txt",
+                           @"Upcoming Projects.txt"
+                           ];
+
+    for (NSString *file in textFiles) {
+        NSString *filePath = [documentsFilePath stringByAppendingPathComponent:file];
+        [file writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    }
+}
+
 - (NSString *)documentsPath
 {
     static NSString *sharedDocumentsDirectoryPath = nil;

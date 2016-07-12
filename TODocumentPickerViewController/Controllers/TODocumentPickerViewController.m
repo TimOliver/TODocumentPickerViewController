@@ -124,7 +124,7 @@
     if (self = [super init]) {
         [self commonInit];
         _configuration = configuration;
-        _filePath = filePath;
+        _filePath = filePath ? filePath : @"/";
         _rootViewController = self;
     }
 
@@ -136,7 +136,7 @@
     if (self = [super init]) {
         [self commonInit];
         _configuration = rootController.configuration;
-        _filePath = filePath;
+        _filePath = filePath ? filePath : @"/";
         _rootViewController = rootController;
     }
 
@@ -490,7 +490,20 @@
 
 - (void)chooseButtonTapped
 {
-    
+    NSMutableArray *items = [NSMutableArray array];
+    NSArray *selectedIndexPaths = self.tableView.indexPathsForSelectedRows;
+
+    for (NSIndexPath *indexPath in selectedIndexPaths) {
+        TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
+        [items addObject:item];
+    }
+
+    // Make immutable
+    items = (NSMutableArray *)[NSArray arrayWithArray:items];
+
+    if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewController:didSelectItems:inFilePath:)]) {
+        [self.documentPickerDelegate documentPickerViewController:self didSelectItems:items inFilePath:self.filePath];
+    }
 }
 
 #pragma mark - Table View Data Source -
@@ -516,14 +529,20 @@
         cell = [[tableViewCellClass alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
         cell.detailTextLabel.textColor = [UIColor colorWithWhite:0.6f alpha:1.0f];
     }
-        
+
+    // Configure the cell with the item
     TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
     cell.textLabel.text         = item.fileName;
     cell.detailTextLabel.text   = item.localizedMetadata;
     cell.accessoryType          = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     cell.textLabel.font         = item.isFolder ? self.cellFolderFont : self.cellFileFont;
     cell.imageView.image        = item.isFolder ? self.configuration.folderIcon : self.configuration.defaultIcon;
-    
+
+    // Give the data source a chance to perform additional configuration
+    if ([self.dataSource respondsToSelector:@selector(documentPickerViewController:configureCell:withItem:)]) {
+        [self.dataSource documentPickerViewController:self configureCell:cell withItem:item];
+    }
+
     return cell;
 }
 
@@ -550,19 +569,27 @@
 #pragma mark - Table View Delegate -
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    // If editing, update the UI state, but otherwise let the table do its thing
     if (self.editing) {
-        [self updateFooterLabel];
         [self updateToolbarItems];
         return;
     }
-    
+
+    // Play the deselection animation
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
+
+    // Get the item we tapped
     TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
+
+    // If the item is not a folder, inform the delegate
     if (!item.isFolder) {
+        if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewController:didSelectItems:inFilePath:)]) {
+            [self.documentPickerDelegate documentPickerViewController:self didSelectItems:@[item] inFilePath:self.filePath];
+        }
         return;
     }
 
+    // If we selected a folder spawn a new document picker and push it to the navigation controller
     NSString *newFilePath = [self.filePath stringByAppendingPathComponent:item.fileName];
     if (newFilePath == nil) {
         newFilePath = [@"/" stringByAppendingPathComponent:item.fileName];
@@ -574,8 +601,9 @@
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.editing)
+    if (self.editing) {
         [self updateToolbarItems];
+    }
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
@@ -591,7 +619,6 @@
 - (void)updateViewContent
 {
     [self resetHeaderConstraints];
-    [self updateFooterLabel];
     [self updateToolbarItems];
 
     self.selectButton.enabled = (self.items.count > 0);
@@ -687,13 +714,21 @@
         return;
     }
 
-    if (self.editing == NO && self.toolbarItems != self.nonEditingToolbarItems)
-        [self setToolbarItems:self.nonEditingToolbarItems animated:YES];
-    else if (self.editing && self.toolbarItems != self.editingToolbarItems)
-        [self setToolbarItems:self.editingToolbarItems animated:YES];
+    // Update footer label text
+    [self updateFooterLabel];
 
-    if (self.editing == NO)
+    // Set the toolbar items depending on state
+    if (self.editing == NO && self.toolbarItems != self.nonEditingToolbarItems) {
+        [self setToolbarItems:self.nonEditingToolbarItems animated:YES];
+    }
+    else if (self.editing && self.toolbarItems != self.editingToolbarItems) {
+        [self setToolbarItems:self.editingToolbarItems animated:YES];
+    }
+
+    // Update the choose button only if we're editing
+    if (self.editing == NO) {
         return;
+    }
 
     self.chooseButton.enabled = ([self.tableView indexPathsForSelectedRows].count > 0);
 }

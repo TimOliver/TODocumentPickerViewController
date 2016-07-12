@@ -34,7 +34,4 @@
 /** A pre-generated description of the item that is displayed in the picker view */
 @property (nonatomic, copy, readonly) NSString *localizedMetadata;
 
-/** The current document picker view controller in which this item is assigned. */
-@property (nonatomic, readonly) TODocumentPickerViewController *documentPickerViewController;
-
 @end

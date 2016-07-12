@@ -183,14 +183,17 @@
 #pragma mark - Item Serving -
 - (TODocumentPickerItem *)itemForIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.filteredItems)
+    if (self.filteredItems) {
         return self.filteredItems[indexPath.row];
+    }
     
-    if (self.sectionedItems)
+    if (self.sectionedItems) {
         return self.sectionedItems[indexPath.section][indexPath.row];
+    }
     
-    if (self.sortedItems)
+    if (self.sortedItems) {
         return self.sortedItems[indexPath.row];
+    }
     
     return nil;
 }

@@ -91,11 +91,10 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
 
 @protocol TODocumentPickerViewControllerDelegate <NSObject>
 
-/* User tapped a single file to download */
-- (void)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker didSelectItemAtFilePath:(nonnull NSString *)filePath;
+@optional
 
-/* User selected a set of items and tapped */
-- (void)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker didSelectItems:(nonnull NSArray *)items;
+/* User either tapped a single item, or selected multiple items and hit 'choose' */
+- (void)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker didSelectItems:(nonnull NSArray<TODocumentPickerItem *> *)items inFilePath:(nullable NSString *)filePath;
 
 @end
 
