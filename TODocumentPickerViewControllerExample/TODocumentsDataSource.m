@@ -93,17 +93,17 @@
     
     //Perform after a 1 second delay to simulate a web request
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        //completionHandler(items);
-        [documentPicker setItems:items forFilePath:documentPicker.filePath];
+        completionHandler(items);
     });
 }
 
 - (NSString *)documentPickerViewController:(TODocumentPickerViewController *)documentPicker titleForFilePath:(NSString *)filePath
 {
-    if (filePath.length == 0|| [filePath isEqualToString:@"/"])
+    if (filePath.length == 0|| [filePath isEqualToString:@"/"]) {
         return @"Documents";
+    }
     
-    return [filePath lastPathComponent];
+    return filePath.lastPathComponent;
 }
 
 #pragma mark - Static Data -

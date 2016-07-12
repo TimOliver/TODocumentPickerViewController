@@ -380,7 +380,7 @@
 #pragma mark - Content Request Handling -
 - (void)reloadItemsFromDataSource
 {
-    if (self.rootViewController.dataSource == nil) {
+    if (self.dataSource == nil) {
         return;
     }
 
@@ -389,7 +389,7 @@
         [weakSelf setItems:items];
     };
 
-    [self.rootViewController.dataSource documentPickerViewController:self requestItemsForFilePath:self.filePath completionHandler:completionHandler];
+    [self.dataSource documentPickerViewController:self requestItemsForFilePath:self.filePath completionHandler:completionHandler];
 }
 
 - (void)setItems:(NSArray<TODocumentPickerItem *> *)items forFilePath:(NSString *)filePath
@@ -428,7 +428,11 @@
 #pragma mark - Event Handling -
 - (void)refreshControlTriggered
 {
-    //TODO: trigger refresh here
+    if (self.dataSource) {
+        [self reloadItemsFromDataSource];
+        return;
+    }
+
     [self.refreshControl endRefreshing];
 }
 
@@ -630,6 +634,7 @@
 
 - (void)updateFooterLabel
 {
+    // If editing, show the number of selected items in the tool bar
     if (self.editing) {
         NSInteger numberOfSelectedItems = self.tableView.indexPathsForSelectedRows.count;
         NSString *labelText = nil;
@@ -646,6 +651,7 @@
         return;
     }
 
+    // If not editing, print the number of folders/files
     NSInteger numberOfFolders = 0, numberOfFiles = 0;
     for (TODocumentPickerItem *item in self.items) {
         if (item.isFolder)
@@ -654,7 +660,7 @@
             numberOfFiles++;
     }
 
-    //'folder' or 'folders' depending on number
+    // 'folder' or 'folders' depending on number
     NSString *pluralFolders = (numberOfFolders == 1) ? NSLocalizedString(@"folder", nil) : NSLocalizedString(@"folders", nil);
     NSString *pluralFiles = (numberOfFiles == 1) ? NSLocalizedString(@"file", nil) : NSLocalizedString(@"files", nil);
 
