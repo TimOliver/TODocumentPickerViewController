@@ -244,6 +244,7 @@
     }
 
     UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *labelItem = [[UIBarButtonItem alloc] initWithCustomView:self.toolBarLabel];
 
     /* Toolbar button elements */
     if (self.nonEditingToolbarItems == nil) {
@@ -254,7 +255,6 @@
                                                               action:@selector(doneButtonTapped)];
         }
 
-        UIBarButtonItem *labelItem = [[UIBarButtonItem alloc] initWithCustomView:self.toolBarLabel];
         self.nonEditingToolbarItems = @[self.doneButton, spaceItem, labelItem, spaceItem, spaceItem];
     }
 
@@ -270,7 +270,7 @@
         UIBarButtonItem *actionItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:nil action:nil];
         actionItem.enabled = NO;
 
-        self.editingToolbarItems = @[actionItem, spaceItem, self.chooseButton];
+        self.editingToolbarItems = @[actionItem, spaceItem, labelItem, spaceItem, self.chooseButton];
     }
 
     [self updateToolbarItems];
@@ -547,6 +547,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.editing) {
+        [self updateFooterLabel];
         [self updateToolbarItems];
         return;
     }
@@ -629,8 +630,23 @@
 
 - (void)updateFooterLabel
 {
-    NSInteger numberOfFolders = 0, numberOfFiles = 0;
+    if (self.editing) {
+        NSInteger numberOfSelectedItems = self.tableView.indexPathsForSelectedRows.count;
+        NSString *labelText = nil;
 
+        if (numberOfSelectedItems == 1) {
+            labelText = [NSString stringWithFormat:NSLocalizedString(@"%ld item selected", @""), numberOfSelectedItems];
+        }
+        else {
+            labelText = [NSString stringWithFormat:NSLocalizedString(@"%ld items selected", @""), numberOfSelectedItems];
+        }
+
+        self.toolBarLabel.text = labelText;
+
+        return;
+    }
+
+    NSInteger numberOfFolders = 0, numberOfFiles = 0;
     for (TODocumentPickerItem *item in self.items) {
         if (item.isFolder)
             numberOfFolders++;
