@@ -1,7 +1,7 @@
 //
-//  TODocumentPickerDefines.h
+//  TODocumentPickerConfiguration.m
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -20,26 +20,36 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-#import <Foundation/FOundation.h>
+#import "TODocumentPickerConfiguration.h"
+#import "UIImage+TODocumentPickerIcons.h"
 
-/*
- The default content styles that the controller implements.
- */
-typedef NS_ENUM(NSInteger, TODocumentPickerViewControllerStyle) {
-    TODocumentPickerViewControllerStyleLightContent,
-    TODocumentPickerViewControllerStyleDarkContent
-};
+@implementation TODocumentPickerConfiguration
 
-/* 
- The various sorting orders in which the picker can display the files. 
-*/
-typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
-    TODocumentPickerSortTypeNameAscending,
-    TODocumentPickerSortTypeNameDescending,
-    TODocumentPickerSortTypeDateAscending,
-    TODocumentPickerSortTypeDateDescending,
-    TODocumentPickerSortTypeSizeAscending,
-    TODocumentPickerSortTypeSizeDescending
-};
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _showToolbar = YES;
+    }
 
+    return self;
+}
+
+- (UIImage *)defaultIcon
+{
+    if (_defaultIcon == nil) {
+        _defaultIcon = [UIImage TO_documentPickerDefaultIcon];
+    }
+
+    return _defaultIcon;
+}
+
+- (UIImage *)folderIcon
+{
+    if (_folderIcon == nil) {
+        _folderIcon = [UIImage TO_documentPickerFolderIcon];
+    }
+
+    return _folderIcon;
+}
+
+@end

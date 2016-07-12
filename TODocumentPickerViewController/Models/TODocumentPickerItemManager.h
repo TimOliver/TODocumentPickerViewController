@@ -1,7 +1,7 @@
 //
 //  TODocumentPickerItemManager.h
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -22,13 +22,13 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "TODocumentPickerDefines.h"
+#import "TODocumentPickerConstants.h"
 
 @class TODocumentPickerItem;
 
 @interface TODocumentPickerItemManager : NSObject
 
-/* Main configuration properties (Changing any of these will cause a reload) */
+/* Main configuration properties (Changing any of these properties will cause a reload) */
 @property (nonatomic, strong) NSArray *items;                       /* Items are passed to the manager by setting this property. */
 @property (nonatomic, assign) TODocumentPickerSortType sortingType; /* The order in which items are displayed. */
 @property (nonatomic, copy)   NSString *searchString;               /* Filter the items with this string */

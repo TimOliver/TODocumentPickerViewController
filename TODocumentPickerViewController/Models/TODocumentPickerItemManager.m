@@ -1,7 +1,7 @@
 //
 //  TODocumentPickerItemManager.m
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -49,7 +49,6 @@
 - (void)reloadItems
 {
     [self rebuildItems];
-    
 }
 
 - (void)rebuildItems
@@ -184,14 +183,17 @@
 #pragma mark - Item Serving -
 - (TODocumentPickerItem *)itemForIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.filteredItems)
+    if (self.filteredItems) {
         return self.filteredItems[indexPath.row];
+    }
     
-    if (self.sectionedItems)
+    if (self.sectionedItems) {
         return self.sectionedItems[indexPath.section][indexPath.row];
+    }
     
-    if (self.sortedItems)
+    if (self.sortedItems) {
         return self.sortedItems[indexPath.row];
+    }
     
     return nil;
 }

@@ -1,7 +1,7 @@
 //
-//  UIImage+TODocumentPickerIcons.h
+//  TODocumentPickerViewController.h
 //
-//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
+//  Copyright 2015 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -21,10 +21,17 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "TODocumentPickerItem.h"
 
-@interface UIImage (TODocumentPickerIcons)
+@class TODocumentPickerViewControllerDataSource;
+@protocol TODocumentPickerViewControllerDelegate;
 
-+ (UIImage *)TO_documentPickerFolderIcon;
-+ (UIImage *)TO_documentPickerDefaultIcon;
+@interface TODocumentPickerViewController : UINavigationController
+
+
 
 @end
+
+
+
+

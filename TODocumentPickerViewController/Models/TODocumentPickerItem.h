@@ -1,7 +1,7 @@
 //
 //  TODocumentPickerItem.h
 //
-//  Copyright 2015 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -22,13 +22,16 @@
 
 #import <Foundation/Foundation.h>
 
+@class TODocumentPickerViewController;
+
 @interface TODocumentPickerItem : NSObject
 
-@property (nonatomic, copy)   NSString   *fileName;
-@property (nonatomic, assign) NSUInteger fileSize;
-@property (nonatomic, strong) NSDate     *lastModifiedDate;
-@property (nonatomic, assign) BOOL       isFolder;
+@property (nonatomic, copy)   NSString   *fileName;         /** The full name of this file */
+@property (nonatomic, assign) NSUInteger fileSize;          /** The size of the file in bytes */
+@property (nonatomic, strong) NSDate     *lastModifiedDate; /** Where possible, the modification date of this file */
+@property (nonatomic, assign) BOOL       isFolder;          /** Whether the file is a folder or now */
 
+/** A pre-generated description of the item that is displayed in the picker view */
 @property (nonatomic, copy, readonly) NSString *localizedMetadata;
 
 @end
