@@ -38,7 +38,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerViewControllerStyle) {
  The various sorting orders in which the picker can display the files. 
 */
 typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
-    TODocumentPickerSortTypeNameAscending,
+    TODocumentPickerSortTypeNameAscending=0,
     TODocumentPickerSortTypeNameDescending,
     TODocumentPickerSortTypeDateAscending,
     TODocumentPickerSortTypeDateDescending,

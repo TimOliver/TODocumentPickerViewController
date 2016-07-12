@@ -82,10 +82,10 @@
         return NO;
     
     CGSize tableSize = self.tableView.bounds.size;
-    CGFloat height = MAX(tableSize.width, tableSize.height);
+    CGFloat height = MIN(tableSize.width, tableSize.height);
     
-    //We should use sections if the height of all rows is > 150% the height of the table
-    if (floor(self.items.count * self.tableView.rowHeight) >= floor(height * 1.5f))
+    //We should use sections if the height of all rows is > 250% the minimum height of the table
+    if (floor(self.items.count * self.tableView.rowHeight) >= floor(height * 2.5f))
         return YES;
     
     return NO;
