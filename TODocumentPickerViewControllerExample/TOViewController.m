@@ -16,7 +16,7 @@
 
 @implementation TOViewController
 
-- (IBAction)buttonTapped:(id)sender
+- (IBAction)defaultButtonTapped:(id)sender
 {
     TODocumentPickerViewController *documentPicker = [[TODocumentPickerViewController alloc] initWithFilePath:nil];
     documentPicker.dataSource = [[TODocumentsDataSource alloc] init];
@@ -24,6 +24,35 @@
 
     UINavigationController *controller = [[UINavigationController alloc] initWithRootViewController:documentPicker];
     controller.modalPresentationStyle = UIModalPresentationFormSheet;
+
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
+- (IBAction)darkButtonTapped:(id)sender
+{
+    TODocumentPickerConfiguration *configuration = [[TODocumentPickerConfiguration alloc] init];
+    configuration.style = TODocumentPickerViewControllerStyleDarkContent;
+
+//    NSMutableDictionary *themeAttributes = [NSMutableDictionary dictionary];
+//    themeAttributes[TODocumentPickerViewControllerThemeAttributeBackgroundColor]     = [UIColor colorWithWhite:45.0f/255.0f alpha:1.0];
+//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableSeparatorColor] = [UIColor colorWithWhite:200.0f/255.0f alpha:1.0];
+//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableCellTitleColor] = [UIColor whiteColor];
+//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor] = [UIColor colorWithWhite:100.0/255.0f alpha:1.0f];
+//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor] = [UIColor colorWithWhite:1.0f alpha:0.75f];
+//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor] = [UIColor colorWithWhite:90.0f/255.0f alpha:1.0];
+//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor] = [UIColor whiteColor];
+//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor] = [UIColor whiteColor];
+//    configuration.themeAttributes = themeAttributes;
+
+    TODocumentPickerViewController *documentPicker = [[TODocumentPickerViewController alloc] initWithConfiguration:configuration filePath:nil];
+    documentPicker.dataSource = [[TODocumentsDataSource alloc] init];
+    documentPicker.documentPickerDelegate = self;
+
+    UINavigationController *controller = [[UINavigationController alloc] initWithRootViewController:documentPicker];
+    controller.modalPresentationStyle = UIModalPresentationFormSheet;
+    controller.navigationBar.barStyle = UIBarStyleBlack;
+    controller.toolbar.barStyle = UIBarStyleBlack;
+    controller.view.tintColor = [UIColor whiteColor];
 
     [self presentViewController:controller animated:YES completion:nil];
 }

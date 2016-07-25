@@ -30,7 +30,6 @@
 @property (nonatomic, strong, readwrite) TODocumentPickerSegmentedControl *sortControl;
 
 - (void)setupViews;
-- (void)setupConstraints;
 
 @end
 
@@ -43,7 +42,6 @@
         self.backgroundColor = [UIColor clearColor];
         
         [self setupViews];
-        [self setupConstraints];
     }
     
     return self;
@@ -61,33 +59,22 @@
     [self.clippingView addSubview:self.containerView];
 
     self.searchBar = [[UISearchBar alloc] initWithFrame:(CGRect){0,0,320,44}];
-    self.searchBar.translatesAutoresizingMaskIntoConstraints = NO;
+    self.searchBar.translucent = NO;
     self.searchBar.delegate = self;
     self.searchBar.placeholder = @"Search";
     self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
+    self.searchBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     [self.containerView addSubview:self.searchBar];
 
     self.sortControl = [[TODocumentPickerSegmentedControl alloc] init];
-    self.sortControl.translatesAutoresizingMaskIntoConstraints = NO;
+    self.sortControl.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    self.sortControl.frame = (CGRect){{8.0f, 48.0f}, {self.searchBar.frame.size. width - 16.0f, self.sortControl.frame.size.height}};
     [self.containerView addSubview:self.sortControl];
-}
-
-- (void)setupConstraints
-{
-    NSDictionary *views = @{@"searchBar":self.searchBar, @"sortControl":self.sortControl};
-    
-    //Search bar constraints
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[searchBar]|" options:0 metrics:nil views:views]];
-    
-    //segmented control
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[searchBar]-7-[sortControl]-8-|" options:0 metrics:nil views:views]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-8-[sortControl]-8-|" options:0 metrics:nil views:views]];
 }
 
 - (void)didMoveToSuperview
 {
     [super didMoveToSuperview];
-    self.backgroundColor = self.superview.backgroundColor;
     [self needsUpdateConstraints];
 }
 

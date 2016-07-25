@@ -4,19 +4,32 @@
    version = "2.0">
    <Breakpoints>
       <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         BreakpointExtensionID = "Xcode.Breakpoint.SymbolicBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.h"
-            timestampString = "489989895.251677"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "48"
-            endingLineNumber = "48"
-            landmarkName = "-setItems:forFilePath:"
-            landmarkType = "4">
+            continueAfterRunningActions = "Yes"
+            symbolName = "UIApplicationMain"
+            moduleName = "">
+            <Actions>
+               <BreakpointActionProxy
+                  ActionExtensionID = "Xcode.BreakpointAction.DebuggerCommand">
+                  <ActionContent
+                     consoleCommand = "expr (Class)NSClassFromString(@&quot;IBARevealLoader&quot;) == nil ? (void *)dlopen(&quot;/Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/libReveal.dylib&quot;, 0x2) : ((void*)0)">
+                  </ActionContent>
+               </BreakpointActionProxy>
+            </Actions>
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "UIApplicationMain"
+                  moduleName = "UIKit"
+                  usesParentBreakpointCondition = "Yes"
+                  offsetFromSymbolStart = "0">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -25,13 +38,45 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489989434.707435"
+            filePath = "TODocumentPickerViewController/Models/TODocumentPickerItemManager.m"
+            timestampString = "491132938.179808"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "562"
-            endingLineNumber = "562"
-            landmarkName = "-tableView:sectionForSectionIndexTitle:atIndex:"
+            startingLineNumber = "111"
+            endingLineNumber = "111"
+            landmarkName = "-shouldUseSections"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TODocumentPickerViewController/Models/TODocumentPickerItemManager.m"
+            timestampString = "491132938.179808"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
+            landmarkName = "-shouldUseSections"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "TODocumentPickerViewController/Models/TODocumentPickerItemManager.m"
+            timestampString = "491132938.179808"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "114"
+            endingLineNumber = "114"
+            landmarkName = "-shouldUseSections"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -42,12 +87,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489951226.854123"
+            timestampString = "491131785.895809"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "338"
-            endingLineNumber = "338"
-            landmarkName = "-resetTableViewInitialOffset"
+            startingLineNumber = "163"
+            endingLineNumber = "163"
+            landmarkName = "-dealloc"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -58,156 +103,60 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489951226.854123"
+            timestampString = "491131942.544811"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "337"
-            endingLineNumber = "337"
-            landmarkName = "-resetTableViewInitialOffset"
+            startingLineNumber = "250"
+            endingLineNumber = "250"
+            landmarkName = "-viewWillTransitionToSize:withTransitionCoordinator:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489950735.446851"
+            filePath = "TODocumentPickerViewController/Models/TODocumentPickerItemManager.m"
+            timestampString = "491132938.179808"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "301"
-            endingLineNumber = "301"
-            landmarkName = "-viewWillAppear:"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
+            landmarkName = "-rebuildItemsWithCompleteReset:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489951226.854123"
+            filePath = "TODocumentPickerViewController/Models/TODocumentPickerItemManager.m"
+            timestampString = "491132938.179808"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "392"
-            endingLineNumber = "392"
-            landmarkName = "-reloadItemsFromDataSource"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
+            landmarkName = "-rebuildItemsWithCompleteReset:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489944953.478992"
+            filePath = "TODocumentPickerViewController/Models/TODocumentPickerItemManager.m"
+            timestampString = "491132938.179808"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "229"
-            endingLineNumber = "229"
-            landmarkName = "-configureToolbar"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489951244.771899"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "399"
-            endingLineNumber = "399"
-            landmarkName = "-setItems:forFilePath:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489951345.485258"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "410"
-            endingLineNumber = "410"
-            landmarkName = "-setItems:forFilePath:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489951592.731221"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "421"
-            endingLineNumber = "421"
-            landmarkName = "-setItems:forFilePath:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewController/Controllers/TODocumentPickerViewController.m"
-            timestampString = "489951592.731221"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "422"
-            endingLineNumber = "422"
-            landmarkName = "-setItems:forFilePath:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewControllerExample/TOViewController.m"
-            timestampString = "489989911.130559"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "35"
-            endingLineNumber = "35"
-            landmarkName = "-documentPickerViewController:didSelectItems:inFilePath:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TODocumentPickerViewControllerExample/TOViewController.m"
-            timestampString = "489989988.146816"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "34"
-            endingLineNumber = "34"
-            landmarkName = "-documentPickerViewController:didSelectItems:inFilePath:"
+            startingLineNumber = "81"
+            endingLineNumber = "81"
+            landmarkName = "-rebuildItemsWithCompleteReset:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

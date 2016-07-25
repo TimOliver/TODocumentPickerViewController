@@ -31,7 +31,7 @@
 
 @property (nonatomic, strong) NSArray *sectionTitles;    /* Names of the sections, aligned to sectionedItems property. */
 
-- (void)rebuildItems; /* Flush out, and rebuild the list of items */
+- (void)rebuildItemsWithCompleteReset:(BOOL)reset; /* Flush out, and rebuild the list of items */
 - (BOOL)shouldUseSections;  /* Calculate if we should use sections or not */
 - (void)updateTableView;
 
@@ -48,29 +48,54 @@
 #pragma mark - Item Sorting -
 - (void)reloadItems
 {
-    [self rebuildItems];
+    [self rebuildItemsWithCompleteReset:YES];
 }
 
-- (void)rebuildItems
+- (void)refreshItems
+{
+    [self rebuildItemsWithCompleteReset:NO];
+}
+
+- (void)rebuildItemsWithCompleteReset:(BOOL)reset
 {
     /* Clear out all of the lists */
-    self.sortedItems    = nil;
-    self.sectionedItems = nil;
-    self.filteredItems  = nil;
-    self.sectionTitles  = nil;
+    if (reset) {
+        self.sortedItems    = nil;
+        self.sectionedItems = nil;
+        self.filteredItems  = nil;
+        self.sectionTitles  = nil;
+    }
+    else {
+        //If we're not resetting, check to see if we
+        //need to swap between sectioned and non-sectioned
+        if (!self.shouldUseSections) {
+            self.sectionTitles = nil;
+            self.sectionedItems = nil;
+        }
+        else {
+            self.sortedItems = nil;
+        }
+    }
     
     //A search string overrides all other lists
     if (self.searchString.length > 0) {
-        self.filteredItems = [self filteredItemsWithItems:self.items searchString:self.searchString];
-        self.filteredItems = [self sortedItemsArrayWithArray:self.filteredItems];
+        if (self.filteredItems == nil) {
+            self.filteredItems = [self filteredItemsWithItems:self.items searchString:self.searchString];
+            self.filteredItems = [self sortedItemsArrayWithArray:self.filteredItems];
+        }
     }
     //if sections are warranted, sort them out, else do a flat single list
     else if ([self shouldUseSections]) {
-        self.sectionTitles = [self sectionTitlesForItems:self.items];
-        self.sectionedItems = [self sectionedItemsWithArray:self.items];
+        if (self.sectionTitles.count == 0) {
+            self.sectionTitles = [self sectionTitlesForItems:self.items];
+            self.sectionedItems = [self sectionedItemsWithArray:self.items];
+        }
     }
+    //else create a flat, sorted list
     else {
-        self.sortedItems = [self sortedItemsArrayWithArray:self.items];
+        if (self.sortedItems == nil) {
+            self.sortedItems = [self sortedItemsArrayWithArray:self.items];
+        }
     }
     
     [self updateTableView];
@@ -261,7 +286,7 @@
     if (self.tableView == nil)
         return;
     
-    [self rebuildItems];
+    [self reloadItems];
 }
 
 - (void)setSortingType:(TODocumentPickerSortType)sortingType
@@ -274,7 +299,7 @@
     if (self.tableView == nil)
         return;
     
-    [self rebuildItems];
+    [self reloadItems];
 }
 
 - (void)setSearchString:(NSString *)searchString
@@ -287,7 +312,7 @@
     if (self.tableView == nil)
         return;
     
-    [self rebuildItems];
+    [self reloadItems];
 }
 
 @end

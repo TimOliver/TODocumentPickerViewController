@@ -22,8 +22,82 @@
 
 #import "TODocumentPickerTableView.h"
 
+// Header offset code by b2cloud: http://www.b2cloud.com.au/tutorial/uitableview-section-header-positions/
+@interface TODocumentPickerTableView ()
+@property (nonatomic, assign) BOOL shouldManuallyLayoutHeaderViews;
+- (void)layoutHeaderViews;
+@end
+
 @implementation TODocumentPickerTableView
 
+#pragma mark - Section Header View Layout -
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+
+    if(self.shouldManuallyLayoutHeaderViews) {
+        [self layoutHeaderViews];
+    }
+}
+
+- (void)setHeaderViewInsets:(UIEdgeInsets)headerViewInsets
+{
+    if (UIEdgeInsetsEqualToEdgeInsets(headerViewInsets, _headerViewInsets)) {
+        return;
+    }
+
+    _headerViewInsets = headerViewInsets;
+    self.shouldManuallyLayoutHeaderViews = !UIEdgeInsetsEqualToEdgeInsets(headerViewInsets, UIEdgeInsetsZero);
+    [self setNeedsLayout];
+}
+
+- (void)layoutHeaderViews
+{
+    const NSArray *indexPaths = self.indexPathsForVisibleRows;
+    if (indexPaths.count == 0) {
+        return;
+    }
+
+    const NSRange sectionRange = NSMakeRange([indexPaths.firstObject section], [indexPaths.lastObject section]);
+
+    const NSUInteger numberOfSections = self.numberOfSections;
+    const UIEdgeInsets contentInset = self.contentInset;
+    const CGPoint contentOffset = self.contentOffset;
+
+    const CGFloat sectionViewMinimumOriginY = contentOffset.y + contentInset.top + self.headerViewInsets.top;
+
+    //Layout each header view
+    for (NSUInteger section = sectionRange.location; section <= sectionRange.length; section++)
+    {
+        UIView *sectionView = [self headerViewForSection:section];
+        if(sectionView == nil) {
+            continue;
+        }
+
+        const CGRect sectionFrame = [self rectForSection:section];
+
+        CGRect sectionViewFrame = sectionView.frame;
+        sectionViewFrame.origin.y = ((sectionFrame.origin.y < sectionViewMinimumOriginY) ? sectionViewMinimumOriginY : sectionFrame.origin.y);
+
+        //If it's not last section, manually 'stick' it to the below section if needed
+        if (section < numberOfSections - 1) {
+            const CGRect nextSectionFrame = [self rectForSection:section + 1];
+
+            if (CGRectGetMaxY(sectionViewFrame) > CGRectGetMinY(nextSectionFrame)) {
+                sectionViewFrame.origin.y = nextSectionFrame.origin.y - sectionViewFrame.size.height;
+            }
+        }
+        
+        sectionView.frame = sectionViewFrame;
+    }
+}
+
+/*
+ When initially showing an empty table, we still want the header view
+ to be scrolled upwards, out of view. To achieve this, the minimum content size
+ of this view needs to explicitly be (tableHeight + headerHeight) in order to have 
+ enough scrollable height to hide it.
+ */
 - (void)setContentSize:(CGSize)contentSize
 {
     CGFloat scrollInset = self.contentInset.top + self.contentInset.bottom;

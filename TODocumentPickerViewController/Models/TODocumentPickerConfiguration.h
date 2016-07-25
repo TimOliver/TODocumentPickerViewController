@@ -27,6 +27,9 @@
 
 @interface TODocumentPickerConfiguration : NSObject
 
+/* The style of this view controller, whether it is light or dark. */
+@property (nonatomic, assign) TODocumentPickerViewControllerStyle style;
+
 /* Whether this controller shows and manages the navigation controller toolbar (Default is YES) */
 @property (nonatomic, assign) BOOL showToolbar;
 
@@ -51,7 +54,7 @@
 /* If desired, a custom table view cell class that can contain additional controls or formatting. */
 @property (nonatomic, assign, nullable) Class tableViewCellClass;
 
-/* Attributes for applying a new colour scheme to this view controller. */
-@property (nonatomic, strong, nullable) NSDictionary *themeAttributes;
+/* An optional object that contains theme values that will override what is set by `style` */
+@property (nonatomic, strong, nullable) TODocumentPickerTheme *theme;
 
 @end

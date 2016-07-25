@@ -26,8 +26,9 @@
 #import "TODocumentPickerItemManager.h"
 #import "TODocumentPickerItem.h"
 #import "TODocumentPickerConfiguration.h"
+#import "TODocumentPickerTheme.h"
 
-@interface TODocumentPickerViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface TODocumentPickerViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, UIViewControllerPreviewingDelegate>
 
 /* Root Controller Management */
 @property (nonatomic, strong, readwrite) TODocumentPickerViewController *rootViewController;
@@ -82,11 +83,14 @@
 - (void)commonInit;
 - (void)configureToolbar;
 
+/* Theming */
+- (void)applyThemeForConfiguration;
+- (void)applyThemetoTableCell:(UITableViewCell *)cell;
+
 /* Show dummy content labels */
 - (void)showFeedbackLabelIfNeeded;
 
 /* Setup positions and constraints */
-- (void)resetHeaderConstraints;
 - (void)resetTableViewInitialOffset;
 - (void)resetAfterInitialItemLoad;
 
@@ -163,16 +167,16 @@
 {
     [super viewDidLoad];
     
-    CGRect frame = CGRectZero;
+    CGRect frame = self.view.bounds;
     __weak typeof(self)weakSelf = self;
     
     /* Configure table */
-    self.tableView = [[TODocumentPickerTableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    self.tableView = [[TODocumentPickerTableView alloc] initWithFrame:frame style:UITableViewStylePlain];
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.rowHeight = 52.0f;
-    self.tableView.sectionIndexBackgroundColor = self.view.backgroundColor;
+    self.tableView.sectionIndexBackgroundColor = [UIColor clearColor];
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
 
     /* Table item manager setup */
@@ -180,16 +184,30 @@
     self.itemManager.contentReloadedHandler = ^{ [weakSelf updateViewContent]; };
     
     /* Configure header view and components */
-    self.headerView = [TODocumentPickerHeaderView new];
+    self.headerView = [[TODocumentPickerHeaderView alloc] init];
     self.headerView.searchTextChangedHandler = ^(NSString *searchText) {
         weakSelf.itemManager.searchString = searchText;
         [weakSelf showFeedbackLabelIfNeeded];
     };
-    
-    UIView *tableHeaderView = [[UIView alloc] initWithFrame:self.headerView.bounds];
-    tableHeaderView.backgroundColor = self.view.backgroundColor;
+
+    frame = self.headerView.bounds;
+    UIView *tableHeaderView = [[UIView alloc] initWithFrame:frame];
+    tableHeaderView.backgroundColor = [UIColor clearColor];
     [tableHeaderView addSubview:self.headerView];
     self.tableView.tableHeaderView = tableHeaderView;
+
+    //Inset the header view so it doesn't overlap the section index
+    CGFloat inset = 8.0f;
+
+    //Even if we're in split screen, UITableView section indexes still use the iPad spacing
+    if (self.traitCollection.userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        inset = 16.0f;
+    }
+
+    frame = self.headerView.frame;
+    frame.size.width -= (inset * 2.0f);
+    frame.origin.x += inset;
+    self.headerView.frame = frame;
 
     /* Handler for changing sort type */
     self.headerView.sortControl.sortTypeChangedHandler = ^{
@@ -216,6 +234,20 @@
 
     /* Set-up the toolbar */
     [self configureToolbar];
+
+    /* Apply the theme */
+    [self applyThemeForConfiguration];
+
+    /* Enable 3D Touch */
+    if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+        [self registerForPreviewingWithDelegate:self sourceView:self.view];
+    }
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [self.itemManager refreshItems];
 }
 
 - (void)configureToolbar
@@ -276,14 +308,61 @@
     [self updateToolbarItems];
 }
 
+- (void)applyThemeForConfiguration
+{
+    BOOL darkTheme = (self.configuration.style == TODocumentPickerViewControllerStyleDarkContent);
+    TODocumentPickerTheme *theme = self.configuration.theme;
+
+    /* Set the main view background color */
+    UIColor *backgroundColor = theme.backgroundColor;
+    if (backgroundColor == nil) {
+        backgroundColor = darkTheme ? [UIColor colorWithWhite:0.2f alpha:1.0f] : [UIColor whiteColor];
+    }
+    self.view.backgroundColor = backgroundColor;
+
+    /* Set the table cell separator color */
+    UIColor *separatorColor = theme.cellSeparatorColor;
+    if (separatorColor == nil) {
+        CGFloat greyScale = darkTheme ? 0.6f : 0.8f;
+        separatorColor = [UIColor colorWithWhite:greyScale alpha:1.0f];
+    }
+    self.tableView.separatorColor = separatorColor;
+
+    /* Set the color of the activity indicator */
+    self.loadingView.color = darkTheme ? [UIColor whiteColor] : nil;
+
+    /* Set the theme of the search bar */
+    self.headerView.searchBar.barStyle = darkTheme ? UIBarStyleBlack : UIBarStyleDefault;
+    
+}
+
+- (void)applyThemetoTableCell:(UITableViewCell *)cell
+{
+    BOOL darkTheme = (self.configuration.style == TODocumentPickerViewControllerStyleDarkContent);
+    TODocumentPickerTheme *theme = self.configuration.theme;
+
+    UIColor *backgroundColor = theme.backgroundColor;
+    if (backgroundColor == nil) {
+        backgroundColor = darkTheme ? [UIColor colorWithWhite:0.2f alpha:1.0f] : [UIColor whiteColor];
+    }
+    cell.backgroundColor = backgroundColor;
+
+    UIColor *titleTextColor = theme.titleTextColor;
+    if (titleTextColor == nil) {
+        titleTextColor = darkTheme ? [UIColor whiteColor] : [UIColor blackColor];
+    }
+    cell.textLabel.textColor = titleTextColor;
+
+    UIColor *detailTextColor = theme.detailTextColor;
+    if (detailTextColor == nil) {
+        detailTextColor = darkTheme ? [UIColor colorWithWhite:0.7f alpha:1.0f] : [UIColor colorWithWhite:0.5f alpha:1.0f];
+    }
+    cell.detailTextLabel.textColor = detailTextColor;
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
-    /* Absolutely make sure this view controller is being presented via navigation controller */
-    if (self.navigationController == nil) {
-        [NSException raise:NSInternalInconsistencyException format:@"TODocumentPickerViewController MUST be presented under a UINavigationController"];
-    }
 
     /* Fire this off only on the initial appearence of the controller */
     if (!self.viewInitiallyAppeared) {
@@ -338,33 +417,6 @@
     self.tableView.contentOffset = contentOffset;
 }
 
-- (void)resetHeaderConstraints
-{
-    NSInteger width = 0;
-
-    /* Work out the width of the section index view */
-    if (self.sortingType <= TODocumentPickerSortTypeNameDescending) {
-        //Extract the section index view
-        UIView *indexView = nil;
-        for (UIView *view in self.tableView.subviews) {
-            if ([NSStringFromClass([view class]) rangeOfString:@"ViewIndex"].length == 0)
-                continue;
-            
-            indexView = view;
-            break;
-        }
-        
-        width = (NSInteger)CGRectGetWidth(indexView.frame);
-    }
-
-    CGFloat newWidth = CGRectGetWidth(self.tableView.bounds) - width;
-    if ((NSInteger)newWidth == (NSInteger)CGRectGetWidth(self.headerView.frame))
-        return;
-    
-    CGRect frame = self.headerView.frame;
-    frame.size.width = newWidth;
-    self.headerView.frame = frame;
-}
 
 - (void)setupFeedbackLabel
 {
@@ -506,6 +558,33 @@
     }
 }
 
+#pragma mark - 3D Touch -
+- (nullable UIViewController *)previewingContext:(id <UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location
+{
+    CGPoint cellPostion = [self.tableView convertPoint:location fromView:self.view];
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:cellPostion];
+    if (indexPath == nil) {
+        return nil;
+    }
+
+    TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
+    if (item == nil || !item.isFolder) {
+        return nil;
+    }
+
+    previewingContext.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
+
+    NSString *filePath = [self.filePath stringByAppendingPathComponent:item.fileName];
+    TODocumentPickerViewController *documentPickerController = [[TODocumentPickerViewController alloc] initWithRootViewController:self.rootViewController filePath:filePath];
+    return documentPickerController;
+}
+
+- (void)previewingContext:(id <UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit
+{
+    [self.navigationController pushViewController:viewControllerToCommit animated:NO];
+    [(TODocumentPickerViewController *)viewControllerToCommit resetTableViewInitialOffset];
+}
+
 #pragma mark - Table View Data Source -
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -527,7 +606,6 @@
             tableViewCellClass = [UITableViewCell class];
         
         cell = [[tableViewCellClass alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
-        cell.detailTextLabel.textColor = [UIColor colorWithWhite:0.6f alpha:1.0f];
     }
 
     // Configure the cell with the item
@@ -537,6 +615,9 @@
     cell.accessoryType          = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     cell.textLabel.font         = item.isFolder ? self.cellFolderFont : self.cellFileFont;
     cell.imageView.image        = item.isFolder ? self.configuration.folderIcon : self.configuration.defaultIcon;
+
+    //Configure the theme for the cell
+    [self applyThemetoTableCell:cell];
 
     // Give the data source a chance to perform additional configuration
     if ([self.dataSource respondsToSelector:@selector(documentPickerViewController:configureCell:withItem:)]) {
@@ -618,9 +699,7 @@
 #pragma mark - Update View Content -
 - (void)updateViewContent
 {
-    [self resetHeaderConstraints];
     [self updateToolbarItems];
-
     self.selectButton.enabled = (self.items.count > 0);
 }
 
@@ -751,7 +830,7 @@
         self.itemManager.items = items;
         
         //Force the end refresh animation to happen on another iteration of the run loop
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.001f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self resetAfterInitialItemLoad];
         });
     });

@@ -22,12 +22,12 @@
 
 #import "TODocumentPickerConstants.h"
 
-NSString * const TODocumentPickerViewControllerThemeAttributeBackgroundColor = @"";
-NSString * const TODocumentPickerViewControllerThemeAttributeTableSeparatorColor = @"";
-NSString * const TODocumentPickerViewControllerThemeAttributeTableCellTitleColor = @"";
-NSString * const TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor = @"";
-NSString * const TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor = @"";
-NSString * const TODocumentPickerViewControllerThemeAttributeTableCellIconTintColor = @"";
-NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor = @"";
-NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor = @"";
-NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor = @"";
+NSString * const TODocumentPickerViewControllerThemeAttributeBackgroundColor = @"TODocumentPickerViewControllerThemeAttributeBackgroundColor";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableSeparatorColor = @"TODocumentPickerViewControllerThemeAttributeTableSeparatorColor";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableCellTitleColor = @"TODocumentPickerViewControllerThemeAttributeTableCellTitleColor";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor = @"TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor = @"TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableCellIconTintColor = @"TODocumentPickerViewControllerThemeAttributeTableCellIconTintColor";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor = @"TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor = @"TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor";
+NSString * const TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor = @"TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor";

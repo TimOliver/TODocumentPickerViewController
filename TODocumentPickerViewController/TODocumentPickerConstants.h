@@ -25,6 +25,7 @@
 
 @class TODocumentPickerViewController;
 @class TODocumentPickerItem;
+@class TODocumentPickerTheme;
 
 /*
  The default content styles that the controller implements.

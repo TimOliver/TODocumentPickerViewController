@@ -41,6 +41,9 @@
 /* Start sorting items, if not already done so. */
 - (void)reloadItems;
 
+/* If the table size changed, recalculate the layouts */
+- (void)refreshItems;
+
 - (NSInteger)numberOfSections;
 - (NSInteger)numberOfRowsForSection:(NSInteger)section;
 - (TODocumentPickerItem *)itemForIndexPath:(NSIndexPath *)indexPath;

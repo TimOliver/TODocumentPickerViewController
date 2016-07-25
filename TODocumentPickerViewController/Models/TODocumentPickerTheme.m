@@ -1,5 +1,5 @@
 //
-//  TODocumentPickerTableView.h
+//  TODocumentPickerTheme.m
 //
 //  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
@@ -20,10 +20,8 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import "TODocumentPickerTheme.h"
 
-@interface TODocumentPickerTableView : UITableView
-
-@property (nonatomic, assign) UIEdgeInsets headerViewInsets;
+@implementation TODocumentPickerTheme
 
 @end

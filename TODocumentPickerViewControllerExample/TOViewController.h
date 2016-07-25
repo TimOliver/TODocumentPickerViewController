@@ -10,7 +10,5 @@
 
 @interface TOViewController : UIViewController
 
-- (IBAction)buttonTapped:(id)sender;
-
 @end
 
