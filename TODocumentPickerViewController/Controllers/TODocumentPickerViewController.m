@@ -333,7 +333,12 @@
 
     /* Set the theme of the search bar */
     self.headerView.searchBar.barStyle = darkTheme ? UIBarStyleBlack : UIBarStyleDefault;
-    
+
+    /* Set the text color of the accessory label view*/
+    self.toolBarLabel.textColor = darkTheme ? [UIColor whiteColor] : [UIColor blackColor];
+
+    /* Theme the pull-to-refresh control */
+    self.refreshControl.tintColor = (self.configuration.style == TODocumentPickerViewControllerStyleDarkContent ? [UIColor whiteColor] : nil);
 }
 
 - (void)applyThemetoTableCell:(UITableViewCell *)cell
@@ -341,23 +346,35 @@
     BOOL darkTheme = (self.configuration.style == TODocumentPickerViewControllerStyleDarkContent);
     TODocumentPickerTheme *theme = self.configuration.theme;
 
+    /* Set the default background color */
     UIColor *backgroundColor = theme.backgroundColor;
     if (backgroundColor == nil) {
         backgroundColor = darkTheme ? [UIColor colorWithWhite:0.2f alpha:1.0f] : [UIColor whiteColor];
     }
     cell.backgroundColor = backgroundColor;
 
+    /* Set the title color */
     UIColor *titleTextColor = theme.titleTextColor;
     if (titleTextColor == nil) {
         titleTextColor = darkTheme ? [UIColor whiteColor] : [UIColor blackColor];
     }
     cell.textLabel.textColor = titleTextColor;
 
+    /* Set the detail text color */
     UIColor *detailTextColor = theme.detailTextColor;
     if (detailTextColor == nil) {
-        detailTextColor = darkTheme ? [UIColor colorWithWhite:0.7f alpha:1.0f] : [UIColor colorWithWhite:0.5f alpha:1.0f];
+        CGFloat grayScale = darkTheme ? 0.7f : 0.5f;
+        detailTextColor = [UIColor colorWithWhite:grayScale alpha:1.0f];
     }
     cell.detailTextLabel.textColor = detailTextColor;
+
+    /* Set the selection color */
+    UIColor *selectedBackgroundColor = theme.selectedCellBackgroundColor;
+    if (selectedBackgroundColor == nil) {
+        CGFloat grayScale = darkTheme ? 0.35f : 0.9f;
+        selectedBackgroundColor = [UIColor colorWithWhite:grayScale alpha:1.0f];
+    }
+    cell.selectedBackgroundView.backgroundColor = selectedBackgroundColor;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -398,6 +415,7 @@
     if (self.refreshControl == nil) {
         self.refreshControl = [[UIRefreshControl alloc] init];
         [self.refreshControl addTarget:self action:@selector(refreshControlTriggered) forControlEvents:UIControlEventValueChanged];
+        self.refreshControl.tintColor = (self.configuration.style == TODocumentPickerViewControllerStyleDarkContent ? [UIColor whiteColor] : nil);
     }
 
     /* Stop the refresh control */
@@ -602,10 +620,12 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil) {
         Class tableViewCellClass = self.configuration.tableViewCellClass;
-        if (tableViewCellClass == nil)
+        if (tableViewCellClass == nil) {
             tableViewCellClass = [UITableViewCell class];
-        
+        }
+
         cell = [[tableViewCellClass alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
+        cell.selectedBackgroundView = [[UIView alloc] init];
     }
 
     // Configure the cell with the item
@@ -694,6 +714,25 @@
 
     //Update the header clipping, so it's not visible under translucent bars
     self.headerView.clippingHeight = scrollView.contentInset.top + scrollView.contentOffset.y;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UITableViewHeaderFooterView *)view forSection:(NSInteger)section
+{
+    BOOL darkTheme = (self.configuration.style == TODocumentPickerViewControllerStyleDarkContent);
+
+    /* Change the text color to white or black depending on the theme. */
+    UIColor *textColor = self.configuration.theme.sectionTitleColor;
+    if (textColor == nil) {
+        textColor = darkTheme ? [UIColor whiteColor] : [UIColor blackColor];
+    }
+    view.textLabel.textColor = textColor;
+
+    UIColor *backgroundColor = self.configuration.theme.sectionHeaderColor;
+    if (backgroundColor == nil) {
+        CGFloat greyScale = darkTheme ? 0.15f : 0.95f;
+        backgroundColor = [UIColor colorWithWhite:greyScale alpha:1.0f];
+    }
+    view.contentView.backgroundColor = backgroundColor;
 }
 
 #pragma mark - Update View Content -

@@ -26,6 +26,7 @@
 @interface TODocumentPickerTheme : NSObject
 
 @property (nonatomic, strong, nullable) UIColor *backgroundColor;         /* Background color of the table view and cells */
+@property (nonatomic, strong, nullable) UIColor *selectedCellBackgroundColor; /* When a cell is selected, this is the color of the selection */
 @property (nonatomic, strong, nullable) UIColor *cellSeparatorColor;      /* Color of the table cell divider lines */
 @property (nonatomic, strong, nullable) UIColor *titleTextColor;          /* Color of the title text label in each cell */
 @property (nonatomic, strong, nullable) UIColor *detailTextColor;         /* Color of the subtitle text label in each cell */
