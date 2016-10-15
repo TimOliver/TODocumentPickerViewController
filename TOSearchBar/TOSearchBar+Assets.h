@@ -1,5 +1,5 @@
 //
-//  TODocumentPickerHeaderView.h
+//  TOSearchBar+ImageAssets.h
 //
 //  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
@@ -20,24 +20,14 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-
-#import "TODocumentPickerSegmentedControl.h"
 #import "TOSearchBar.h"
 
-@interface TODocumentPickerHeaderView : UIView
+@interface TOSearchBar (ImageAssets)
 
-/* Views */
-@property (nonatomic, readonly) TOSearchBar *searchBar;
-@property (nonatomic, readonly) TODocumentPickerSegmentedControl *sortControl;
++ (UIImage *)sharedSearchBarBackground; /* The rounded rectangle for the background */
++ (UIImage *)sharedSearchIcon; /* The magnifying glads icon */
++ (UIImage *)sharedClearIcon;  /* The clear button icon. */
 
-/* The height from the top of the view that is clipped */
-@property (nonatomic, assign) CGFloat clippingHeight;
-
-/* Responding to text inserted into the search bar */
-@property (nonatomic, copy) void (^searchTextChangedHandler)(NSString *searchText);
-
-/* Cancelling the search bar (i.e the user scrolls the table view) */
-- (void)dismissKeyboard;
++ (void)cleanUpSharedAssets; /* Called upon each `dealloc` method call to clean up any freed assets. */
 
 @end

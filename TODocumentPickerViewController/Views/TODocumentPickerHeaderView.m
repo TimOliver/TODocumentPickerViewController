@@ -22,11 +22,11 @@
 
 #import "TODocumentPickerHeaderView.h"
 
-@interface TODocumentPickerHeaderView () <UISearchBarDelegate>
+@interface TODocumentPickerHeaderView () <TOSearchBarDelegate>
 
 @property (nonatomic, strong, readwrite) UIView *clippingView;
 @property (nonatomic, strong, readwrite) UIView *containerView;
-@property (nonatomic, strong, readwrite) UISearchBar *searchBar;
+@property (nonatomic, strong, readwrite) TOSearchBar *searchBar;
 @property (nonatomic, strong, readwrite) TODocumentPickerSegmentedControl *sortControl;
 
 - (void)setupViews;
@@ -58,12 +58,10 @@
     self.containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     [self.clippingView addSubview:self.containerView];
 
-    self.searchBar = [[UISearchBar alloc] initWithFrame:(CGRect){0,0,320,44}];
-    self.searchBar.translucent = NO;
+    self.searchBar = [[TOSearchBar alloc] initWithFrame:(CGRect){0,0,320,44}];
     self.searchBar.delegate = self;
-    self.searchBar.placeholder = @"Search";
-    self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
     self.searchBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    self.searchBar.horizontalInset = 8.0f;
     [self.containerView addSubview:self.searchBar];
 
     self.sortControl = [[TODocumentPickerSegmentedControl alloc] init];
@@ -104,13 +102,13 @@
 }
 
 #pragma mark - Search Bar Delegate -
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+- (void)searchBar:(TOSearchBar *)searchBar textDidChange:(NSString *)searchText
 {
     if (self.searchTextChangedHandler)
         self.searchTextChangedHandler(searchText);
 }
 
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+- (void)searchBarSearchButtonTapped:(TOSearchBar *)searchBar
 {
     [self.searchBar resignFirstResponder];
 }
@@ -118,7 +116,7 @@
 #pragma mark - External Interactions -
 - (void)dismissKeyboard
 {
-    if ([self.searchBar isFirstResponder])
+    if (self.searchBar.isFirstResponder)
         [self.searchBar resignFirstResponder];
 }
 

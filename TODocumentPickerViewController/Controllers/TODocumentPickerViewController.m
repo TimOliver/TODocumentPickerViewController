@@ -323,7 +323,7 @@
     /* Set the table cell separator color */
     UIColor *separatorColor = theme.cellSeparatorColor;
     if (separatorColor == nil) {
-        CGFloat greyScale = darkTheme ? 0.6f : 0.8f;
+        CGFloat greyScale = darkTheme ? 0.4f : 0.8f;
         separatorColor = [UIColor colorWithWhite:greyScale alpha:1.0f];
     }
     self.tableView.separatorColor = separatorColor;
@@ -332,7 +332,7 @@
     self.loadingView.color = darkTheme ? [UIColor whiteColor] : nil;
 
     /* Set the theme of the search bar */
-    self.headerView.searchBar.barStyle = darkTheme ? UIBarStyleBlack : UIBarStyleDefault;
+    self.headerView.searchBar.style = darkTheme ? TOSearchBarStyleDark : TOSearchBarStyleLight;
 
     /* Set the text color of the accessory label view*/
     self.toolBarLabel.textColor = darkTheme ? [UIColor whiteColor] : [UIColor blackColor];
@@ -594,6 +594,7 @@
 
     NSString *filePath = [self.filePath stringByAppendingPathComponent:item.fileName];
     TODocumentPickerViewController *documentPickerController = [[TODocumentPickerViewController alloc] initWithRootViewController:self.rootViewController filePath:filePath];
+    documentPickerController.view.tintColor = self.view.tintColor;
     return documentPickerController;
 }
 

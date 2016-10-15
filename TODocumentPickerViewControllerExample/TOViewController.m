@@ -33,17 +33,6 @@
     TODocumentPickerConfiguration *configuration = [[TODocumentPickerConfiguration alloc] init];
     configuration.style = TODocumentPickerViewControllerStyleDarkContent;
 
-//    NSMutableDictionary *themeAttributes = [NSMutableDictionary dictionary];
-//    themeAttributes[TODocumentPickerViewControllerThemeAttributeBackgroundColor]     = [UIColor colorWithWhite:45.0f/255.0f alpha:1.0];
-//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableSeparatorColor] = [UIColor colorWithWhite:200.0f/255.0f alpha:1.0];
-//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableCellTitleColor] = [UIColor whiteColor];
-//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor] = [UIColor colorWithWhite:100.0/255.0f alpha:1.0f];
-//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor] = [UIColor colorWithWhite:1.0f alpha:0.75f];
-//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor] = [UIColor colorWithWhite:90.0f/255.0f alpha:1.0];
-//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor] = [UIColor whiteColor];
-//    themeAttributes[TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor] = [UIColor whiteColor];
-//    configuration.themeAttributes = themeAttributes;
-
     TODocumentPickerViewController *documentPicker = [[TODocumentPickerViewController alloc] initWithConfiguration:configuration filePath:nil];
     documentPicker.dataSource = [[TODocumentsDataSource alloc] init];
     documentPicker.documentPickerDelegate = self;
@@ -52,7 +41,7 @@
     controller.modalPresentationStyle = UIModalPresentationFormSheet;
     controller.navigationBar.barStyle = UIBarStyleBlack;
     controller.toolbar.barStyle = UIBarStyleBlack;
-    controller.view.tintColor = [UIColor whiteColor];
+    controller.view.tintColor = [UIColor colorWithRed:93.0f/255.0f green:128.0f/255.0f blue:198.0f/255.0f alpha:1.0f];
 
     [self presentViewController:controller animated:YES completion:nil];
 }
