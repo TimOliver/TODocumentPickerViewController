@@ -117,7 +117,7 @@
 
 @implementation TODocumentPickerViewController
 
-#pragma mark - View Setup -
+#pragma mark - Class Setup -
 - (instancetype)initWithFilePath:(NSString *)filePath
 {
     return [self initWithConfiguration:[[TODocumentPickerConfiguration alloc] init] filePath:filePath];
@@ -163,6 +163,7 @@
     }
 }
 
+#pragma mark - View Life-cycle -
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -328,17 +329,38 @@
     }
     self.tableView.separatorColor = separatorColor;
 
+    /* Set the tint color of the section index */
+    self.tableView.sectionIndexColor = theme.sectionIndexTintColor;
+    
     /* Set the color of the activity indicator */
     self.loadingView.color = darkTheme ? [UIColor whiteColor] : nil;
 
     /* Set the theme of the search bar */
     self.headerView.searchBar.style = darkTheme ? TOSearchBarStyleDark : TOSearchBarStyleLight;
 
+    /* Override the search bar theming if needed */
+    if (theme.searchBarBackgroundColor) { self.headerView.searchBar.barBackgroundTintColor = theme.searchBarBackgroundColor; }
+    if (theme.searchPlaceholderTextTintColor) { self.headerView.searchBar.placeholderTintColor = theme.searchPlaceholderTextTintColor; }
+    if (theme.searchClearButtonTintColor) { self.headerView.searchBar.clearButton.tintColor = theme.searchClearButtonTintColor; }
+    if (theme.searchTextColor) { self.headerView.searchBar.searchTextField.textColor = theme.searchTextColor; }
+    
     /* Set the text color of the accessory label view*/
     self.toolBarLabel.textColor = darkTheme ? [UIColor whiteColor] : [UIColor blackColor];
 
     /* Theme the pull-to-refresh control */
     self.refreshControl.tintColor = (self.configuration.style == TODocumentPickerViewControllerStyleDarkContent ? [UIColor whiteColor] : nil);
+
+    /* The 'Done', 'Cancel' and 'Choose' buttons  */
+    UIColor *doneButtonColor = theme.doneButtonTintColor;
+    if (doneButtonColor == nil) {
+        doneButtonColor = darkTheme ? [UIColor colorWithRed:93.0f/255.0f green:128.0f/255.0f blue:198.0f/255.0f alpha:1.0f] : nil;
+    }
+    self.doneButton.tintColor = doneButtonColor;
+    self.cancelButton.tintColor = doneButtonColor;
+    self.chooseButton.tintColor = doneButtonColor;
+    
+    /* The list sorting control */
+    self.headerView.sortControl.tintColor = theme.sortControlTintColor;
 }
 
 - (void)applyThemetoTableCell:(UITableViewCell *)cell
@@ -346,6 +368,9 @@
     BOOL darkTheme = (self.configuration.style == TODocumentPickerViewControllerStyleDarkContent);
     TODocumentPickerTheme *theme = self.configuration.theme;
 
+    /* Apply base theming color */
+    cell.tintColor = theme.cellTintColor;
+    
     /* Set the default background color */
     UIColor *backgroundColor = theme.backgroundColor;
     if (backgroundColor == nil) {
