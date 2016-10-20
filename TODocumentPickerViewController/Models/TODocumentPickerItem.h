@@ -24,6 +24,8 @@
 
 @class TODocumentPickerViewController;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface TODocumentPickerItem : NSObject
 
 @property (nonatomic, copy)   NSString   *fileName;         /** The full name of this file */
@@ -35,3 +37,5 @@
 @property (nonatomic, copy, readonly) NSString *localizedMetadata;
 
 @end
+
+NS_ASSUME_NONNULL_END

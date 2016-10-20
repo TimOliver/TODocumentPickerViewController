@@ -25,9 +25,12 @@
 #import "TODocumentPickerItem.h"
 #import "TODocumentPickerConfiguration.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface TODocumentPickerViewController : UITableViewController
 
-@property (nonatomic, readonly, nonnull)  TODocumentPickerConfiguration *configuration; /* An object that holds the configuration for all controllers */
+/** The configuration object for settings applied to all controllers */
+@property (nonatomic, readonly)  TODocumentPickerConfiguration *configuration;
 
 @property (nonatomic, strong, nullable)   id<TODocumentPickerViewControllerDataSource> dataSource;             /* Data source for file info. Retained by the document picker and shared among all children. */
 @property (nonatomic, weak, nullable)     id<TODocumentPickerViewControllerDelegate>   documentPickerDelegate; /* Sends out delegate events to the assigned object */
@@ -35,8 +38,12 @@
 @property (nonatomic, readonly, nullable) NSString *filePath; /* The file path that this view controller corresponds to */
 @property (nonatomic, strong, nullable)   NSArray  *items;    /* All of the items displayed by this view controller. (Setting this will trigger a UI refresh) */
 
-@property (nonatomic, readonly, nonnull)  TODocumentPickerViewController *rootViewController; /* In a navigation chain of picker controllers, the root controller at the front.  */
-@property (nonatomic, readonly, nonnull)  NSArray *viewControllers;         /* The chain of document picker view controllers in the navigation stack */
+@property (nonatomic, readonly)  TODocumentPickerViewController *rootViewController; /* In a navigation chain of picker controllers, the root controller at the front.  */
+@property (nonatomic, readonly)  NSArray *viewControllers;         /* The chain of document picker view controllers in the navigation stack */
+
+@property (nonatomic, assign) BOOL selecting; /* View contoller is in multi-selection mode */
+@property (nonatomic, readonly) NSInteger numberOfSelectedItems; /* A very low overhead for determining if any items are selected */
+@property (nonatomic, readonly, nullable) NSArray<TODocumentPickerItem *> *selectedItems; /* Builds a list of all of the selected items */
 
 /* Create the base view controller with the initial starting file path, with a default configuration */
 - (nullable instancetype)initWithFilePath:(nullable NSString *)filePath;
@@ -52,3 +59,5 @@
 + (nonnull instancetype)new __attribute__((unavailable("Must use initWithFilePath: instead.")));
 
 @end
+
+NS_ASSUME_NONNULL_END

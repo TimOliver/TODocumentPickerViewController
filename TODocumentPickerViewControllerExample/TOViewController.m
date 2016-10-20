@@ -46,7 +46,7 @@
     [self presentViewController:controller animated:YES completion:nil];
 }
 
-- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker didSelectItems:(nonnull NSArray<TODocumentPickerItem *> *)items inFilePath:(NSString *)filePath
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker didPickItems:(nonnull NSArray<TODocumentPickerItem *> *)items inFilePath:(NSString *)filePath
 {
     [self dismissViewControllerAnimated:YES completion:nil];
 
@@ -57,6 +57,16 @@
     }
 
     NSLog(@"Paths for items selected: %@", absoluteItemPaths);
+}
+
+- (void)documentPickerViewControllerDidChangeSelectedItems:(TODocumentPickerViewController *)documentPicker
+{
+    NSLog(@"%ld items selected!", (long)documentPicker.numberOfSelectedItems);
+}
+
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker didSetSelecting:(BOOL)selecting
+{
+    NSLog(@"Selection mode is %@!", selecting ? @"on" : @"off");
 }
 
 @end

@@ -26,6 +26,6 @@
 @interface TODocumentPickerSegmentedControl : UISegmentedControl
 
 @property (nonatomic, assign) TODocumentPickerSortType sortingType;
-@property (nonatomic, copy)   void (^sortTypeChangedHandler)(void);
+@property (nonatomic, copy, nullable)   void (^sortTypeChangedHandler)(void);
 
 @end

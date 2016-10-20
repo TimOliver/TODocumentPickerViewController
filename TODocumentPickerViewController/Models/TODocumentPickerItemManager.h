@@ -26,17 +26,19 @@
 
 @class TODocumentPickerItem;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface TODocumentPickerItemManager : NSObject
 
 /* Main configuration properties (Changing any of these properties will cause a reload) */
-@property (nonatomic, strong) NSArray *items;                       /* Items are passed to the manager by setting this property. */
+@property (nonatomic, strong, nullable) NSArray *items;                       /* Items are passed to the manager by setting this property. */
 @property (nonatomic, assign) TODocumentPickerSortType sortingType; /* The order in which items are displayed. */
-@property (nonatomic, copy)   NSString *searchString;               /* Filter the items with this string */
+@property (nonatomic, copy, nullable)   NSString *searchString;               /* Filter the items with this string */
 
 @property (nonatomic, readonly) BOOL sectionIndexIsVisible;         /* Determines whether the list on the right side is visible. */
 
-@property (nonatomic, weak) UITableView *tableView;                 /* A weak reference to the relating table view. */
-@property (nonatomic, copy) void (^contentReloadedHandler)(void);   /* A handler called each time the manager decides to reload the table view. */
+@property (nonatomic, weak, nullable) UITableView *tableView;                 /* A weak reference to the relating table view. */
+@property (nonatomic, copy, nullable) void (^contentReloadedHandler)(void);   /* A handler called each time the manager decides to reload the table view. */
 
 /* Start sorting items, if not already done so. */
 - (void)reloadItems;
@@ -53,3 +55,5 @@
 - (NSInteger)sectionForSectionIndexAtIndex:(NSInteger)index;
 
 @end
+
+NS_ASSUME_NONNULL_END

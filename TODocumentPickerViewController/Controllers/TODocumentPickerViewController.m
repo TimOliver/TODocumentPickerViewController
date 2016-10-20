@@ -28,7 +28,7 @@
 #import "TODocumentPickerConfiguration.h"
 #import "TODocumentPickerTheme.h"
 
-@interface TODocumentPickerViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource, UIViewControllerPreviewingDelegate>
+@interface TODocumentPickerViewController () <UITableViewDelegate, UITableViewDataSource, UIViewControllerPreviewingDelegate>
 
 /* Root Controller Management */
 @property (nonatomic, strong, readwrite) TODocumentPickerViewController *rootViewController;
@@ -238,11 +238,6 @@
 
     /* Apply the theme */
     [self applyThemeForConfiguration];
-
-    /* Enable 3D Touch */
-    if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
-        [self registerForPreviewingWithDelegate:self sourceView:self.view];
-    }
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
@@ -423,6 +418,16 @@
     }
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    /* Enable 3D Touch */
+    if (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+        [self registerForPreviewingWithDelegate:self sourceView:self.view];
+    }
+}
+
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
@@ -535,6 +540,10 @@
 {
     [self setEditing:!self.editing animated:YES];
     [self updateBarButtonsAnimated:YES];
+    
+    if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewController:didSetSelecting:)]) {
+        [self.documentPickerDelegate documentPickerViewController:self didSetSelecting:self.editing];
+    }
 }
 
 - (void)updateBarButtonsAnimated:(BOOL)animated
@@ -576,6 +585,11 @@
 
     // Update the toolbar state
     [self updateToolbarItems];
+    
+    //Alert the delegate about the selection change
+    if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewControllerDidChangeSelectedItems:)]) {
+        [self.documentPickerDelegate documentPickerViewControllerDidChangeSelectedItems:self];
+    }
 }
 
 - (void)doneButtonTapped
@@ -585,19 +599,8 @@
 
 - (void)chooseButtonTapped
 {
-    NSMutableArray *items = [NSMutableArray array];
-    NSArray *selectedIndexPaths = self.tableView.indexPathsForSelectedRows;
-
-    for (NSIndexPath *indexPath in selectedIndexPaths) {
-        TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
-        [items addObject:item];
-    }
-
-    // Make immutable
-    items = (NSMutableArray *)[NSArray arrayWithArray:items];
-
-    if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewController:didSelectItems:inFilePath:)]) {
-        [self.documentPickerDelegate documentPickerViewController:self didSelectItems:items inFilePath:self.filePath];
+    if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewController:didPickItems:inFilePath:)]) {
+        [self.documentPickerDelegate documentPickerViewController:self didPickItems:self.selectedItems inFilePath:self.filePath];
     }
 }
 
@@ -699,6 +702,11 @@
     // If editing, update the UI state, but otherwise let the table do its thing
     if (self.editing) {
         [self updateToolbarItems];
+        
+        if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewControllerDidChangeSelectedItems:)]) {
+            [self.documentPickerDelegate documentPickerViewControllerDidChangeSelectedItems:self];
+        }
+        
         return;
     }
 
@@ -710,8 +718,8 @@
 
     // If the item is not a folder, inform the delegate
     if (!item.isFolder) {
-        if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewController:didSelectItems:inFilePath:)]) {
-            [self.documentPickerDelegate documentPickerViewController:self didSelectItems:@[item] inFilePath:self.filePath];
+        if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewController:didPickItems:inFilePath:)]) {
+            [self.documentPickerDelegate documentPickerViewController:self didPickItems:@[item] inFilePath:self.filePath];
         }
         return;
     }
@@ -722,14 +730,20 @@
         newFilePath = [@"/" stringByAppendingPathComponent:item.fileName];
     }
 
-    TODocumentPickerViewController *newController = [[TODocumentPickerViewController alloc] initWithRootViewController:self.rootViewController filePath:newFilePath];
+    UIViewController *newController = [[[self class] alloc] initWithRootViewController:self.rootViewController filePath:newFilePath];
     [self.navigationController pushViewController:newController animated:YES];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.editing) {
-        [self updateToolbarItems];
+    if (self.editing == NO) {
+        return;
+    }
+    
+    [self updateToolbarItems];
+    
+    if ([self.documentPickerDelegate respondsToSelector:@selector(documentPickerViewControllerDidChangeSelectedItems:)]) {
+        [self.documentPickerDelegate documentPickerViewControllerDidChangeSelectedItems:self];
     }
 }
 
@@ -920,6 +934,38 @@
 {
     [super setEditing:editing animated:animated];
     [self updateViewContent];
+}
+
+- (void)setSelecting:(BOOL)selecting
+{
+    [self setEditing:selecting animated:NO];
+}
+
+- (BOOL)selecting
+{
+    return self.editing;
+}
+
+- (NSArray<TODocumentPickerItem *> *)selectedItems
+{
+    NSMutableArray *items = [NSMutableArray array];
+    NSArray *selectedIndexPaths = self.tableView.indexPathsForSelectedRows;
+    if (selectedIndexPaths.count == 0) {
+        return nil;
+    }
+    
+    for (NSIndexPath *indexPath in selectedIndexPaths) {
+        TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
+        [items addObject:item];
+    }
+    
+    // Make immutable
+    return [NSArray arrayWithArray:items];
+}
+
+- (NSInteger)numberOfSelectedItems
+{
+    return self.tableView.indexPathsForSelectedRows.count;
 }
 
 - (BOOL)allCellsSelected

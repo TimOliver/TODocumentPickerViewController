@@ -21,9 +21,10 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
-
 #import "TODocumentPickerSegmentedControl.h"
 #import "TOSearchBar.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface TODocumentPickerHeaderView : UIView
 
@@ -35,9 +36,11 @@
 @property (nonatomic, assign) CGFloat clippingHeight;
 
 /* Responding to text inserted into the search bar */
-@property (nonatomic, copy) void (^searchTextChangedHandler)(NSString *searchText);
+@property (nonatomic, copy, nullable) void (^searchTextChangedHandler)(NSString *searchText);
 
 /* Cancelling the search bar (i.e the user scrolls the table view) */
 - (void)dismissKeyboard;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -23,6 +23,8 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/FOundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class TODocumentPickerViewController;
 @class TODocumentPickerItem;
 @class TODocumentPickerTheme;
@@ -61,9 +63,9 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
  
  @param filePath The file path with which to download file information
  */
-- (void)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker
-             requestItemsForFilePath:(nonnull NSString *)filePath
-                   completionHandler:(nonnull void (^)(NSArray<TODocumentPickerItem *> * _Nullable items))completionHandler;
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker
+             requestItemsForFilePath:(NSString *)filePath
+                   completionHandler:(void (^)(NSArray<TODocumentPickerItem *> * _Nullable items))completionHandler;
 
 @optional
 
@@ -73,18 +75,18 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
  
  @param filePath The file path with which to cancel loading
  */
-- (void)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker cancelRequestForFilePath:(nonnull NSString *)filePath;
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker cancelRequestForFilePath:(NSString *)filePath;
 
 /** 
  After a table cell has been configured for display, this method allows for additional custom configuration of the cell after the fact.
  */
-- (void)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker configureCell:(nonnull UITableViewCell *)cell withItem:(nonnull TODocumentPickerItem *)item;
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker configureCell:(UITableViewCell *)cell withItem:(TODocumentPickerItem *)item;
 
 /**
  The title that will appear in the navigation bar for the folder at this file path.
  If not implemented, defautl behaviour is to return simply the folder name from the filePath string
  */
-- (nullable NSString *)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker titleForFilePath:(nullable NSString *)filePath;
+- (nullable NSString *)documentPickerViewController:(TODocumentPickerViewController *)documentPicker titleForFilePath:(NSString *)filePath;
 
 @end
 
@@ -95,20 +97,15 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
 @optional
 
 /* User either tapped a single item, or selected multiple items and hit 'choose' */
-- (void)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker didSelectItems:(nonnull NSArray<TODocumentPickerItem *> *)items inFilePath:(nullable NSString *)filePath;
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker didPickItems:(NSArray<TODocumentPickerItem *> *)items inFilePath:(NSString *)filePath;
+
+/* User selected or deselected a specific item whilst in selecting mode. */
+- (void)documentPickerViewControllerDidChangeSelectedItems:(TODocumentPickerViewController *)documentPicker;
+
+/* User tapped the 'Select' button to start or cancel multiple item selection */
+- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker didSetSelecting:(BOOL)selecting;
 
 @end
 
-//-------------------------------------------------------------------------
+NS_ASSUME_NONNULL_END
 
-// Theming Attributes
-
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeBackgroundColor;                     /* Background color of the table view */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableSeparatorColor;                 /* Color of the table cell divider lines */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableCellTitleColor;                 /* Color of the title text label in each cell */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor;            /* Color of the subtitle text label in each cell */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor;         /* Color of the arrow accessory icon */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableCellIconTintColor;              /* Tint color of the icons in each cell */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor;   /* Background color of each section header */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor;              /* Color of the text in each section header */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor;              /* Tint color of the scrollable section index column */
