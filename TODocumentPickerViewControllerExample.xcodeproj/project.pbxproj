@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2205C43E1EBF0B1600B20229 /* TODocumentsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2205C43D1EBF0B1600B20229 /* TODocumentsDataSource.m */; };
+		2205C4411EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2205C4401EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m */; };
 		220D33011D33F0440004E4BE /* TODocumentPickerConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */; };
 		225C38F91A7E37DC004DA4D9 /* TODocumentPickerItemManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */; };
 		22707A811A53BDDF008E66CC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707A801A53BDDF008E66CC /* main.m */; };
@@ -15,7 +17,6 @@
 		22707A8A1A53BDDF008E66CC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22707A881A53BDDF008E66CC /* Main.storyboard */; };
 		22707A8C1A53BDDF008E66CC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22707A8B1A53BDDF008E66CC /* Images.xcassets */; };
 		22707A8F1A53BDDF008E66CC /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22707A8D1A53BDDF008E66CC /* LaunchScreen.xib */; };
-		22707AB01A550B65008E66CC /* TODocumentsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707AAF1A550B65008E66CC /* TODocumentsDataSource.m */; };
 		22A3E19B1A56857700C4839E /* TODocumentPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1941A56857700C4839E /* TODocumentPickerViewController.m */; };
 		22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1991A56857700C4839E /* TODocumentPickerItem.m */; };
 		22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E19F1A5685A000C4839E /* TODocumentPickerHeaderView.m */; };
@@ -26,6 +27,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2205C43C1EBF0B1600B20229 /* TODocumentsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentsDataSource.h; sourceTree = "<group>"; };
+		2205C43D1EBF0B1600B20229 /* TODocumentsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentsDataSource.m; sourceTree = "<group>"; };
+		2205C43F1EBF0DAF00B20229 /* TODocumentPickerFileDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerFileDataSource.h; sourceTree = "<group>"; };
+		2205C4401EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerFileDataSource.m; sourceTree = "<group>"; };
 		220D32FF1D33F0440004E4BE /* TODocumentPickerConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerConfiguration.h; sourceTree = "<group>"; };
 		220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerConfiguration.m; sourceTree = "<group>"; };
 		2211A3CF1A5B80900089106B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
@@ -43,8 +48,6 @@
 		22707A891A53BDDF008E66CC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		22707A8B1A53BDDF008E66CC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		22707A8E1A53BDDF008E66CC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
-		22707AAE1A550B65008E66CC /* TODocumentsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentsDataSource.h; sourceTree = "<group>"; };
-		22707AAF1A550B65008E66CC /* TODocumentsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentsDataSource.m; sourceTree = "<group>"; };
 		22A3E1931A56857700C4839E /* TODocumentPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerViewController.h; sourceTree = "<group>"; };
 		22A3E1941A56857700C4839E /* TODocumentPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerViewController.m; sourceTree = "<group>"; };
 		22A3E1981A56857700C4839E /* TODocumentPickerItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerItem.h; sourceTree = "<group>"; };
@@ -100,8 +103,8 @@
 		22707A7D1A53BDDF008E66CC /* TODocumentPickerViewControllerExample */ = {
 			isa = PBXGroup;
 			children = (
-				22707AAE1A550B65008E66CC /* TODocumentsDataSource.h */,
-				22707AAF1A550B65008E66CC /* TODocumentsDataSource.m */,
+				2205C43C1EBF0B1600B20229 /* TODocumentsDataSource.h */,
+				2205C43D1EBF0B1600B20229 /* TODocumentsDataSource.m */,
 				22707A821A53BDDF008E66CC /* TOAppDelegate.h */,
 				22707A831A53BDDF008E66CC /* TOAppDelegate.m */,
 				22707A851A53BDDF008E66CC /* TOViewController.h */,
@@ -149,6 +152,8 @@
 		22A3E1971A56857700C4839E /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				2205C43F1EBF0DAF00B20229 /* TODocumentPickerFileDataSource.h */,
+				2205C4401EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m */,
 				220D32FF1D33F0440004E4BE /* TODocumentPickerConfiguration.h */,
 				220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */,
 				225C38F71A7E37DC004DA4D9 /* TODocumentPickerItemManager.h */,
@@ -244,12 +249,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2205C43E1EBF0B1600B20229 /* TODocumentsDataSource.m in Sources */,
 				22DF14A61A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m in Sources */,
+				2205C4411EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m in Sources */,
 				220D33011D33F0440004E4BE /* TODocumentPickerConfiguration.m in Sources */,
 				22707A871A53BDDF008E66CC /* TOViewController.m in Sources */,
 				22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */,
 				22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */,
-				22707AB01A550B65008E66CC /* TODocumentsDataSource.m in Sources */,
 				22AF79871D2C01550066965F /* TODocumentPickerConstants.m in Sources */,
 				22A3E19B1A56857700C4839E /* TODocumentPickerViewController.m in Sources */,
 				22A3E1A31A56880C00C4839E /* TODocumentPickerSegmentedControl.m in Sources */,
