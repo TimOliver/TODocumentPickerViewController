@@ -25,16 +25,44 @@
 
 @interface TODocumentPickerFileDataSource ()
 
-@property (nonatomic, copy) NSString *filePath;
+@property (nonatomic, copy) NSString *rootFilePath;
 
 @end
 
 @implementation TODocumentPickerFileDataSource
 
+- (instancetype)initWithFilePath:(NSString *)filePath
+{
+    if (self = [super init]) {
+        _rootFilePath = [TODocumentPickerFileDataSource formattedRootFilePath:filePath];
+    }
+
+    return self;
+}
+
++ (NSString *)formattedRootFilePath:(NSString *)filePath
+{
+    // If it doesn't start with '/', assume absolute
+    if ([filePath characterAtIndex:0] != '/') {
+        return filePath;
+    }
+
+    NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *applicationSandboxPath = [documentPath stringByDeletingLastPathComponent];
+    return applicationSandboxPath;
+}
+
+#pragma mark - Data Source Protocol Methods-
+
 - (NSString *)documentPickerViewController:(TODocumentPickerViewController *)documentPicker titleForFilePath:(NSString *)filePath
 {
-    if (filePath.length == 0|| [filePath isEqualToString:@"/"]) {
-        return @"Documents";
+    if (!self.rootFolderName) {
+        return filePath.lastPathComponent;
+    }
+    else {
+        if (filePath.length == 0 || [filePath isEqualToString:self.rootFilePath]) {
+            return self.rootFolderName;
+        }
     }
 
     return filePath.lastPathComponent;
@@ -44,11 +72,16 @@
              requestItemsForFilePath:(NSString *)filePath
                    completionHandler:(void (^)(NSArray<TODocumentPickerItem *> * _Nullable))completionHandler
 {
-    NSString *fullFilePath = [self.documentsPath stringByAppendingPathComponent:filePath];
+    NSString *fullFilePath = [self.rootFilePath stringByAppendingPathComponent:filePath];
     NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:fullFilePath error:nil];
 
     NSMutableArray *items = [NSMutableArray array];
     for (NSString *file in files) {
+        // Skip hidden files if required
+        if (!self.showHiddenFiles && [file characterAtIndex:0] == '.') {
+            continue;
+        }
+
         NSString *path = [fullFilePath stringByAppendingPathComponent:file];
 
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
@@ -60,10 +93,7 @@
         [items addObject:item];
     }
 
-    //Perform after a 1 second delay to simulate a web request
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        completionHandler(items);
-    });
+    completionHandler(items);
 }
 
 @end

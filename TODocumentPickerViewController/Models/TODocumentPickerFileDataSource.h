@@ -25,8 +25,17 @@
 
 @interface TODocumentPickerFileDataSource : NSObject<TODocumentPickerViewControllerDataSource>
 
+/** Allows you to override the title of the root folder displayed initially. */
 @property (nonatomic, copy) NSString *rootFolderName;
 
+/** Shows files that have been prefixed with a '.' character. */
+@property (nonatomic, assign) BOOL showHiddenFiles;
+
+/* Create a new instance of this data source, with the supplied file path
+   pointing to the folder that will be initially displayed.
+   If the file path is relative (eg, starts with '/'), the app's top-most directory
+   in the sandbox will be used.
+ */
 - (instancetype)initWithFilePath:(NSString *)filePath;
 
 @end
