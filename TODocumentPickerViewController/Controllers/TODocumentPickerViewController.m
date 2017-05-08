@@ -798,7 +798,7 @@
 
 - (id<TODocumentPickerViewControllerDelegate>)documentPickerDelegate
 {
-    if (_documentPickerDelegate == nil) {
+    if (_documentPickerDelegate == nil && self != self.rootViewController) {
         return self.rootViewController.documentPickerDelegate;
     }
 

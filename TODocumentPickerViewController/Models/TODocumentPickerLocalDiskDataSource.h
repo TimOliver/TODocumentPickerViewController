@@ -23,7 +23,7 @@
 #import <Foundation/Foundation.h>
 #import "TODocumentPickerConstants.h"
 
-@interface TODocumentPickerFileDataSource : NSObject<TODocumentPickerViewControllerDataSource>
+@interface TODocumentPickerLocalDiskDataSource : NSObject<TODocumentPickerViewControllerDataSource>
 
 /** Allows you to override the title of the root folder displayed initially. */
 @property (nonatomic, copy) NSString *rootFolderName;
@@ -36,6 +36,6 @@
    If the file path is relative (eg, starts with '/'), the app's top-most directory
    in the sandbox will be used.
  */
-- (instancetype)initWithFilePath:(NSString *)filePath;
+- (instancetype)initWithBaseFolderPath:(NSString *)folderPath;
 
 @end

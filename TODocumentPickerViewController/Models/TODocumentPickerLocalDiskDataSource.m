@@ -20,21 +20,30 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import "TODocumentPickerFileDataSource.h"
+#import "TODocumentPickerLocalDiskDataSource.h"
 #import "TODocumentPickerViewController.h"
 
-@interface TODocumentPickerFileDataSource ()
+@interface TODocumentPickerLocalDiskDataSource ()
 
 @property (nonatomic, copy) NSString *rootFilePath;
 
 @end
 
-@implementation TODocumentPickerFileDataSource
+@implementation TODocumentPickerLocalDiskDataSource
 
-- (instancetype)initWithFilePath:(NSString *)filePath
+- (instancetype)init
+{
+    if (self = [self initWithBaseFolderPath:nil]) {
+
+    }
+
+    return self;
+}
+
+- (instancetype)initWithBaseFolderPath:(NSString *)folderPath
 {
     if (self = [super init]) {
-        _rootFilePath = [TODocumentPickerFileDataSource formattedRootFilePath:filePath];
+        _rootFilePath = [TODocumentPickerLocalDiskDataSource formattedRootFilePath:folderPath];
     }
 
     return self;
@@ -43,7 +52,7 @@
 + (NSString *)formattedRootFilePath:(NSString *)filePath
 {
     // If it doesn't start with '/', assume absolute
-    if ([filePath characterAtIndex:0] != '/') {
+    if (filePath.length && [filePath characterAtIndex:0] != '/') {
         return filePath;
     }
 
@@ -60,7 +69,7 @@
         return filePath.lastPathComponent;
     }
     else {
-        if (filePath.length == 0 || [filePath isEqualToString:self.rootFilePath]) {
+        if (filePath.length == 0 || [filePath isEqualToString:@"/"]) {
             return self.rootFolderName;
         }
     }

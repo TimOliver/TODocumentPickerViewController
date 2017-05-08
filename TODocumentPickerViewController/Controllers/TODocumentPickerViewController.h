@@ -38,7 +38,7 @@
 @property (nonatomic, readonly, nonnull)  TODocumentPickerViewController *rootViewController; /* In a navigation chain of picker controllers, the root controller at the front.  */
 @property (nonatomic, readonly, nonnull)  NSArray *viewControllers;         /* The chain of document picker view controllers in the navigation stack */
 
-/* Create the base view controller with the initial starting file path, with a default configuration */
+/* Create the initial view controller with the file path string that will be the initial starting point */
 - (nullable instancetype)initWithFilePath:(nullable NSString *)filePath;
 
 /* Create an instance with a custom created configuration object */
