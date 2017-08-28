@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2205C43E1EBF0B1600B20229 /* TODocumentsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2205C43D1EBF0B1600B20229 /* TODocumentsDataSource.m */; };
-		2205C4411EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2205C4401EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m */; };
 		220D33011D33F0440004E4BE /* TODocumentPickerConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */; };
 		225C38F91A7E37DC004DA4D9 /* TODocumentPickerItemManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */; };
 		22707A811A53BDDF008E66CC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 22707A801A53BDDF008E66CC /* main.m */; };
@@ -24,13 +23,12 @@
 		22A5E42C1A7B17F8000CD302 /* TODocumentPickerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A5E42B1A7B17F8000CD302 /* TODocumentPickerTableView.m */; };
 		22AF79871D2C01550066965F /* TODocumentPickerConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AF79861D2C01550066965F /* TODocumentPickerConstants.m */; };
 		22DF14A61A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DF14A51A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m */; };
+		22F806D71ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F806D61ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2205C43C1EBF0B1600B20229 /* TODocumentsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentsDataSource.h; sourceTree = "<group>"; };
 		2205C43D1EBF0B1600B20229 /* TODocumentsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentsDataSource.m; sourceTree = "<group>"; };
-		2205C43F1EBF0DAF00B20229 /* TODocumentPickerFileDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerFileDataSource.h; sourceTree = "<group>"; };
-		2205C4401EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerFileDataSource.m; sourceTree = "<group>"; };
 		220D32FF1D33F0440004E4BE /* TODocumentPickerConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerConfiguration.h; sourceTree = "<group>"; };
 		220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerConfiguration.m; sourceTree = "<group>"; };
 		2211A3CF1A5B80900089106B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
@@ -61,6 +59,8 @@
 		22AF79861D2C01550066965F /* TODocumentPickerConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TODocumentPickerConstants.m; path = TODocumentPickerViewController/TODocumentPickerConstants.m; sourceTree = "<group>"; };
 		22DF14A41A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+TODocumentPickerIcons.h"; path = "TODocumentPickerViewController/Categories/UIImage+TODocumentPickerIcons.h"; sourceTree = "<group>"; };
 		22DF14A51A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+TODocumentPickerIcons.m"; path = "TODocumentPickerViewController/Categories/UIImage+TODocumentPickerIcons.m"; sourceTree = "<group>"; };
+		22F806D51ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerLocalDiskDataSource.h; sourceTree = "<group>"; };
+		22F806D61ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerLocalDiskDataSource.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,8 +152,8 @@
 		22A3E1971A56857700C4839E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				2205C43F1EBF0DAF00B20229 /* TODocumentPickerFileDataSource.h */,
-				2205C4401EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m */,
+				22F806D51ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.h */,
+				22F806D61ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.m */,
 				220D32FF1D33F0440004E4BE /* TODocumentPickerConfiguration.h */,
 				220D33001D33F0440004E4BE /* TODocumentPickerConfiguration.m */,
 				225C38F71A7E37DC004DA4D9 /* TODocumentPickerItemManager.h */,
@@ -205,7 +205,7 @@
 		22707A731A53BDDF008E66CC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Tim Oliver";
 				TargetAttributes = {
 					22707A7A1A53BDDF008E66CC = {
@@ -251,8 +251,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2205C43E1EBF0B1600B20229 /* TODocumentsDataSource.m in Sources */,
+				22F806D71ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.m in Sources */,
 				22DF14A61A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m in Sources */,
-				2205C4411EBF0DAF00B20229 /* TODocumentPickerFileDataSource.m in Sources */,
 				220D33011D33F0440004E4BE /* TODocumentPickerConfiguration.m in Sources */,
 				22707A871A53BDDF008E66CC /* TOViewController.m in Sources */,
 				22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */,
@@ -295,17 +295,26 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -314,6 +323,7 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -326,7 +336,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -338,17 +348,26 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -356,13 +375,14 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -376,7 +396,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 6LF3GMKZAB;
 				INFOPLIST_FILE = TODocumentPickerViewControllerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.timoliver.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -389,7 +409,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 6LF3GMKZAB;
 				INFOPLIST_FILE = TODocumentPickerViewControllerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.timoliver.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
