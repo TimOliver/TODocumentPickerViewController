@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'TODocumentPickerViewController'
-  spec.version      = '0.1.0'
+  spec.version      = '0.1.1'
   spec.platform     = :ios, '7.0'
   spec.license      = { :type => 'MIT', :file => 'LICENSE' }
   spec.homepage     = 'https://github.com/TimOliver/TODocumentPickerViewController'
