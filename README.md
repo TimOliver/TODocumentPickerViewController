@@ -12,4 +12,4 @@ While functional, TODocumentPickerViewController is still heavily in development
 iOS 7.0 or above.
 
 ## License
-TODocumentPickerViewControlleris licensed under the MIT License. Please see the LICENSE file. 
+TODocumentPickerViewControlleris licensed under the MIT License. Please see the LICENSE file. ![analytics](https://ga-beacon.appspot.com/UA-5643664-16/TODocumentPickerViewController/README.md?pixel)
