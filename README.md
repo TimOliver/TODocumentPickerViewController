@@ -13,3 +13,8 @@ iOS 7.0 or above.
 
 ## License
 TODocumentPickerViewControlleris licensed under the MIT License. Please see the LICENSE file. ![analytics](https://ga-beacon.appspot.com/UA-5643664-16/TODocumentPickerViewController/README.md?pixel)
+
+## Support on Beerpay
+Hey dude! Help me out for a couple of :beers:!
+
+[![Beerpay](https://beerpay.io/TimOliver/TODocumentPickerViewController/badge.svg?style=beer-square)](https://beerpay.io/TimOliver/TODocumentPickerViewController)  [![Beerpay](https://beerpay.io/TimOliver/TODocumentPickerViewController/make-wish.svg?style=flat-square)](https://beerpay.io/TimOliver/TODocumentPickerViewController?focus=wish)
