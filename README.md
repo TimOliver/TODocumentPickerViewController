@@ -4,6 +4,7 @@ TODocumentPickerViewController is an open source 'document picker' implementatio
 <p align="center">
 <img src="https://raw.githubusercontent.com/TimOliver/TODocumentPickerViewController/master/screenshot.jpg" width="500" style="margin:0 auto" />
 </p>
+
 [![Beerpay](https://beerpay.io/TimOliver/TODocumentPickerViewController/badge.svg?style=flat)](https://beerpay.io/TimOliver/TODocumentPickerViewController)
 [![PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=M4RKULAVKV7K8)
 
