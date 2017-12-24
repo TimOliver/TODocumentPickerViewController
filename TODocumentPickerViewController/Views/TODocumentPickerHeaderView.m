@@ -29,9 +29,6 @@
 @property (nonatomic, strong, readwrite) UISearchBar *searchBar;
 @property (nonatomic, strong, readwrite) TODocumentPickerSegmentedControl *sortControl;
 
-- (void)setupViews;
-- (void)setupConstraints;
-
 @end
 
 @implementation TODocumentPickerHeaderView
@@ -43,7 +40,6 @@
         self.backgroundColor = [UIColor clearColor];
         
         [self setupViews];
-        [self setupConstraints];
     }
     
     return self;
@@ -61,27 +57,13 @@
     [self.clippingView addSubview:self.containerView];
 
     self.searchBar = [[UISearchBar alloc] initWithFrame:(CGRect){0,0,320,44}];
-    self.searchBar.translatesAutoresizingMaskIntoConstraints = NO;
     self.searchBar.delegate = self;
     self.searchBar.placeholder = @"Search";
     self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
     [self.containerView addSubview:self.searchBar];
 
     self.sortControl = [[TODocumentPickerSegmentedControl alloc] init];
-    self.sortControl.translatesAutoresizingMaskIntoConstraints = NO;
     [self.containerView addSubview:self.sortControl];
-}
-
-- (void)setupConstraints
-{
-    NSDictionary *views = @{@"searchBar":self.searchBar, @"sortControl":self.sortControl};
-    
-    //Search bar constraints
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[searchBar]|" options:0 metrics:nil views:views]];
-    
-    //segmented control
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[searchBar]-7-[sortControl]-8-|" options:0 metrics:nil views:views]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-8-[sortControl]-8-|" options:0 metrics:nil views:views]];
 }
 
 - (void)didMoveToSuperview
@@ -114,6 +96,19 @@
     frame = self.bounds;
     frame.origin.y = -clampedHeight;
     self.containerView.frame = frame;
+    
+    // Layout the child views
+    frame = self.searchBar.frame;
+    frame.size.width = self.bounds.size.width;
+    frame.size.height = 44.0f;
+    self.searchBar.frame = frame;
+    
+    frame = self.sortControl.frame;
+    frame.origin.x = self.layoutMargins.left;
+    frame.size.width = self.bounds.size.width - (self.layoutMargins.left + self.layoutMargins.right);
+    frame.origin.y = CGRectGetMaxY(self.searchBar.frame) + 5.0f;
+    frame.size.height = 33.0f;
+    self.sortControl.frame = frame;
 }
 
 #pragma mark - Search Bar Delegate -

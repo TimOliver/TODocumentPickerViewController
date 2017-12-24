@@ -78,37 +78,6 @@
 /* Serial queue for posting updates to the items property asynchronously. */
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 
-/* Intial setup */
-- (void)commonInit;
-- (void)configureToolbar;
-
-/* Show dummy content labels */
-- (void)showFeedbackLabelIfNeeded;
-
-/* Setup positions and constraints */
-- (void)resetHeaderConstraints;
-- (void)resetTableViewInitialOffset;
-- (void)resetAfterInitialItemLoad;
-
-/* User interaction callbacks */
-- (void)refreshControlTriggered;
-- (void)selectButtonTapped;
-- (void)doneButtonTapped;
-- (void)selectAllButtonTapped;
-- (void)chooseButtonTapped;
-
-/* Fetch items */
-- (void)reloadItemsFromDataSource;
-
-/* Visual content updates */
-- (void)updateViewContent;
-- (void)updateFooterLabel;
-- (void)updateToolbarItems;
-- (void)updateBarButtonsAnimated:(BOOL)animated;
-
-/* Internal controller creation */
-- (instancetype)initWithRootViewController:(TODocumentPickerViewController *)rootController filePath:(NSString *)filePath;
-
 @end
 
 @implementation TODocumentPickerViewController
@@ -171,7 +140,7 @@
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    self.tableView.rowHeight = 52.0f;
+    self.tableView.rowHeight = 64.0f;
     self.tableView.sectionIndexBackgroundColor = self.view.backgroundColor;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
 
@@ -334,7 +303,12 @@
 - (void)resetTableViewInitialOffset
 {
     CGPoint contentOffset = self.tableView.contentOffset;
-    contentOffset.y = -self.tableView.contentInset.top + CGRectGetHeight(self.headerView.frame);
+    if (@available(iOS 11.0, *)) {
+        contentOffset.y = -self.tableView.adjustedContentInset.top + CGRectGetHeight(self.headerView.frame);
+    }
+    else {
+        contentOffset.y = -self.tableView.contentInset.top + CGRectGetHeight(self.headerView.frame);
+    }
     self.tableView.contentOffset = contentOffset;
 }
 
@@ -612,7 +586,12 @@
     [self.headerView dismissKeyboard];
 
     //Update the header clipping, so it's not visible under translucent bars
-    self.headerView.clippingHeight = scrollView.contentInset.top + scrollView.contentOffset.y;
+    if (@available(iOS 11.0, *)) {
+        self.headerView.clippingHeight = scrollView.adjustedContentInset.top + scrollView.contentOffset.y;
+    }
+    else {
+        self.headerView.clippingHeight = scrollView.contentInset.top + scrollView.contentOffset.y;
+    }
 }
 
 #pragma mark - Update View Content -
