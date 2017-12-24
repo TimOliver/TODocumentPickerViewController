@@ -27,6 +27,9 @@
 - (void)setContentSize:(CGSize)contentSize
 {
     CGFloat scrollInset = self.contentInset.top + self.contentInset.bottom;
+    if (@available(iOS 11.0, *)) {
+        scrollInset = self.adjustedContentInset.top + self.adjustedContentInset.bottom;
+    }
     CGFloat height = (CGRectGetHeight(self.bounds) - scrollInset) + CGRectGetHeight(self.tableHeaderView.frame);
     contentSize.height = MAX(height, contentSize.height);
     [super setContentSize:contentSize];
