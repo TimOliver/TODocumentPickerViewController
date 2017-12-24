@@ -85,6 +85,16 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
  */
 - (nullable NSString *)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker titleForFilePath:(nullable NSString *)filePath;
 
+/**
+ If desired, this method may be overridden to provide a custom icon for items that represent folders in the file system.
+ */
+- (nonnull UIImage *)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker folderIconForStyle:(TODocumentPickerViewControllerStyle)style;
+
+/**
+ If desired, a custom icon can be provided by default for each type of file that the view controller is displaying. `extension` can be `nil` for unknown file types.
+ */
+- (nonnull UIImage *)documentPickerViewController:(nonnull TODocumentPickerViewController *)documentPicker fileIconForExtension:(nullable NSString *)extension style:(TODocumentPickerViewControllerStyle)style;
+
 @end
 
 //-------------------------------------------------------------------------

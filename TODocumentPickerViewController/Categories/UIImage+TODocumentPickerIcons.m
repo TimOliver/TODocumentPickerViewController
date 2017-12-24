@@ -24,6 +24,25 @@
 
 @implementation UIImage (TODocumentPickerIcons)
 
++ (UIImage *)TO_documentPickerFolderIconWithSize:(CGSize)size
+                                 backgroundColor:(UIColor *)backgroundColor
+                           foregroundBottomColor:(UIColor *)foregroundBottomColor
+                              foregroundTopColor:(UIColor *)foregroundTopColor
+{
+    
+}
+
++ (UIImage *)TO_documentPickerDefaultIconWithSize:(CGSize)size
+                                     outlineColor:(UIColor *)outlineColor
+                                  backgroundColor:(UIColor *)backgroundColor
+                                      cornerColor:(UIColor *)cornerColor
+                                 formatNameString:(NSString *)formatNameString
+                                   formatNameFont:(UIFont *)formatNameFont
+                                  formatNameColor:(UIColor *)formatNameColor
+{
+    
+}
+
 + (UIImage *)TO_documentPickerFolderIcon
 {
     UIImage *folderIcon = nil;
