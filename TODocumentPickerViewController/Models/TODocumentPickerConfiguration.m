@@ -20,8 +20,17 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#import "TODocumentPickerConstants.h"
+
 #import "TODocumentPickerConfiguration.h"
+#import "TODocumentPickerTheme.h"
 #import "UIImage+TODocumentPickerIcons.h"
+
+@interface TODocumentPickerConfiguration ()
+
+@property (nonatomic, strong, readwrite) TODocumentPickerTheme *theme;
+
+@end
 
 @implementation TODocumentPickerConfiguration
 
@@ -29,6 +38,7 @@
 {
     if (self = [super init]) {
         _showToolbar = YES;
+        _theme = [[TODocumentPickerTheme alloc] init];
     }
 
     return self;
@@ -37,7 +47,9 @@
 - (UIImage *)defaultIcon
 {
     if (_defaultIcon == nil) {
-        _defaultIcon = [UIImage TO_documentPickerDefaultIcon];
+        _defaultIcon = [UIImage TO_documentPickerDefaultFileIconWithExtension:nil
+                                                                    tintColor:nil
+                                                                        style:self.style];
     }
 
     return _defaultIcon;
@@ -46,10 +58,19 @@
 - (UIImage *)folderIcon
 {
     if (_folderIcon == nil) {
-        _folderIcon = [UIImage TO_documentPickerFolderIcon];
+        _folderIcon = [UIImage TO_documentPickerDefaultFolderForStyle:self.style];
     }
 
     return _folderIcon;
+}
+
+- (void)setStyle:(TODocumentPickerViewControllerStyle)style
+{
+    if (style == _style) { return; }
+    _style = style;
+    
+    _defaultIcon = nil;
+    _defaultIcon = nil;
 }
 
 @end

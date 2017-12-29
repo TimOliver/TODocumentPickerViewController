@@ -64,14 +64,6 @@
     });
 }
 
-- (void)documentPickerViewController:(TODocumentPickerViewController *)documentPicker configureCell:(UITableViewCell *)cell withItem:(TODocumentPickerItem *)item
-{
-    // Apply the system tint color to these icons
-    if (cell.imageView.image.renderingMode != UIImageRenderingModeAlwaysTemplate) {
-        cell.imageView.image = [cell.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    }
-}
-
 #pragma mark - Class Setup / Management -
 - (void)createTestData
 {

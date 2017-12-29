@@ -24,12 +24,58 @@
 
 @implementation UIImage (TODocumentPickerIcons)
 
++ (UIImage *)TO_documentPickerDefaultFolderForStyle:(TODocumentPickerViewControllerStyle)style
+{
+    BOOL darkMode = (style == TODocumentPickerViewControllerStyleDark);
+    UIColor *backgroundColor, *frontBottomColor, *frontTopColor;
+    
+    if (darkMode) {
+        
+    }
+    else {
+        backgroundColor = [UIColor colorWithRed: 0.553 green: 0.855 blue: 1 alpha: 1];
+        frontTopColor = [UIColor colorWithRed: 0.396 green: 0.761 blue: 0.937 alpha: 1];
+        frontBottomColor = [UIColor colorWithRed: 0.525 green: 0.835 blue: 0.988 alpha: 1];
+    }
+    
+    return [UIImage TO_documentPickerFolderIconWithSize:kTODocumentPickerDefaultFolderIconSize
+                                        backgroundColor:backgroundColor
+                                  foregroundBottomColor:frontBottomColor
+                                     foregroundTopColor:frontTopColor];
+}
+
++ (UIImage *)TO_documentPickerDefaultFileIconWithExtension:(NSString *)extension
+                                                 tintColor:(UIColor *)tintColor
+                                                     style:(TODocumentPickerViewControllerStyle)style
+{
+    BOOL darkMode = (style == TODocumentPickerViewControllerStyleDark);
+    UIColor *outlineColor, *backgroundColor, *cornerColor, *formatNameColor;
+    
+    if (darkMode) {
+        
+    }
+    else {
+        outlineColor = [UIColor colorWithRed: 0.851 green: 0.851 blue: 0.851 alpha: 1];
+        backgroundColor = [UIColor colorWithRed: 0.976 green: 0.976 blue: 0.976 alpha: 1];
+        cornerColor = [UIColor colorWithRed: 1 green: 1 blue: 1 alpha: 1];
+        formatNameColor = [UIColor colorWithRed: 0.039 green: 0.376 blue: 1 alpha: 1];
+    }
+    
+    return [UIImage TO_documentPickerIconWithSize:kTODocumentPickerDefaultFileIconSize
+                                     outlineColor:outlineColor
+                                  backgroundColor:backgroundColor
+                                      cornerColor:cornerColor
+                                 formatNameString:extension
+                                   formatNameFont:[UIFont boldSystemFontOfSize:15.0f]
+                                  formatNameColor:tintColor];
+}
+
 + (UIImage *)TO_documentPickerFolderIconWithSize:(CGSize)size
                                  backgroundColor:(UIColor *)backgroundColor
                            foregroundBottomColor:(UIColor *)foregroundBottomColor
                               foregroundTopColor:(UIColor *)foregroundTopColor
 {
-    UIImage *folderIcon = nil;
+    UIImage *folderIconImage = nil;
     
     UIGraphicsBeginImageContextWithOptions(size, NO, 0.0f);
     {
@@ -107,20 +153,20 @@
         //// Cleanup
         CGGradientRelease(folderGradient);
         
-        folderIcon = UIGraphicsGetImageFromCurrentImageContext();
+        folderIconImage = UIGraphicsGetImageFromCurrentImageContext();
     }
     UIGraphicsEndImageContext();
     
-    return folderIcon;
+    return [folderIconImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
-+ (UIImage *)TO_documentPickerDefaultIconWithSize:(CGSize)size
-                                     outlineColor:(UIColor *)fileOutline
-                                  backgroundColor:(UIColor *)backgroundFillColor
-                                      cornerColor:(UIColor *)topFillColor
-                                 formatNameString:(NSString *)formatNameString
-                                   formatNameFont:(UIFont *)formatNameFont
-                                  formatNameColor:(UIColor *)textColor
++ (UIImage *)TO_documentPickerIconWithSize:(CGSize)size
+                              outlineColor:(UIColor *)fileOutline
+                           backgroundColor:(UIColor *)backgroundFillColor
+                               cornerColor:(UIColor *)topFillColor
+                          formatNameString:(NSString *)formatNameString
+                            formatNameFont:(UIFont *)formatNameFont
+                           formatNameColor:(UIColor *)textColor
 {
     UIImage *fileIconImage = nil;
     
@@ -184,12 +230,13 @@
             
             
             //// Text Drawing
-            CGRect textRect = CGRectMake(CGRectGetMinX(fileIcon) + floor(fileIcon.size.width * 0.02469 - 0.39) + 0.89, CGRectGetMinY(fileIcon) + floor(fileIcon.size.height * 0.30244 - 0.02) + 0.52, floor(fileIcon.size.width * 0.98190 + 0.15) - floor(fileIcon.size.width * 0.02469 - 0.39) - 0.54, floor(fileIcon.size.height * 0.69823 - 0.02) - floor(fileIcon.size.height * 0.30244 - 0.02));
-            {
-                NSString* textContent = @"zip";
+            if (formatNameString.length > 0) {
+                CGRect textRect = CGRectMake(CGRectGetMinX(fileIcon) + floor(fileIcon.size.width * 0.02469 - 0.39) + 0.89, CGRectGetMinY(fileIcon) + floor(fileIcon.size.height * 0.30244 - 0.02) + 0.52, floor(fileIcon.size.width * 0.98190 + 0.15) - floor(fileIcon.size.width * 0.02469 - 0.39) - 0.54, floor(fileIcon.size.height * 0.69823 - 0.02) - floor(fileIcon.size.height * 0.30244 - 0.02));
+                
+                NSString* textContent = formatNameString;
                 NSMutableParagraphStyle* textStyle = [[NSMutableParagraphStyle alloc] init];
                 textStyle.alignment = NSTextAlignmentCenter;
-                NSDictionary* textFontAttributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize: 15], NSForegroundColorAttributeName: textColor, NSParagraphStyleAttributeName: textStyle};
+                NSDictionary* textFontAttributes = @{NSFontAttributeName: formatNameFont, NSForegroundColorAttributeName: textColor, NSParagraphStyleAttributeName: textStyle};
                 
                 CGFloat textTextHeight = [textContent boundingRectWithSize: CGSizeMake(textRect.size.width, INFINITY) options: NSStringDrawingUsesLineFragmentOrigin attributes: textFontAttributes context: nil].size.height;
                 CGContextSaveGState(context);
@@ -203,89 +250,7 @@
     }
     UIGraphicsEndImageContext();
     
-    return fileIconImage;
-}
-
-+ (UIImage *)TO_documentPickerFolderIcon
-{
-    UIImage *folderIcon = nil;
-    
-    UIGraphicsBeginImageContextWithOptions((CGSize){33,27}, NO, 0.0f);
-    {
-        //// Rectangle Drawing
-        UIBezierPath* rectanglePath = UIBezierPath.bezierPath;
-        [rectanglePath moveToPoint: CGPointMake(0.5, 23.61)];
-        [rectanglePath addCurveToPoint: CGPointMake(3.41, 26.5) controlPoint1: CGPointMake(0.5, 25.21) controlPoint2: CGPointMake(1.8, 26.5)];
-        [rectanglePath addLineToPoint: CGPointMake(29.59, 26.5)];
-        [rectanglePath addCurveToPoint: CGPointMake(32.5, 23.61) controlPoint1: CGPointMake(31.2, 26.5) controlPoint2: CGPointMake(32.5, 25.21)];
-        [rectanglePath addLineToPoint: CGPointMake(32.5, 6.39)];
-        [rectanglePath addCurveToPoint: CGPointMake(29.59, 3.5) controlPoint1: CGPointMake(32.5, 4.79) controlPoint2: CGPointMake(31.2, 3.5)];
-        [rectanglePath addCurveToPoint: CGPointMake(15.5, 3.5) controlPoint1: CGPointMake(29.59, 3.5) controlPoint2: CGPointMake(17.5, 3.5)];
-        [rectanglePath addCurveToPoint: CGPointMake(10.5, 0.5) controlPoint1: CGPointMake(13.5, 3.5) controlPoint2: CGPointMake(12.5, 0.5)];
-        [rectanglePath addCurveToPoint: CGPointMake(3.41, 0.5) controlPoint1: CGPointMake(8.5, 0.5) controlPoint2: CGPointMake(3.41, 0.5)];
-        [rectanglePath addCurveToPoint: CGPointMake(0.5, 3.39) controlPoint1: CGPointMake(1.8, 0.5) controlPoint2: CGPointMake(0.5, 1.79)];
-        [rectanglePath addLineToPoint: CGPointMake(0.5, 23.61)];
-        [rectanglePath closePath];
-        [UIColor.blackColor setStroke];
-        rectanglePath.lineWidth = 1;
-        [rectanglePath stroke];
-        
-        
-        //// Rectangle 2 Drawing
-        UIBezierPath* rectangle2Path = UIBezierPath.bezierPath;
-        [rectangle2Path moveToPoint: CGPointMake(32.5, 10.5)];
-        [rectangle2Path addCurveToPoint: CGPointMake(29.5, 7.5) controlPoint1: CGPointMake(32.5, 8.84) controlPoint2: CGPointMake(31.16, 7.5)];
-        [rectangle2Path addLineToPoint: CGPointMake(3.5, 7.5)];
-        [rectangle2Path addCurveToPoint: CGPointMake(0.5, 10.5) controlPoint1: CGPointMake(1.84, 7.5) controlPoint2: CGPointMake(0.5, 8.84)];
-        [UIColor.blackColor setStroke];
-        rectangle2Path.lineWidth = 1;
-        [rectangle2Path stroke];
-        
-        folderIcon = UIGraphicsGetImageFromCurrentImageContext();
-    }
-    UIGraphicsEndImageContext();
-    
-    return folderIcon;
-}
-
-+ (UIImage *)TO_documentPickerDefaultIcon
-{
-    UIImage *documentIcon = nil;
-    
-    UIGraphicsBeginImageContextWithOptions((CGSize){33,37}, NO, 0.0f);
-    {
-        //// Group
-        {
-            //// Page Drawing
-            UIBezierPath* pagePath = UIBezierPath.bezierPath;
-            [pagePath moveToPoint: CGPointMake(5.5, 33.5)];
-            [pagePath addLineToPoint: CGPointMake(28.5, 33.5)];
-            [pagePath addLineToPoint: CGPointMake(28.5, 11.41)];
-            [pagePath addLineToPoint: CGPointMake(19.3, 2.5)];
-            [pagePath addLineToPoint: CGPointMake(5.5, 2.5)];
-            [pagePath addLineToPoint: CGPointMake(5.5, 33.5)];
-            [pagePath closePath];
-            [UIColor.blackColor setStroke];
-            pagePath.lineWidth = 1;
-            [pagePath stroke];
-            
-            
-            //// Fold Drawing
-            UIBezierPath* foldPath = UIBezierPath.bezierPath;
-            [foldPath moveToPoint: CGPointMake(19.5, 2.5)];
-            [foldPath addLineToPoint: CGPointMake(19.5, 11.5)];
-            [foldPath addLineToPoint: CGPointMake(28.5, 11.5)];
-            [UIColor.blackColor setStroke];
-            foldPath.lineWidth = 1;
-            [foldPath stroke];
-        }
-
-        
-        documentIcon = UIGraphicsGetImageFromCurrentImageContext();
-    }
-    UIGraphicsEndImageContext();
-    
-    return documentIcon;
+    return [fileIconImage imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
 @end

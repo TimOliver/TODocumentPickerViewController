@@ -24,6 +24,7 @@
 #import "TODocumentPickerConstants.h"
 #import "TODocumentPickerItem.h"
 #import "TODocumentPickerConfiguration.h"
+#import "TODocumentPickerTheme.h"
 
 @interface TODocumentPickerViewController : UITableViewController
 

@@ -21,15 +21,22 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "TODocumentPickerConstants.h"
 
 @interface UIImage (TODocumentPickerIcons)
+
++ (UIImage *)TO_documentPickerDefaultFolderForStyle:(TODocumentPickerViewControllerStyle)style;
 
 + (UIImage *)TO_documentPickerFolderIconWithSize:(CGSize)size
                                  backgroundColor:(UIColor *)backgroundColor
                            foregroundBottomColor:(UIColor *)foregroundBottomColor
                               foregroundTopColor:(UIColor *)foregroundTopColor;
 
-+ (UIImage *)TO_documentPickerDefaultIconWithSize:(CGSize)size
++ (UIImage *)TO_documentPickerDefaultFileIconWithExtension:(NSString *)extension
+                                                 tintColor:(UIColor *)tintColor
+                                                  style:(TODocumentPickerViewControllerStyle)style;
+
++ (UIImage *)TO_documentPickerIconWithSize:(CGSize)size
                                      outlineColor:(UIColor *)outlineColor
                                   backgroundColor:(UIColor *)backgroundColor
                                       cornerColor:(UIColor *)cornerColor

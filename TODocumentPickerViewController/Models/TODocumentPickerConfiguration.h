@@ -20,16 +20,18 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#import "TODocumentPickerConstants.h"
+
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-#import "TODocumentPickerConstants.h"
+@class TODocumentPickerTheme;
+
+NS_ASSUME_NONNULL_BEGIN
 
 @interface TODocumentPickerConfiguration : NSObject
 
-/* Whether the view controller is rendered in a light or dark style.
-    These properties can be subsequently overridden with the style properties below.
- */
+/* Sets the style of the view controller to be light or dark. (Can be customized with the `theme` property) */
 @property (nonatomic, assign) TODocumentPickerViewControllerStyle style;
 
 /* Whether this controller shows and manages the navigation controller toolbar (Default is YES) */
@@ -56,7 +58,9 @@
 /* If desired, a custom table view cell class that can contain additional controls or formatting. */
 @property (nonatomic, assign, nullable) Class tableViewCellClass;
 
-/* Attributes for applying a new colour scheme to this view controller. */
-@property (nonatomic, strong, nullable) NSDictionary *themeAttributes;
+/* After setting the `style` property, certain visual aspects of the controller can be fine-tuned with this property. */
+@property (nonatomic, readonly) TODocumentPickerTheme *theme;
 
 @end
+
+NS_ASSUME_NONNULL_END

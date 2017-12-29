@@ -109,15 +109,7 @@ typedef NS_ENUM(NSInteger, TODocumentPickerSortType) {
 @end
 
 //-------------------------------------------------------------------------
+// Size of the default file and folder icons
 
-// Theming Attributes
-
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeBackgroundColor;                     /* Background color of the table view */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableSeparatorColor;                 /* Color of the table cell divider lines */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableCellTitleColor;                 /* Color of the title text label in each cell */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableCellDetailTextColor;            /* Color of the subtitle text label in each cell */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableCellAccessoryTintColor;         /* Color of the arrow accessory icon */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableCellIconTintColor;              /* Tint color of the icons in each cell */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableSectionHeaderBackgroundColor;   /* Background color of each section header */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableSectionTitleColor;              /* Color of the text in each section header */
-extern NSString *  _Nonnull const TODocumentPickerViewControllerThemeAttributeTableSectionIndexColor;              /* Tint color of the scrollable section index column */
+static const CGSize kTODocumentPickerDefaultFolderIconSize  = (CGSize){47,37};
+static const CGSize kTODocumentPickerDefaultFileIconSize    = (CGSize){37,49};
