@@ -114,7 +114,7 @@
 
 - (void)commonInit
 {
-    _cellFolderFont = [UIFont boldSystemFontOfSize:17.0f];
+    _cellFolderFont = [UIFont systemFontOfSize:17.0f];
     _cellFileFont   = [UIFont systemFontOfSize:17.0f];
     _itemManager = [[TODocumentPickerItemManager alloc] init];
     _serialQueue = dispatch_queue_create("TODocumentPickerViewController.itemBuilderQueue", DISPATCH_QUEUE_SERIAL);
@@ -481,14 +481,9 @@
 }
 
 #pragma mark - Table View Data Source -
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return [self.itemManager numberOfSections];
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.itemManager numberOfRowsForSection:section];
+    return self.itemManager.numberOfItems;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -497,8 +492,9 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil) {
         Class tableViewCellClass = self.configuration.tableViewCellClass;
-        if (tableViewCellClass == nil)
+        if (tableViewCellClass == nil) {
             tableViewCellClass = [UITableViewCell class];
+        }
         
         cell = [[tableViewCellClass alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
         cell.detailTextLabel.textColor = [UIColor colorWithWhite:0.6f alpha:1.0f];
@@ -518,26 +514,6 @@
     }
 
     return cell;
-}
-
-- (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
-{
-    return [self.itemManager sectionIndexTitles];
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    return [self.itemManager titleForHeaderInSection:section];
-}
-
-- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
-{
-    if ([title isEqualToString:@"{search}"]) {
-        [self.tableView setContentOffset:(CGPoint){0, -tableView.contentInset.top} animated:NO];
-        return -1;
-    }
-        
-    return [self.itemManager sectionForSectionIndexAtIndex:index];
 }
 
 #pragma mark - Table View Delegate -
@@ -608,7 +584,7 @@
     self.feedbackLabel.hidden = YES;
 
     //Cancel if searching AND resulting rows is greater than one
-    if (self.itemManager.searchString.length > 0 && [self.itemManager numberOfRowsForSection:0] > 0)
+    if (self.itemManager.searchString.length > 0 && self.itemManager.numberOfItems > 0)
         return;
 
     //Cnacel if not searching and items are present
@@ -759,11 +735,7 @@
 
 - (BOOL)allCellsSelected
 {
-    //If we're mid search, compare the count to the item manager
-    if (self.itemManager.searchString.length > 0)
-        return [self.tableView indexPathsForSelectedRows].count == [self.itemManager numberOfRowsForSection:0];
-    
-    return [self.tableView indexPathsForSelectedRows].count == self.items.count;
+    return [self.tableView indexPathsForSelectedRows].count == self.itemManager.numberOfItems;
 }
 
 - (id<TODocumentPickerViewControllerDataSource>)dataSource

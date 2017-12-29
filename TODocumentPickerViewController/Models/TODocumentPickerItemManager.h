@@ -33,20 +33,15 @@
 @property (nonatomic, assign) TODocumentPickerSortType sortingType; /* The order in which items are displayed. */
 @property (nonatomic, copy)   NSString *searchString;               /* Filter the items with this string */
 
-@property (nonatomic, readonly) BOOL sectionIndexIsVisible;         /* Determines whether the list on the right side is visible. */
-
 @property (nonatomic, weak) UITableView *tableView;                 /* A weak reference to the relating table view. */
 @property (nonatomic, copy) void (^contentReloadedHandler)(void);   /* A handler called each time the manager decides to reload the table view. */
+
+@property (nonatomic, readonly) NSInteger numberOfItems;             /* Number of visible rows depending on search string */
 
 /* Start sorting items, if not already done so. */
 - (void)reloadItems;
 
-- (NSInteger)numberOfSections;
-- (NSInteger)numberOfRowsForSection:(NSInteger)section;
+/* Retrieve the appropriate object at the provided index */
 - (TODocumentPickerItem *)itemForIndexPath:(NSIndexPath *)indexPath;
-
-- (NSArray *)sectionIndexTitles;
-- (NSString *)titleForHeaderInSection:(NSInteger)section;
-- (NSInteger)sectionForSectionIndexAtIndex:(NSInteger)index;
 
 @end
