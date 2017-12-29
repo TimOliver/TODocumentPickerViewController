@@ -22,6 +22,7 @@
 		22A3E1A31A56880C00C4839E /* TODocumentPickerSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A3E1A21A56880C00C4839E /* TODocumentPickerSegmentedControl.m */; };
 		22A5E42C1A7B17F8000CD302 /* TODocumentPickerTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A5E42B1A7B17F8000CD302 /* TODocumentPickerTableView.m */; };
 		22AF79871D2C01550066965F /* TODocumentPickerConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AF79861D2C01550066965F /* TODocumentPickerConstants.m */; };
+		22B177011FF60F6700F974BB /* TODocumentPickerTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B177001FF60F6700F974BB /* TODocumentPickerTheme.m */; };
 		22DF14A61A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DF14A51A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m */; };
 		22F806D71ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F806D61ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.m */; };
 /* End PBXBuildFile section */
@@ -57,6 +58,8 @@
 		22A5E42A1A7B17F8000CD302 /* TODocumentPickerTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerTableView.h; sourceTree = "<group>"; };
 		22A5E42B1A7B17F8000CD302 /* TODocumentPickerTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerTableView.m; sourceTree = "<group>"; };
 		22AF79861D2C01550066965F /* TODocumentPickerConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TODocumentPickerConstants.m; path = TODocumentPickerViewController/TODocumentPickerConstants.m; sourceTree = "<group>"; };
+		22B176FF1FF60F6700F974BB /* TODocumentPickerTheme.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerTheme.h; sourceTree = "<group>"; };
+		22B177001FF60F6700F974BB /* TODocumentPickerTheme.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TODocumentPickerTheme.m; sourceTree = "<group>"; };
 		22DF14A41A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+TODocumentPickerIcons.h"; path = "TODocumentPickerViewController/Categories/UIImage+TODocumentPickerIcons.h"; sourceTree = "<group>"; };
 		22DF14A51A8104F8002E9DE4 /* UIImage+TODocumentPickerIcons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+TODocumentPickerIcons.m"; path = "TODocumentPickerViewController/Categories/UIImage+TODocumentPickerIcons.m"; sourceTree = "<group>"; };
 		22F806D51ECAC5EB0053C94E /* TODocumentPickerLocalDiskDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TODocumentPickerLocalDiskDataSource.h; sourceTree = "<group>"; };
@@ -160,6 +163,8 @@
 				225C38F81A7E37DC004DA4D9 /* TODocumentPickerItemManager.m */,
 				22A3E1981A56857700C4839E /* TODocumentPickerItem.h */,
 				22A3E1991A56857700C4839E /* TODocumentPickerItem.m */,
+				22B176FF1FF60F6700F974BB /* TODocumentPickerTheme.h */,
+				22B177001FF60F6700F974BB /* TODocumentPickerTheme.m */,
 			);
 			name = Models;
 			path = TODocumentPickerViewController/Models;
@@ -256,6 +261,7 @@
 				220D33011D33F0440004E4BE /* TODocumentPickerConfiguration.m in Sources */,
 				22707A871A53BDDF008E66CC /* TOViewController.m in Sources */,
 				22A3E19D1A56857700C4839E /* TODocumentPickerItem.m in Sources */,
+				22B177011FF60F6700F974BB /* TODocumentPickerTheme.m in Sources */,
 				22A3E1A01A5685A000C4839E /* TODocumentPickerHeaderView.m in Sources */,
 				22AF79871D2C01550066965F /* TODocumentPickerConstants.m in Sources */,
 				22A3E19B1A56857700C4839E /* TODocumentPickerViewController.m in Sources */,

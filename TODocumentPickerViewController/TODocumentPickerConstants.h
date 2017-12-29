@@ -30,8 +30,8 @@
  The default content styles that the controller implements.
  */
 typedef NS_ENUM(NSInteger, TODocumentPickerViewControllerStyle) {
-    TODocumentPickerViewControllerStyleLightContent,
-    TODocumentPickerViewControllerStyleDarkContent
+    TODocumentPickerViewControllerStyleLight,
+    TODocumentPickerViewControllerStyleDark
 };
 
 /* 

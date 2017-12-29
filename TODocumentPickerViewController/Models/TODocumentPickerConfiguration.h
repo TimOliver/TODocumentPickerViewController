@@ -27,6 +27,11 @@
 
 @interface TODocumentPickerConfiguration : NSObject
 
+/* Whether the view controller is rendered in a light or dark style.
+    These properties can be subsequently overridden with the style properties below.
+ */
+@property (nonatomic, assign) TODocumentPickerViewControllerStyle style;
+
 /* Whether this controller shows and manages the navigation controller toolbar (Default is YES) */
 @property (nonatomic, assign) BOOL showToolbar;
 
