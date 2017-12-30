@@ -22,29 +22,87 @@
 
 #import "TODocumentPickerTableViewCell.h"
 
+static const CGFloat kTODocumentPickerTableViewCellImagePadding = 15.0f;
+
+@interface TODocumentPickerTableViewCell ()
+
+@property (nonatomic, assign) CGFloat textFontHeight;
+@property (nonatomic, assign) CGFloat detailTextFontHeight;
+
+@end
+
 @implementation TODocumentPickerTableViewCell
 
+@synthesize imageView = __imageView;
 @synthesize textLabel = __textLabel;
 @synthesize detailTextLabel = __detailTextLabel;
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     if (self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier]) {
-        
+        [self commonInit];
     }
 
     return self;
 }
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    // Initialization code
+- (void)commonInit
+{
+    __textLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    __textLabel.font = [UIFont systemFontOfSize:18.0f weight:UIFontWeightRegular];
+    __textLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self.contentView addSubview:__textLabel];
+    
+    __detailTextLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    __detailTextLabel.font = [UIFont systemFontOfSize:13.0f weight:UIFontWeightRegular];
+    __detailTextLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self.contentView addSubview:__detailTextLabel];
+
+    __imageView = [[UIImageView alloc] initWithImage:nil];
+    __imageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.contentView addSubview:__imageView];
+    
+    _textFontHeight = __textLabel.font.ascender - __textLabel.font.descender;
+    _detailTextFontHeight = __detailTextLabel.font.ascender - __detailTextLabel.font.descender;
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
+- (void)configureCellForStyle:(TODocumentPickerViewControllerStyle)style
+{
+    BOOL darkMode = (style == TODocumentPickerViewControllerStyleDark);
+    
+    self.textLabel.textColor = darkMode ? [UIColor whiteColor] : [UIColor blackColor];
+    self.detailTextLabel.textColor = darkMode ? [UIColor colorWithWhite:0.6f alpha:1.0f] : [UIColor colorWithWhite:0.5f alpha:1.0f];
+}
 
-    // Configure the view for the selected state
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    CGRect contentFrame = CGRectZero;
+    contentFrame.origin.x = self.layoutMargins.left;
+    contentFrame.origin.y = self.layoutMargins.top;
+    contentFrame.size.width = CGRectGetWidth(self.contentView.frame) - (self.layoutMargins.left + self.layoutMargins.right);
+    contentFrame.size.height = CGRectGetHeight(self.contentView.frame) - (self.layoutMargins.top + self.layoutMargins.bottom);
+    
+    CGRect frame = CGRectZero;
+    frame.origin.x = contentFrame.origin.x;
+    frame.origin.y = contentFrame.origin.y;
+    frame.size.height = contentFrame.size.height;
+    frame.size.width = contentFrame.size.height;
+    self.imageView.frame = CGRectIntegral(frame);
+    
+    CGFloat midY = CGRectGetMidY(contentFrame);
+    frame.origin.x = CGRectGetMaxX(self.imageView.frame) + kTODocumentPickerTableViewCellImagePadding;
+    frame.origin.y = ceilf(midY - self.textFontHeight);
+    frame.size.width = contentFrame.size.width - frame.origin.x;
+    frame.size.height = self.textFontHeight;
+    self.textLabel.frame = CGRectIntegral(frame);
+    
+    frame.origin.x = CGRectGetMaxX(self.imageView.frame) + kTODocumentPickerTableViewCellImagePadding;
+    frame.origin.y = ceilf(midY);
+    frame.size.width = contentFrame.size.width - frame.origin.x;
+    frame.size.height = self.detailTextFontHeight;
+    self.detailTextLabel.frame = CGRectIntegral(frame);
 }
 
 @end

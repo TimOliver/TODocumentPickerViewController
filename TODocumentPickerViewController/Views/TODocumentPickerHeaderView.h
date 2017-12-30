@@ -23,14 +23,19 @@
 #import <UIKit/UIKit.h>
 #import "TODocumentPickerSegmentedControl.h"
 
+@class TOSearchBar;
+
 @interface TODocumentPickerHeaderView : UIView
 
 /* Views */
-@property (nonatomic, readonly) UISearchBar *searchBar;
+@property (nonatomic, readonly) TOSearchBar *searchBar;
 @property (nonatomic, readonly) TODocumentPickerSegmentedControl *sortControl;
 
 /* The height from the top of the view that is clipped */
 @property (nonatomic, assign) CGFloat clippingHeight;
+
+/* Whether to show the search bar or not */
+@property (nonatomic, assign) BOOL showsSearchBar;
 
 /* Responding to text inserted into the search bar */
 @property (nonatomic, copy) void (^searchTextChangedHandler)(NSString *searchText);

@@ -43,9 +43,6 @@ NS_ASSUME_NONNULL_BEGIN
 /* Shows files that weren't on the allowed extensions list, but grayed out (Default is NO) */
 @property (nonatomic, assign) BOOL showExcludedFileExtensions;
 
-/* If dealing with custom formats, this lets you add custom icons for those formats (Images must be 40x40 points) */
-@property (nonatomic, strong, nullable) NSDictionary *fileFormatIcons;
-
 /* The default icon if the file format isn't recognized, or other icons aren't available. */
 @property (nonatomic, strong, nullable) UIImage *defaultIcon;
 

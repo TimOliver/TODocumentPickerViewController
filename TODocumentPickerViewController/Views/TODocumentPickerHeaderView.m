@@ -21,12 +21,15 @@
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #import "TODocumentPickerHeaderView.h"
+#import "TOSearchBar.h"
 
-@interface TODocumentPickerHeaderView () <UISearchBarDelegate>
+static const CGFloat kTODocumentPickerHeaderViewPadding = 5.0f;
+
+@interface TODocumentPickerHeaderView () <TOSearchBarDelegate>
 
 @property (nonatomic, strong, readwrite) UIView *clippingView;
 @property (nonatomic, strong, readwrite) UIView *containerView;
-@property (nonatomic, strong, readwrite) UISearchBar *searchBar;
+@property (nonatomic, strong, readwrite) TOSearchBar *searchBar;
 @property (nonatomic, strong, readwrite) TODocumentPickerSegmentedControl *sortControl;
 
 @end
@@ -35,7 +38,7 @@
 
 - (instancetype)init
 {
-    if (self = [super initWithFrame:(CGRect){0,0,320,88}]) {
+    if (self = [super initWithFrame:(CGRect){0,0,320,44}]) {
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         self.backgroundColor = [UIColor clearColor];
         
@@ -56,14 +59,23 @@
     self.containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     [self.clippingView addSubview:self.containerView];
 
-    self.searchBar = [[UISearchBar alloc] initWithFrame:(CGRect){0,0,320,44}];
-    self.searchBar.delegate = self;
-    self.searchBar.placeholder = @"Search";
-    self.searchBar.searchBarStyle = UISearchBarStyleMinimal;
-    [self.containerView addSubview:self.searchBar];
-
     self.sortControl = [[TODocumentPickerSegmentedControl alloc] init];
     [self.containerView addSubview:self.sortControl];
+}
+
+- (void)sizeToFit
+{
+    CGFloat height = self.layoutMargins.top + self.layoutMargins.bottom;
+    height += self.sortControl.frame.size.height;
+    
+    if (self.searchBar) {
+        height += kTODocumentPickerHeaderViewPadding;
+        height += self.searchBar.frame.size.height;
+    }
+    
+    CGRect frame = self.frame;
+    frame.size.height = height;
+    self.frame = frame;
 }
 
 - (void)didMoveToSuperview
@@ -97,28 +109,41 @@
     frame.origin.y = -clampedHeight;
     self.containerView.frame = frame;
     
+    CGFloat midY = floorf(originalHeight * 0.5f);
+    
     // Layout the child views
-    frame = self.searchBar.frame;
-    frame.size.width = self.bounds.size.width;
-    frame.size.height = 44.0f;
-    self.searchBar.frame = frame;
+    if (self.searchBar) {
+        frame = self.searchBar.frame;
+        frame.origin.x = self.layoutMargins.left;
+        frame.size.width = self.bounds.size.width - (self.layoutMargins.left + self.layoutMargins.right);
+        frame.size.height = 44.0f;
+        frame.origin.y = self.layoutMargins.top;
+        self.searchBar.frame = CGRectIntegral(frame);
+    }
     
     frame = self.sortControl.frame;
     frame.origin.x = self.layoutMargins.left;
     frame.size.width = self.bounds.size.width - (self.layoutMargins.left + self.layoutMargins.right);
-    frame.origin.y = CGRectGetMaxY(self.searchBar.frame) + 5.0f;
     frame.size.height = 33.0f;
-    self.sortControl.frame = frame;
+    if (self.searchBar) {
+        frame.origin.y = CGRectGetMaxY(self.searchBar.frame) + kTODocumentPickerHeaderViewPadding;
+    }
+    else {
+        frame.origin.y = midY - (frame.size.height * 0.5f);
+    }
+    
+    self.sortControl.frame = CGRectIntegral(frame);
 }
 
 #pragma mark - Search Bar Delegate -
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+- (void)searchBar:(TOSearchBar *)searchBar textDidChange:(NSString *)searchText
 {
-    if (self.searchTextChangedHandler)
+    if (self.searchTextChangedHandler) {
         self.searchTextChangedHandler(searchText);
+    }
 }
 
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+- (void)searchBarSearchButtonTapped:(TOSearchBar *)searchBar
 {
     [self.searchBar resignFirstResponder];
 }
@@ -147,6 +172,28 @@
 
     self.hidden = NO;
     [self setNeedsLayout];
+}
+
+- (void)setShowsSearchBar:(BOOL)showsSearchBar
+{
+    if (_showsSearchBar == showsSearchBar) {
+        return;
+    }
+    
+    _showsSearchBar = showsSearchBar;
+    
+    if (_showsSearchBar) {
+        self.searchBar = [[TOSearchBar alloc] initWithFrame:(CGRect){0,0,320,44}];
+        self.searchBar.delegate = self;
+        self.searchBar.placeholderText = @"Search";
+        [self.containerView addSubview:self.searchBar];
+    }
+    else {
+        [self.searchBar removeFromSuperview];
+        self.searchBar = nil;
+    }
+    
+    [self sizeToFit];
 }
 
 @end

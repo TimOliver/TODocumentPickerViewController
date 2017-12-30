@@ -55,14 +55,6 @@
     return _defaultIcon;
 }
 
-- (UIImage *)folderIcon
-{
-    if (_folderIcon == nil) {
-        _folderIcon = [UIImage TO_documentPickerDefaultFolderForStyle:self.style];
-    }
-
-    return _folderIcon;
-}
 
 - (void)setStyle:(TODocumentPickerViewControllerStyle)style
 {

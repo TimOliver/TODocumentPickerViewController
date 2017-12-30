@@ -26,8 +26,11 @@
 #import "TODocumentPickerItemManager.h"
 #import "TODocumentPickerItem.h"
 #import "TODocumentPickerConfiguration.h"
+#import "TODocumentPickerTableViewCell.h"
+#import "TOSearchBar.h"
+#import "UIImage+TODocumentPickerIcons.h"
 
-@interface TODocumentPickerViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface TODocumentPickerViewController () <UITableViewDelegate, UITableViewDataSource>
 
 /* Root Controller Management */
 @property (nonatomic, strong, readwrite) TODocumentPickerViewController *rootViewController;
@@ -135,34 +138,40 @@
     CGRect frame = CGRectZero;
     __weak typeof(self)weakSelf = self;
     
+    /* Load default assets */
+    [self setUpDefaultIcons];
+    
     /* Configure table */
     self.tableView = [[TODocumentPickerTableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
     self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.rowHeight = 64.0f;
+    self.tableView.cellLayoutMarginsFollowReadableWidth = NO;
     self.tableView.sectionIndexBackgroundColor = self.view.backgroundColor;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
+    
+    if (@available(iOS 11.0, *)) {
+        self.tableView.insetsContentViewsToSafeArea = NO;
+    }
 
     /* Table item manager setup */
     self.itemManager.tableView = self.tableView;
     self.itemManager.contentReloadedHandler = ^{ [weakSelf updateViewContent]; };
     
     /* Configure header view and components */
-    self.headerView = [TODocumentPickerHeaderView new];
-    self.headerView.searchTextChangedHandler = ^(NSString *searchText) {
-        weakSelf.itemManager.searchString = searchText;
-        [weakSelf showFeedbackLabelIfNeeded];
-    };
+    self.headerView = [[TODocumentPickerHeaderView alloc] init];
     
-    UIView *tableHeaderView = [[UIView alloc] initWithFrame:self.headerView.bounds];
-    tableHeaderView.backgroundColor = self.view.backgroundColor;
-    [tableHeaderView addSubview:self.headerView];
-    self.tableView.tableHeaderView = tableHeaderView;
-
     /* Handler for changing sort type */
     self.headerView.sortControl.sortTypeChangedHandler = ^{
         weakSelf.sortingType = self.headerView.sortControl.sortingType;
+    };
+    
+    /* Handler for searhc bar */
+    self.headerView.showsSearchBar = YES;
+    self.headerView.searchTextChangedHandler = ^(NSString *searchText) {
+        weakSelf.itemManager.searchString = searchText;
+        [weakSelf showFeedbackLabelIfNeeded];
     };
     
     /* Create the incidental loading indicator. */
@@ -249,6 +258,21 @@
 {
     [super viewWillAppear:animated];
 
+    /* Configure the sizing and insetting of the header now that the table view will be ready */
+    UIEdgeInsets headerInsets = UIEdgeInsetsZero;
+    headerInsets.left = self.tableView.separatorInset.left;
+    headerInsets.right = self.tableView.separatorInset.left;
+    headerInsets.top = 10.0f;
+    headerInsets.bottom = 10.0f;
+    self.headerView.layoutMargins = headerInsets;
+    [self.headerView sizeToFit];
+    
+    /* Add the header view to the table view */
+    UIView *tableHeaderView = [[UIView alloc] initWithFrame:self.headerView.bounds];
+    tableHeaderView.backgroundColor = self.view.backgroundColor;
+    [tableHeaderView addSubview:self.headerView];
+    self.tableView.tableHeaderView = tableHeaderView;
+    
     /* Absolutely make sure this view controller is being presented via navigation controller */
     if (self.navigationController == nil) {
         [NSException raise:NSInternalInconsistencyException format:@"TODocumentPickerViewController MUST be presented under a UINavigationController"];
@@ -284,7 +308,7 @@
 
 - (void)resetAfterInitialItemLoad
 {
-    /* After the initial content has loaded, add the pull-to-refresh controler */
+    /* After the initial content has loaded, add the pull-to-refresh controller */
     if (self.refreshControl == nil) {
         self.refreshControl = [[UIRefreshControl alloc] init];
         [self.refreshControl addTarget:self action:@selector(refreshControlTriggered) forControlEvents:UIControlEventValueChanged];
@@ -312,43 +336,49 @@
     self.tableView.contentOffset = contentOffset;
 }
 
-- (void)resetHeaderConstraints
+- (void)setUpFeedbackLabel
 {
-    NSInteger width = 0;
-
-    /* Work out the width of the section index view */
-    if (self.sortingType <= TODocumentPickerSortTypeNameDescending) {
-        //Extract the section index view
-        UIView *indexView = nil;
-        for (UIView *view in self.tableView.subviews) {
-            if ([NSStringFromClass([view class]) rangeOfString:@"ViewIndex"].length == 0)
-                continue;
-            
-            indexView = view;
-            break;
-        }
-        
-        width = (NSInteger)CGRectGetWidth(indexView.frame);
+    if (self.feedbackLabel != nil) {
+        return;
     }
-
-    CGFloat newWidth = CGRectGetWidth(self.tableView.bounds) - width;
-    if ((NSInteger)newWidth == (NSInteger)CGRectGetWidth(self.headerView.frame))
-        return;
-    
-    CGRect frame = self.headerView.frame;
-    frame.size.width = newWidth;
-    self.headerView.frame = frame;
-}
-
-- (void)setupFeedbackLabel
-{
-    if (self.feedbackLabel != nil)
-        return;
     
     self.feedbackLabel = [[UILabel alloc] initWithFrame:(CGRect){0,0,20,44}];
     self.feedbackLabel.font = [UIFont systemFontOfSize:14.0f];
     self.feedbackLabel.textAlignment = NSTextAlignmentCenter;
     self.feedbackLabel.textColor = [UIColor colorWithWhite:0.7f alpha:1.0f];
+}
+
+- (void)setUpDefaultIcons
+{
+    // Generate a default icon for the folder
+    if (self.configuration.folderIcon == nil) {
+        UIImage *folderIcon = nil;
+        
+        if ([self.dataSource respondsToSelector:@selector(documentPickerViewController:folderIconForStyle:)]) {
+            folderIcon = [self.dataSource documentPickerViewController:self folderIconForStyle:self.configuration.style];
+        }
+        
+        if (folderIcon == nil) {
+            folderIcon = [UIImage TO_documentPickerDefaultFolderForStyle:self.configuration.style];
+        }
+        
+        self.configuration.folderIcon = folderIcon;
+    }
+    
+    // Generate a default generic file icon
+    if (self.configuration.defaultIcon == nil) {
+        UIImage *defaultIcon = nil;
+        
+        if ([self.dataSource respondsToSelector:@selector(documentPickerViewController:fileIconForExtension:style:)]) {
+            defaultIcon = [self.dataSource documentPickerViewController:self fileIconForExtension:nil style:self.configuration.style];
+        }
+        
+        if (defaultIcon == nil) {
+            defaultIcon = [UIImage TO_documentPickerDefaultFileIconWithExtension:nil tintColor:nil style:self.configuration.style];
+        }
+        
+        self.configuration.defaultIcon = defaultIcon;
+    }
 }
 
 #pragma mark - Content Request Handling -
@@ -493,7 +523,7 @@
     if (cell == nil) {
         Class tableViewCellClass = self.configuration.tableViewCellClass;
         if (tableViewCellClass == nil) {
-            tableViewCellClass = [UITableViewCell class];
+            tableViewCellClass = [TODocumentPickerTableViewCell class];
         }
         
         cell = [[tableViewCellClass alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:identifier];
@@ -573,9 +603,7 @@
 #pragma mark - Update View Content -
 - (void)updateViewContent
 {
-    [self resetHeaderConstraints];
     [self updateToolbarItems];
-
     self.selectButton.enabled = (self.items.count > 0);
 }
 
@@ -691,8 +719,9 @@
 #pragma mark - Accessors -
 - (void)setItems:(NSArray *)items
 {
-    if (items == self.itemManager.items)
+    if (items == self.itemManager.items) {
         return;
+    }
     
     //if the items are actually 0, reset the views now,
     //but still set the value via the serial queue to ensure no collisions
@@ -703,7 +732,11 @@
     
     // perform sorting on a separate queue to ensure no hiccups in the refresh UI
     dispatch_async(self.serialQueue, ^{
-        self.itemManager.items = items;
+        
+        @autoreleasepool {
+            // Assign the new items, which will be sorted internally
+            self.itemManager.items = items;
+        }
         
         //Force the end refresh animation to happen on another iteration of the run loop
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

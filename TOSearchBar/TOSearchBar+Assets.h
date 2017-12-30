@@ -1,7 +1,7 @@
 //
-//  TODocumentPickerTableViewCell.h
+//  TOSearchBar+ImageAssets.h
 //
-//  Copyright 2015-2017 Timothy Oliver. All rights reserved.
+//  Copyright 2015-2016 Timothy Oliver. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to
@@ -20,15 +20,14 @@
 //  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
 //  IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-#import "TODocumentPickerConstants.h"
+#import "TOSearchBar.h"
 
-@interface TODocumentPickerTableViewCell : UITableViewCell
+@interface TOSearchBar (ImageAssets)
 
-@property (nonatomic, readonly) UILabel *textLabel;
-@property (nonatomic, readonly) UILabel *detailTextLabel;
-@property (nonatomic, readonly) UIImageView *imageView;
++ (UIImage *)sharedSearchBarBackground; /* The rounded rectangle for the background */
++ (UIImage *)sharedSearchIcon; /* The magnifying glads icon */
++ (UIImage *)sharedClearIcon;  /* The clear button icon. */
 
-- (void)configureCellForStyle:(TODocumentPickerViewControllerStyle)style;
++ (void)cleanUpSharedAssets; /* Called upon each `dealloc` method call to clean up any freed assets. */
 
 @end

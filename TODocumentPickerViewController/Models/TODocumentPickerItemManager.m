@@ -60,8 +60,9 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
-        if (self.contentReloadedHandler)
+        if (self.contentReloadedHandler) {
             self.contentReloadedHandler();
+        }
     });
 }
 
@@ -101,9 +102,10 @@
 - (NSArray *)filteredItemsWithItems:(NSArray *)items searchString:(NSString *)searchString
 {
     NSMutableArray *filteredItems = [NSMutableArray array];
-    [items enumerateObjectsWithOptions:0 usingBlock:^(TODocumentPickerItem *item, NSUInteger i, BOOL *stop) {
-        if ([item.fileName rangeOfString:searchString options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch)].location != NSNotFound)
+    [items enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(TODocumentPickerItem *item, NSUInteger i, BOOL *stop) {
+        if ([item.fileName rangeOfString:searchString options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch)].location != NSNotFound) {
             [filteredItems addObject:item];
+        }
     }];
     
     return [NSArray arrayWithArray:filteredItems];
@@ -136,21 +138,20 @@
 
 - (void)setItems:(NSArray *)items
 {
-    if (items == _items)
-        return;
+    if (items == _items) { return; }
     
     _items = items;
     
-    if (self.tableView == nil)
+    if (self.tableView == nil) {
         return;
+    }
     
     [self rebuildItems];
 }
 
 - (void)setSortingType:(TODocumentPickerSortType)sortingType
 {
-    if (sortingType == _sortingType)
-        return;
+    if (sortingType == _sortingType) { return; }
     
     _sortingType = sortingType;
     
@@ -162,8 +163,7 @@
 
 - (void)setSearchString:(NSString *)searchString
 {
-    if (searchString == _searchString)
-        return;
+    if (searchString == _searchString) { return; }
     
     _searchString = searchString;
     
