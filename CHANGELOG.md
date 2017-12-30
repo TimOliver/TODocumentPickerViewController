@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased
 
+## 0.2.1 - 2017-12-30
+
+### Fixed
+- Table header view not being properly obscured under the navigation bar on iPhone X.
+- Properly aligned the text label in the toolbar at the bottom.
+
 ## 0.2.0 - 2017-12-30
 
 ### Added

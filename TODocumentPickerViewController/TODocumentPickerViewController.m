@@ -225,7 +225,8 @@
         self.toolBarLabel.text = NSLocalizedString(@"Loading...", nil);
     }
 
-    UIBarButtonItem *spaceItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *spaceItemLeft = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *spaceItemRight = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem *labelItem = [[UIBarButtonItem alloc] initWithCustomView:self.toolBarLabel];
 
     /* Toolbar button elements */
@@ -237,7 +238,7 @@
                                                               action:@selector(doneButtonTapped)];
         }
 
-        self.nonEditingToolbarItems = @[self.doneButton, spaceItem, labelItem, spaceItem, spaceItem];
+        self.nonEditingToolbarItems = @[self.doneButton, spaceItemLeft, labelItem, spaceItemRight];
     }
 
     /* Set up editing buttons */
@@ -252,7 +253,7 @@
         UIBarButtonItem *actionItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:nil action:nil];
         actionItem.enabled = NO;
 
-        self.editingToolbarItems = @[actionItem, spaceItem, labelItem, spaceItem, self.chooseButton];
+        self.editingToolbarItems = @[actionItem, spaceItemLeft, labelItem, spaceItemRight, self.chooseButton];
     }
 
     [self updateToolbarItems];
@@ -645,7 +646,7 @@
     [self.headerView dismissKeyboard];
     
     //Update the header clipping, so it's not visible under translucent navigation bar
-    CGFloat navigationBarHeight = self.navigationController.navigationBar.frame.size.height;
+    CGFloat navigationBarHeight = CGRectGetMaxY(self.navigationController.navigationBar.frame);
     self.headerView.clippingHeight = navigationBarHeight + scrollView.contentOffset.y;
 }
 
