@@ -24,6 +24,77 @@
 
 @implementation UIImage (TODocumentPickerIcons)
 
++ (UIImage *)TO_downloadIcon
+{
+    UIImage *downloadIcon = nil;
+    UIGraphicsBeginImageContextWithOptions((CGSize){24,23}, NO, 0.0f);
+    {
+        //// Color Declarations
+        UIColor* downloadColor = [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: 1];
+        
+        //// cloud Drawing
+        UIBezierPath* cloudPath = [UIBezierPath bezierPath];
+        [cloudPath moveToPoint: CGPointMake(9, 15)];
+        [cloudPath addLineToPoint: CGPointMake(4.97, 15)];
+        [cloudPath addCurveToPoint: CGPointMake(1.02, 11.04) controlPoint1: CGPointMake(2.78, 15) controlPoint2: CGPointMake(1.02, 13.25)];
+        [cloudPath addCurveToPoint: CGPointMake(3.96, 6.99) controlPoint1: CGPointMake(1.02, 9.1) controlPoint2: CGPointMake(1.76, 7.08)];
+        [cloudPath addCurveToPoint: CGPointMake(3.69, 5.96) controlPoint1: CGPointMake(3.83, 6.66) controlPoint2: CGPointMake(3.69, 6.34)];
+        [cloudPath addCurveToPoint: CGPointMake(5.28, 3.57) controlPoint1: CGPointMake(3.69, 4.85) controlPoint2: CGPointMake(4.4, 4.09)];
+        [cloudPath addCurveToPoint: CGPointMake(7.15, 3.09) controlPoint1: CGPointMake(5.74, 3.3) controlPoint2: CGPointMake(6.61, 3.09)];
+        [cloudPath addCurveToPoint: CGPointMake(8.63, 3.92) controlPoint1: CGPointMake(7.95, 3.09) controlPoint2: CGPointMake(8.09, 3.4)];
+        [cloudPath addCurveToPoint: CGPointMake(9.86, 2.4) controlPoint1: CGPointMake(8.76, 3.41) controlPoint2: CGPointMake(9.45, 2.8)];
+        [cloudPath addCurveToPoint: CGPointMake(13.88, 1.04) controlPoint1: CGPointMake(10.77, 1.5) controlPoint2: CGPointMake(12.23, 1.04)];
+        [cloudPath addCurveToPoint: CGPointMake(19.09, 4.54) controlPoint1: CGPointMake(16.62, 1.04) controlPoint2: CGPointMake(18.72, 2.54)];
+        [cloudPath addCurveToPoint: CGPointMake(18.99, 6.25) controlPoint1: CGPointMake(19.19, 5.09) controlPoint2: CGPointMake(19.29, 5.79)];
+        [cloudPath addCurveToPoint: CGPointMake(22.95, 10.49) controlPoint1: CGPointMake(22.18, 5.98) controlPoint2: CGPointMake(22.95, 8.01)];
+        [cloudPath addCurveToPoint: CGPointMake(18.33, 15) controlPoint1: CGPointMake(22.95, 12.98) controlPoint2: CGPointMake(20.79, 15)];
+        [cloudPath addLineToPoint: CGPointMake(15, 15)];
+        [downloadColor setStroke];
+        cloudPath.lineWidth = 2;
+        cloudPath.lineJoinStyle = kCGLineJoinRound;
+        [cloudPath stroke];
+        
+        
+        //// arrow Drawing
+        UIBezierPath* arrowPath = [UIBezierPath bezierPath];
+        [arrowPath moveToPoint: CGPointMake(12.93, 8.61)];
+        [arrowPath addCurveToPoint: CGPointMake(13, 9.51) controlPoint1: CGPointMake(13, 8.85) controlPoint2: CGPointMake(13, 9.07)];
+        [arrowPath addLineToPoint: CGPointMake(13, 17.94)];
+        [arrowPath addCurveToPoint: CGPointMake(13, 19.22) controlPoint1: CGPointMake(13, 18.49) controlPoint2: CGPointMake(13, 18.91)];
+        [arrowPath addCurveToPoint: CGPointMake(14.5, 17.72) controlPoint1: CGPointMake(13.59, 18.63) controlPoint2: CGPointMake(14.22, 18)];
+        [arrowPath addCurveToPoint: CGPointMake(14.66, 17.56) controlPoint1: CGPointMake(14.57, 17.65) controlPoint2: CGPointMake(14.61, 17.61)];
+        [arrowPath addCurveToPoint: CGPointMake(15.21, 17.12) controlPoint1: CGPointMake(14.88, 17.34) controlPoint2: CGPointMake(15.02, 17.22)];
+        [arrowPath addCurveToPoint: CGPointMake(16.26, 17.31) controlPoint1: CGPointMake(15.56, 16.96) controlPoint2: CGPointMake(15.98, 17.03)];
+        [arrowPath addCurveToPoint: CGPointMake(16.51, 18.43) controlPoint1: CGPointMake(16.61, 17.66) controlPoint2: CGPointMake(16.68, 18.08)];
+        [arrowPath addCurveToPoint: CGPointMake(15.92, 19.13) controlPoint1: CGPointMake(16.4, 18.65) controlPoint2: CGPointMake(16.24, 18.81)];
+        [arrowPath addLineToPoint: CGPointMake(13.12, 21.93)];
+        [arrowPath addLineToPoint: CGPointMake(12.43, 22.51)];
+        [arrowPath addCurveToPoint: CGPointMake(12, 22.6) controlPoint1: CGPointMake(12.29, 22.58) controlPoint2: CGPointMake(12.15, 22.61)];
+        [arrowPath addCurveToPoint: CGPointMake(11.57, 22.51) controlPoint1: CGPointMake(11.85, 22.61) controlPoint2: CGPointMake(11.71, 22.58)];
+        [arrowPath addLineToPoint: CGPointMake(10.88, 21.93)];
+        [arrowPath addLineToPoint: CGPointMake(8.08, 19.13)];
+        [arrowPath addCurveToPoint: CGPointMake(7.51, 18.46) controlPoint1: CGPointMake(7.76, 18.81) controlPoint2: CGPointMake(7.6, 18.65)];
+        [arrowPath addCurveToPoint: CGPointMake(7.67, 17.38) controlPoint1: CGPointMake(7.32, 18.08) controlPoint2: CGPointMake(7.39, 17.66)];
+        [arrowPath addCurveToPoint: CGPointMake(8.79, 17.12) controlPoint1: CGPointMake(8.02, 17.03) controlPoint2: CGPointMake(8.44, 16.96)];
+        [arrowPath addCurveToPoint: CGPointMake(9.34, 17.56) controlPoint1: CGPointMake(8.98, 17.22) controlPoint2: CGPointMake(9.12, 17.34)];
+        [arrowPath addLineToPoint: CGPointMake(9.42, 17.64)];
+        [arrowPath addCurveToPoint: CGPointMake(11, 19.22) controlPoint1: CGPointMake(9.77, 18) controlPoint2: CGPointMake(10.41, 18.63)];
+        [arrowPath addCurveToPoint: CGPointMake(11, 17.94) controlPoint1: CGPointMake(11, 18.78) controlPoint2: CGPointMake(11, 17.94)];
+        [arrowPath addCurveToPoint: CGPointMake(11.07, 8.65) controlPoint1: CGPointMake(11, 9.07) controlPoint2: CGPointMake(11, 8.85)];
+        [arrowPath addCurveToPoint: CGPointMake(11.95, 8) controlPoint1: CGPointMake(11.21, 8.24) controlPoint2: CGPointMake(11.56, 8)];
+        [arrowPath addLineToPoint: CGPointMake(12.05, 8)];
+        [arrowPath addCurveToPoint: CGPointMake(12.93, 8.61) controlPoint1: CGPointMake(12.44, 8) controlPoint2: CGPointMake(12.79, 8.24)];
+        [arrowPath closePath];
+        [downloadColor setFill];
+        [arrowPath fill];
+        
+        downloadIcon = UIGraphicsGetImageFromCurrentImageContext();
+    }
+    UIGraphicsEndImageContext();
+    
+    return [downloadIcon imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+}
+
 + (UIImage *)TO_documentPickerDefaultFolderForStyle:(TODocumentPickerViewControllerStyle)style
 {
     BOOL darkMode = (style == TODocumentPickerViewControllerStyleDark);

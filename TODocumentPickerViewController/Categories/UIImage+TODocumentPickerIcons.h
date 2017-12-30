@@ -25,6 +25,8 @@
 
 @interface UIImage (TODocumentPickerIcons)
 
++ (UIImage *)TO_downloadIcon;
+
 + (UIImage *)TO_documentPickerDefaultFolderForStyle:(TODocumentPickerViewControllerStyle)style;
 
 + (UIImage *)TO_documentPickerFolderIconWithSize:(CGSize)size
