@@ -81,6 +81,9 @@
 /* Serial queue for posting updates to the items property asynchronously. */
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 
+/* Concurrent queue for rendering new icons */
+@property (nonatomic, strong) dispatch_queue_t mediaQueue;
+
 @end
 
 @implementation TODocumentPickerViewController
@@ -121,6 +124,7 @@
     _cellFileFont   = [UIFont systemFontOfSize:17.0f];
     _itemManager = [[TODocumentPickerItemManager alloc] init];
     _serialQueue = dispatch_queue_create("TODocumentPickerViewController.itemBuilderQueue", DISPATCH_QUEUE_SERIAL);
+    _mediaQueue = dispatch_queue_create("TODocumentPickerViewController.iconBuilderQueue", DISPATCH_QUEUE_CONCURRENT);
 }
 
 - (void)dealloc
@@ -536,7 +540,19 @@
     cell.detailTextLabel.text   = item.localizedMetadata;
     cell.accessoryType          = item.isFolder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     cell.textLabel.font         = item.isFolder ? self.cellFolderFont : self.cellFileFont;
-    cell.imageView.image        = item.isFolder ? self.configuration.folderIcon : self.configuration.defaultIcon;
+    
+    if (item.isFolder) {
+        cell.imageView.image    = self.configuration.folderIcon;
+    }
+    else {
+        NSString *fileExtension = item.fileName.pathExtension.lowercaseString;
+        if (self.configuration.fileIcons[fileExtension]) {
+            cell.imageView.image = self.configuration.fileIcons[fileExtension];
+        }
+        else {
+            cell.imageView.image = self.configuration.defaultIcon;
+        }
+    }
 
     // Give the data source a chance to perform additional configuration
     if ([self.dataSource respondsToSelector:@selector(documentPickerViewController:configureCell:withItem:)]) {
@@ -547,6 +563,43 @@
 }
 
 #pragma mark - Table View Delegate -
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Get the item coming up
+    TODocumentPickerItem *item = [self.itemManager itemForIndexPath:indexPath];
+    
+    // See if it has a file extension, cancel if it does not
+    NSString *fileExtension = [item.fileName.pathExtension lowercaseString];
+    if (fileExtension.length == 0) { return; }
+    
+    // Check if we already have an icon for it
+    if (self.configuration.fileIcons[fileExtension]) { return; }
+    
+    // Kick off a new thread to render the new icon
+    __weak typeof(self) weakSelf = self;
+    dispatch_async(self.mediaQueue, ^{
+        @autoreleasepool {
+            UIImage *fileIcon = nil;
+            if ([self.dataSource respondsToSelector:@selector(documentPickerViewController:fileIconForExtension:style:)]) {
+                fileIcon = [self.dataSource documentPickerViewController:self fileIconForExtension:fileExtension style:self.configuration.style];
+            }
+            
+            if (fileIcon == nil) {
+                fileIcon = [UIImage TO_documentPickerDefaultFileIconWithExtension:fileExtension tintColor:weakSelf.view.tintColor style:self.configuration.style];
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                weakSelf.configuration.fileIcons[fileExtension] = fileIcon;
+                
+                UITableViewCell *cell = [weakSelf.tableView cellForRowAtIndexPath:indexPath];
+                if (cell) {
+                    cell.imageView.image = fileIcon;
+                }
+            });
+        }
+    });
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // If editing, update the UI state, but otherwise let the table do its thing

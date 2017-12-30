@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) UIImage *folderIcon;
 
 /* A dictionary of file extension strings to images to use as icons for each file format. */
-@property (nonatomic, strong, nullable) NSDictionary *fileIcons;
+@property (nonatomic, strong, null_resettable) NSMutableDictionary *fileIcons;
 
 /* If desired, a custom table view cell class that can contain additional controls or formatting. */
 @property (nonatomic, assign, nullable) Class tableViewCellClass;

@@ -39,6 +39,7 @@
     if (self = [super init]) {
         _showToolbar = YES;
         _theme = [[TODocumentPickerTheme alloc] init];
+        _fileIcons = [NSMutableDictionary dictionary];
     }
 
     return self;
@@ -63,6 +64,17 @@
     
     _defaultIcon = nil;
     _defaultIcon = nil;
+}
+
+- (void)setFileIcons:(NSMutableDictionary *)fileIcons
+{
+    if (fileIcons == _fileIcons) { return; }
+    
+    _fileIcons = fileIcons;
+    
+    if (_fileIcons == nil) {
+        _fileIcons = [NSMutableDictionary dictionary];
+    }
 }
 
 @end
