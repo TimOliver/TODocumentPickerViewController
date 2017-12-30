@@ -643,14 +643,10 @@
 {
     //Dismiss the keyboard if it's visible
     [self.headerView dismissKeyboard];
-
-    //Update the header clipping, so it's not visible under translucent bars
-    if (@available(iOS 11.0, *)) {
-        self.headerView.clippingHeight = scrollView.adjustedContentInset.top + scrollView.contentOffset.y;
-    }
-    else {
-        self.headerView.clippingHeight = scrollView.contentInset.top + scrollView.contentOffset.y;
-    }
+    
+    //Update the header clipping, so it's not visible under translucent navigation bar
+    CGFloat navigationBarHeight = self.navigationController.navigationBar.frame.size.height;
+    self.headerView.clippingHeight = navigationBarHeight + scrollView.contentOffset.y;
 }
 
 #pragma mark - Update View Content -
