@@ -44,6 +44,7 @@
 {
     if (self = [super init]) {
         _rootFilePath = [TODocumentPickerLocalDiskDataSource formattedRootFilePath:folderPath];
+        self.rootFolderName = _rootFilePath.lastPathComponent;
     }
 
     return self;
