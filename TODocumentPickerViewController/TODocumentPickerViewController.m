@@ -302,15 +302,6 @@
     /* Set-up the toolbar */
     [self configureToolbar];
     
-    /* Configure the sizing and insetting of the header now that the table view will be ready */
-    UIEdgeInsets headerInsets = UIEdgeInsetsZero;
-    headerInsets.left = self.tableView.separatorInset.left;
-    headerInsets.right = self.tableView.separatorInset.left;
-    headerInsets.top = 10.0f;
-    headerInsets.bottom = 10.0f;
-    self.headerView.layoutMargins = headerInsets;
-    [self.headerView sizeToFit];
-    
     /* Add the header view to the table view */
     UIView *tableHeaderView = [[UIView alloc] initWithFrame:self.headerView.bounds];
     tableHeaderView.backgroundColor = self.view.backgroundColor;
@@ -348,6 +339,15 @@
         [self resetTableViewInitialOffset];
         self.viewInitiallyLaidOut = YES;
     }
+    
+    /* Configure the sizing and insetting of the header now that the table view will be ready */
+    UIEdgeInsets headerInsets = UIEdgeInsetsZero;
+    headerInsets.left = self.tableView.separatorInset.left;
+    headerInsets.right = self.tableView.separatorInset.left;
+    headerInsets.top = 10.0f;
+    headerInsets.bottom = 10.0f;
+    self.headerView.layoutMargins = headerInsets;
+    [self.headerView sizeToFit];
 }
 
 - (void)resetAfterInitialItemLoad

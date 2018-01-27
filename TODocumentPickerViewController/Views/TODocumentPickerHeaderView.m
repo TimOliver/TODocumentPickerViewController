@@ -136,6 +136,12 @@ static const CGFloat kTODocumentPickerHeaderMaxWidth = 640.0f;
     self.sortControl.frame = CGRectIntegral(frame);
 }
 
+- (void)layoutMarginsDidChange
+{
+    [super layoutMarginsDidChange];
+    [self setNeedsLayout];
+}
+
 #pragma mark - Search Bar Delegate -
 - (void)searchBar:(TOSearchBar *)searchBar textDidChange:(NSString *)searchText
 {
