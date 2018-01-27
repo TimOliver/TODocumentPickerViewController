@@ -230,14 +230,21 @@
 
     /* Toolbar button elements */
     if (self.nonEditingToolbarItems == nil) {
-        if (self.doneButton == nil) {
-            self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil)
-                                                               style:UIBarButtonItemStyleDone
-                                                              target:self
-                                                              action:@selector(doneButtonTapped)];
+        
+        /* Don't add a 'Done' button if we're not being presented modally */
+        if (self.presentingViewController) {
+            if (self.doneButton == nil) {
+                self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil)
+                                                                   style:UIBarButtonItemStyleDone
+                                                                  target:self
+                                                                  action:@selector(doneButtonTapped)];
+            }
+            
+            self.nonEditingToolbarItems = @[self.doneButton, spaceItemLeft, labelItem, spaceItemRight];
         }
-
-        self.nonEditingToolbarItems = @[self.doneButton, spaceItemLeft, labelItem, spaceItemRight];
+        else {
+            self.nonEditingToolbarItems = @[spaceItemLeft, labelItem, spaceItemRight];
+        }
     }
 
     /* Set up editing buttons */
