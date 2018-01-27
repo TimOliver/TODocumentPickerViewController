@@ -151,7 +151,6 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.rowHeight = 64.0f;
-    self.tableView.cellLayoutMarginsFollowReadableWidth = NO;
     self.tableView.sectionIndexBackgroundColor = self.view.backgroundColor;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
     
@@ -262,7 +261,15 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
+    
+    if (self.dataSource == nil) {
+        NSException *exception = [NSException exceptionWithName:NSInternalInconsistencyException
+                                                         reason:@"TODocumentPickerViewController: A data source must be set before the view controller is presented"
+                                                       userInfo:nil];
+        [exception raise];
+        return;
+    }
+    
     /* Configure the sizing and insetting of the header now that the table view will be ready */
     UIEdgeInsets headerInsets = UIEdgeInsetsZero;
     headerInsets.left = self.tableView.separatorInset.left;
@@ -823,7 +830,7 @@
 
 - (id<TODocumentPickerViewControllerDataSource>)dataSource
 {
-    if (_dataSource == nil) {
+    if (_dataSource == nil && self != self.rootViewController) {
         return self.rootViewController.dataSource;
     }
 

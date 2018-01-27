@@ -24,6 +24,7 @@
 #import "TOSearchBar.h"
 
 static const CGFloat kTODocumentPickerHeaderViewPadding = 5.0f;
+static const CGFloat kTODocumentPickerHeaderMaxWidth = 640.0f;
 
 @interface TODocumentPickerHeaderView () <TOSearchBarDelegate>
 
@@ -114,16 +115,16 @@ static const CGFloat kTODocumentPickerHeaderViewPadding = 5.0f;
     // Layout the child views
     if (self.searchBar) {
         frame = self.searchBar.frame;
-        frame.origin.x = self.layoutMargins.left;
-        frame.size.width = self.bounds.size.width - (self.layoutMargins.left + self.layoutMargins.right);
+        frame.size.width = MIN(kTODocumentPickerHeaderMaxWidth, self.bounds.size.width - (self.layoutMargins.left + self.layoutMargins.right));
         frame.size.height = 44.0f;
         frame.origin.y = self.layoutMargins.top;
+        frame.origin.x = CGRectGetMidX(self.bounds) - (frame.size.width * 0.5f);
         self.searchBar.frame = CGRectIntegral(frame);
     }
     
     frame = self.sortControl.frame;
-    frame.origin.x = self.layoutMargins.left;
-    frame.size.width = self.bounds.size.width - (self.layoutMargins.left + self.layoutMargins.right);
+    frame.size.width = MIN(kTODocumentPickerHeaderMaxWidth, self.bounds.size.width - (self.layoutMargins.left + self.layoutMargins.right));
+    frame.origin.x = CGRectGetMidX(self.bounds) - (frame.size.width * 0.5f);
     frame.size.height = 33.0f;
     if (self.searchBar) {
         frame.origin.y = CGRectGetMaxY(self.searchBar.frame) + kTODocumentPickerHeaderViewPadding;
