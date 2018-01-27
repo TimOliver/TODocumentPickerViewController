@@ -194,9 +194,6 @@
 
     /* Set-up Select All button */
     self.selectAllButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Select All", @"") style:UIBarButtonItemStylePlain target:self action:@selector(selectAllButtonTapped)];
-
-    /* Set-up the toolbar */
-    [self configureToolbar];
 }
 
 - (void)configureToolbar
@@ -228,23 +225,48 @@
     UIBarButtonItem *spaceItemRight = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem *labelItem = [[UIBarButtonItem alloc] initWithCustomView:self.toolBarLabel];
 
-    /* Toolbar button elements */
+    /* Toolbar button elements when not in 'Select' mode */
     if (self.nonEditingToolbarItems == nil) {
         
-        /* Don't add a 'Done' button if we're not being presented modally */
-        if (self.presentingViewController) {
-            if (self.doneButton == nil) {
-                self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil)
-                                                                   style:UIBarButtonItemStyleDone
-                                                                  target:self
-                                                                  action:@selector(doneButtonTapped)];
-            }
-            
-            self.nonEditingToolbarItems = @[self.doneButton, spaceItemLeft, labelItem, spaceItemRight];
+        NSMutableArray *barItems = [NSMutableArray array];
+        
+        /* Configure left side of toolbar */
+        if (self.configuration.toolbarLeftItems) {
+            [barItems addObjectsFromArray:self.configuration.toolbarLeftItems];
         }
         else {
-            self.nonEditingToolbarItems = @[spaceItemLeft, labelItem, spaceItemRight];
+            /* Don't add a 'Done' button if we're not being presented modally */
+            if (self.presentingViewController) {
+                if (self.doneButton == nil) {
+                    self.doneButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", nil)
+                                                                       style:UIBarButtonItemStyleDone
+                                                                      target:self
+                                                                      action:@selector(doneButtonTapped)];
+                }
+                
+                [barItems addObject:self.doneButton];
+            }
         }
+        
+        // Add the flexible element to center the label if there are less than 2 bar items on the left side
+        if (barItems.count < 2) {
+            [barItems addObject:spaceItemLeft];
+        }
+        
+        // Add the label
+        [barItems addObject:labelItem];
+        
+        // Add spacing if there's less than 2 items on the right side
+        if (self.configuration.toolbarRightItems.count < 2) {
+            [barItems addObject:spaceItemRight];
+        }
+       
+        // Add right items
+        if (self.configuration.toolbarRightItems) {
+            [barItems addObjectsFromArray:self.configuration.toolbarRightItems];
+        }
+        
+        self.nonEditingToolbarItems = [NSArray arrayWithArray:barItems];
     }
 
     /* Set up editing buttons */
@@ -276,6 +298,9 @@
         [exception raise];
         return;
     }
+    
+    /* Set-up the toolbar */
+    [self configureToolbar];
     
     /* Configure the sizing and insetting of the header now that the table view will be ready */
     UIEdgeInsets headerInsets = UIEdgeInsetsZero;

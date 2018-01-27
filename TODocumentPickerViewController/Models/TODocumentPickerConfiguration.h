@@ -37,6 +37,12 @@ NS_ASSUME_NONNULL_BEGIN
 /* Whether this controller shows and manages the navigation controller toolbar (Default is YES) */
 @property (nonatomic, assign) BOOL showToolbar;
 
+/* When not in 'Select' mode, the bar button items on the left hand side of the toolbar */
+@property (nonatomic, strong) NSArray<UIBarButtonItem *> *toolbarLeftItems;
+
+/* When not in 'Select' mode, the bar button items on the right hand side of the toolbar */
+@property (nonatomic, strong) NSArray<UIBarButtonItem *> *toolbarRightItems;
+
 /* File formats that may be selected by this controller. (If nil, all files may be selected) */
 @property (nonatomic, strong, nullable) NSArray *allowedFileExtensions;
 
