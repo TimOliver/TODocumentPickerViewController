@@ -713,6 +713,7 @@
         self.feedbackLabel.font = [UIFont systemFontOfSize:16.0f];
         self.feedbackLabel.textColor = [UIColor colorWithWhite:0.8f alpha:1.0f];
         self.feedbackLabel.textAlignment = NSTextAlignmentCenter;
+        self.feedbackLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
         [self.tableView addSubview:self.feedbackLabel];
     }
 
