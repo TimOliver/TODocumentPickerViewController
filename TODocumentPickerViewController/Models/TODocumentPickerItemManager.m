@@ -102,7 +102,7 @@
 - (NSArray *)filteredItemsWithItems:(NSArray *)items searchString:(NSString *)searchString
 {
     NSMutableArray *filteredItems = [NSMutableArray array];
-    [items enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(TODocumentPickerItem *item, NSUInteger i, BOOL *stop) {
+    [items enumerateObjectsUsingBlock:^(TODocumentPickerItem *item, NSUInteger i, BOOL *stop) {
         if ([item.fileName rangeOfString:searchString options:(NSCaseInsensitiveSearch|NSDiacriticInsensitiveSearch)].location != NSNotFound) {
             [filteredItems addObject:item];
         }
