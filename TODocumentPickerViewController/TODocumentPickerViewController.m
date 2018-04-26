@@ -615,6 +615,8 @@
     // Check if we already have an icon for it
     if (self.configuration.fileIcons[fileExtension]) { return; }
     
+    UIColor *tintColor = self.view.tintColor;
+
     // Kick off a new thread to render the new icon
     __weak typeof(self) weakSelf = self;
     dispatch_async(self.mediaQueue, ^{
@@ -625,7 +627,7 @@
             }
             
             if (fileIcon == nil) {
-                fileIcon = [UIImage TO_documentPickerDefaultFileIconWithExtension:fileExtension tintColor:weakSelf.view.tintColor style:self.configuration.style];
+                fileIcon = [UIImage TO_documentPickerDefaultFileIconWithExtension:fileExtension tintColor:tintColor style:self.configuration.style];
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
