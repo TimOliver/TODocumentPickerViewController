@@ -37,7 +37,7 @@ All of the necessary source files are in `TODocumentPickerViewController`. Simpl
 While copies have been placed in this repo to minimise the need to download multiple other repos, be sure to check to see if there have been updates on their main repos.
 
 ## Technical Requirements
-iOS 9.0 or above.
+iOS 15.0 or above.
 
 ## License
 TODocumentPickerViewControlleris licensed under the MIT License. Please see the LICENSE file for more information. ![analytics](https://ga-beacon.appspot.com/UA-5643664-16/TODocumentPickerViewController/README.md?pixel)
