@@ -178,7 +178,7 @@
     };
     
     /* Create the incidental loading indicator. */
-    self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
     self.loadingView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
     frame = self.loadingView.frame;
     frame.origin.x = (CGRectGetWidth(self.tableView.bounds) - CGRectGetWidth(frame)) * 0.5f;
